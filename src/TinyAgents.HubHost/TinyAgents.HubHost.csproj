@@ -20,7 +20,7 @@
         <PackageReference Include="Azure.Identity" Version="1.11.3"/>
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.13.0"/>
         <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.13.0-alpha"/>
-        <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.11.1-alpha"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.13.0-alpha" />
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.OpenApi" Version="1.13.0-alpha"/>
         <PackageReference Include="Serilog" Version="3.1.1"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.1"/>

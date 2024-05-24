@@ -37,7 +37,7 @@ internal sealed class LocationPlugin
         return "Unknown";
     }
 
-    public static Task<LocationPlugin> AddTo(Kernel kernel)
+    public static Task<LocationPlugin> ScopeTo(Kernel kernel)
     {
         var mapsSearchClient = kernel.Services.GetRequiredKeyedService<MapsSearchClient>(nameof(LocationPlugin));
         var plugin = new LocationPlugin(mapsSearchClient);

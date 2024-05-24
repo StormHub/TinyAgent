@@ -22,7 +22,7 @@ internal sealed class TripAssistant(IKernelBuilder kernelBuilder, string modelId
     {
         var kernel = kernelBuilder.Build();
 
-        await LocationPlugin.AddTo(kernel);
+        await LocationPlugin.ScopeTo(kernel);
 
         var configuration =
             kernel.Services.GetRequiredKeyedService<OpenAIAssistantConfiguration>(nameof(OpenAIAssistantAgent));

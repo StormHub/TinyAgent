@@ -15,12 +15,17 @@ internal static class DependencyInjection
         services.AddOptions<OpenAIOptions>()
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
+        
+        services.AddOptions<AssistantOptions>()
+            .BindConfiguration(nameof(AssistantOptions))
+            .ValidateDataAnnotations();
 
         services.AddOptions<LocationOptions>()
             .BindConfiguration(nameof(LocationOptions))
             .ValidateDataAnnotations();
 
         services.AddHttpClient(nameof(OpenAIClient));
+        services.AddHttpClient(nameof(AssistantOptions));
         services.AddHttpClient(nameof(MapsSearchClient));
 
         services.AddTransient(provider =>
@@ -43,40 +48,51 @@ internal static class DependencyInjection
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = factory.CreateClient(nameof(OpenAIClient));
 
-            var options = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+            var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
 
             var builder = Kernel.CreateBuilder();
-            if (!string.IsNullOrEmpty(options.ApiKey))
+            if (!string.IsNullOrEmpty(openAIOptions.ApiKey))
+            {
                 builder.AddAzureOpenAIChatCompletion(
-                    options.ModelId,
-                    options.Uri.ToString(),
-                    options.ApiKey,
-                    options.ModelId,
-                    options.ModelId,
-                    httpClient);
+                    openAIOptions.ModelId,
+                    openAIOptions.Uri.ToString(),
+                    openAIOptions.ApiKey,
+                    openAIOptions.ModelId,
+                    openAIOptions.ModelId,
+                    httpClient: factory.CreateClient(nameof(OpenAIClient)));
+            }
             else
+            {
                 builder.AddOpenAIChatCompletion(
-                    options.ModelId,
-                    apiKey: options.ApiKey,
-                    endpoint: options.Uri);
+                    openAIOptions.ModelId,
+                    apiKey: openAIOptions.ApiKey,
+                    endpoint: openAIOptions.Uri, 
+                    httpClient: factory.CreateClient(nameof(OpenAIClient)));
+            }
 
-            builder.Services.AddKeyedSingleton(nameof(OpenAIAssistantAgent),
-                new OpenAIAssistantConfiguration(options.ApiKey, options.Uri.ToString())
+            var assistantOptions = provider.GetRequiredService<IOptions<AssistantOptions>>().Value;
+
+            builder.Services.AddKeyedSingleton(
+                nameof(OpenAIAssistantAgent),
+                new OpenAIAssistantConfiguration(
+                    assistantOptions.ApiKey,
+                    assistantOptions.Uri.ToString())
                 {
-                    HttpClient = httpClient
+                    HttpClient = factory.CreateClient(nameof(AssistantOptions))
                 });
 
-            builder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
-            builder.Services.AddKeyedSingleton(nameof(LocationPlugin), provider.GetRequiredService<MapsSearchClient>());
+            builder.Services.AddKeyedSingleton(
+                nameof(LocationPlugin), 
+                provider.GetRequiredService<MapsSearchClient>());
 
+            builder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
             return builder;
         });
 
         services.AddTransient(provider =>
         {
-            var options = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+            var options = provider.GetRequiredService<IOptions<AssistantOptions>>().Value;
             return new TripAssistant(
                 provider.GetRequiredService<IKernelBuilder>(),
                 options.ModelId);
