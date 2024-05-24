@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
-using Microsoft.SemanticKernel;
 using Azure.Maps.Search;
+using Microsoft.SemanticKernel;
 
 namespace TinyAgents.HubHost.Agents;
 
@@ -14,9 +14,11 @@ internal sealed class LocationPlugin
     }
 
     [KernelFunction("FindGpsPosition")]
-    [Description("Find GPS positions in 'latitude, longitude' string format for postal address, postcode, suburbs in Australia")]
+    [Description(
+        "Find GPS positions in 'latitude, longitude' string format for postal address, postcode, suburbs in Australia")]
     public async Task<string> FindGpsPosition(
-        [Description("Postal address, postcode, suburbs in Australia to search for")] string location)
+        [Description("Postal address, postcode, suburbs in Australia to search for")]
+        string location)
     {
         var response = await _mapsSearchClient.SearchAddressAsync(location);
         var results = response?.Value?.Results;
@@ -35,10 +37,11 @@ internal sealed class LocationPlugin
         return "Unknown";
     }
 
-    public static Task<LocationPlugin> Create(Kernel kernel)
+    public static Task<LocationPlugin> AddTo(Kernel kernel)
     {
         var mapsSearchClient = kernel.Services.GetRequiredKeyedService<MapsSearchClient>(nameof(LocationPlugin));
         var plugin = new LocationPlugin(mapsSearchClient);
+        kernel.Plugins.AddFromObject(plugin);
         return Task.FromResult(plugin);
     }
 }

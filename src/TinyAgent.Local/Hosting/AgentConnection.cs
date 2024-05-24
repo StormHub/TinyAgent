@@ -1,20 +1,23 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Options;
 
 namespace TinyAgent.Local.Hosting;
 
 internal sealed class AgentConnection : IAsyncDisposable
 {
     private readonly HubConnection _connection;
-    private readonly AgentOptions _options;
-
     public AgentConnection(IOptions<AgentOptions> options)
     {
-        _options = options.Value;
-        var uri = new Uri(_options.Uri, _options.ChannelName);
+        var options1 = options.Value;
+        var uri = new Uri(options1.Uri, options1.ChannelName);
         _connection = new HubConnectionBuilder()
             .WithUrl(uri)
             .Build();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _connection.DisposeAsync();
     }
 
     public async Task Start(CancellationToken cancellationToken)
@@ -23,7 +26,7 @@ internal sealed class AgentConnection : IAsyncDisposable
 
         foreach (var input in ConsoleInput(cancellationToken))
         {
-            var result = _connection.StreamAsync<string>("Streaming", input, cancellationToken: cancellationToken);
+            var result = _connection.StreamAsync<string>("Streaming", input, cancellationToken);
             await foreach (var message in result)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -41,12 +44,7 @@ internal sealed class AgentConnection : IAsyncDisposable
         {
             Console.Write("User > ");
             var input = Console.ReadLine();
-            if (!string.IsNullOrEmpty(input))
-            {
-                yield return input;
-            }
+            if (!string.IsNullOrEmpty(input)) yield return input;
         }
     }
-
-    public async ValueTask DisposeAsync() => await _connection.DisposeAsync();
 }

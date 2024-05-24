@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Agents.OpenAI;
-using Azure;
+﻿using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core.Pipeline;
-using Azure.Identity;
 using Azure.Maps.Search;
+using Microsoft.Extensions.Options;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Agents.OpenAI;
 
 namespace TinyAgents.HubHost.Agents;
 
@@ -49,28 +48,19 @@ internal static class DependencyInjection
             var options = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
 
             var builder = Kernel.CreateBuilder();
-
-            builder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
             if (!string.IsNullOrEmpty(options.ApiKey))
-            {
                 builder.AddAzureOpenAIChatCompletion(
-                    options.TextGenerationDeploymentName,
+                    options.ModelId,
                     options.Uri.ToString(),
                     options.ApiKey,
-                    options.TextGenerationDeploymentName,
-                    options.TextGenerationDeploymentName,
+                    options.ModelId,
+                    options.ModelId,
                     httpClient);
-            }
             else
-            {
-                builder.AddAzureOpenAIChatCompletion(
-                    options.TextGenerationDeploymentName,
-                    options.Uri.ToString(),
-                    new DefaultAzureCredential(),
-                    options.TextGenerationDeploymentName,
-                    options.TextGenerationDeploymentName,
-                    httpClient);
-            }
+                builder.AddOpenAIChatCompletion(
+                    options.ModelId,
+                    apiKey: options.ApiKey,
+                    endpoint: options.Uri);
 
             builder.Services.AddKeyedSingleton(nameof(OpenAIAssistantAgent),
                 new OpenAIAssistantConfiguration(options.ApiKey, options.Uri.ToString())
@@ -78,6 +68,7 @@ internal static class DependencyInjection
                     HttpClient = httpClient
                 });
 
+            builder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
             builder.Services.AddKeyedSingleton(nameof(LocationPlugin), provider.GetRequiredService<MapsSearchClient>());
 
             return builder;
@@ -88,7 +79,7 @@ internal static class DependencyInjection
             var options = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
             return new TripAssistant(
                 provider.GetRequiredService<IKernelBuilder>(),
-                options.TextGenerationDeploymentName);
+                options.ModelId);
         });
 
         return services;

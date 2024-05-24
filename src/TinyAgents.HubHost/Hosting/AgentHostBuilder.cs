@@ -24,7 +24,9 @@ internal static class AgentHostBuilder
     {
         // Fallback before configuration can be loaded
         var logger = new LoggerConfiguration()
-            .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {CorrelationId} {Level:u3}] {Username} {Message:lj}{NewLine}{Exception}")
+            .WriteTo.Console(
+                outputTemplate:
+                "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {CorrelationId} {Level:u3}] {Username} {Message:lj}{NewLine}{Exception}")
             .CreateBootstrapLogger();
 
         builder.UseSerilog((hostContext, provider, configuration) =>

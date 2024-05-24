@@ -64,7 +64,7 @@
             },
             "Microsoft.Extensions.Http.Polly": {
               "target": "Package",
-              "version": "[8.0.4, )"
+              "version": "[8.0.5, )"
             },
             "Microsoft.Extensions.Options.DataAnnotations": {
               "target": "Package",
@@ -72,11 +72,11 @@
             },
             "Microsoft.SemanticKernel": {
               "target": "Package",
-              "version": "[1.11.1, )"
+              "version": "[1.13.0, )"
             },
             "Microsoft.SemanticKernel.Agents.Core": {
               "target": "Package",
-              "version": "[1.11.1-alpha, )"
+              "version": "[1.13.0-alpha, )"
             },
             "Microsoft.SemanticKernel.Agents.OpenAI": {
               "target": "Package",
@@ -84,7 +84,7 @@
             },
             "Microsoft.SemanticKernel.Plugins.OpenApi": {
               "target": "Package",
-              "version": "[1.11.1-alpha, )"
+              "version": "[1.13.0-alpha, )"
             },
             "Serilog": {
               "target": "Package",

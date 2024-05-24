@@ -5,23 +5,17 @@ using TinyAgents.HubHost.Agents;
 
 namespace TinyAgents.HubHost.Hosting;
 
-internal sealed class AgentHub : Hub
+internal sealed class AgentHub(TripAssistant agentBuilder) : Hub
 {
-    private readonly TripAssistant _agentBuilder;
-    private static readonly ConcurrentDictionary<string, TripAssistant.Session> _sessions = new();
-
-    public AgentHub(TripAssistant agentBuilder)
-    {
-        _agentBuilder = agentBuilder;
-    }
+    private static readonly ConcurrentDictionary<string, TripAssistant.Session> Sessions = new();
 
     public override async Task OnConnectedAsync()
     {
         var id = Context.ConnectionId;
-        if (!_sessions.TryGetValue(id, out var session))
+        if (!Sessions.TryGetValue(id, out var session))
         {
-            session = await _agentBuilder.CreateSession();
-            _sessions.AddOrUpdate(id, (k) => session, (k, v) => session);
+            session = await agentBuilder.CreateSession();
+            Sessions.AddOrUpdate(id, _ => session, (_, _) => session);
         }
 
         await base.OnConnectedAsync();
@@ -30,27 +24,20 @@ internal sealed class AgentHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var id = Context.ConnectionId;
-        if (_sessions.TryRemove(id, out var session))
-        {
-            await session.DisposeAsync();
-        }
+        if (Sessions.TryRemove(id, out var session)) await session.DisposeAsync();
 
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async IAsyncEnumerable<string> Streaming(string input, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<string> Streaming(string input,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var id = Context.ConnectionId;
-        if (_sessions.TryGetValue(id, out var session))
-        {
+        if (Sessions.TryGetValue(id, out var session))
             await foreach (var message in session.Invoke(input, cancellationToken))
             {
                 var content = message.Content;
-                if (!string.IsNullOrEmpty(content))
-                {
-                    yield return content;
-                }
+                if (!string.IsNullOrEmpty(content)) yield return content;
             }
-        }
     }
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TinyAgents.HubHost")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+853e8f9260f220199ea202ea0d679b8fae5581c5")]
 [assembly: System.Reflection.AssemblyProductAttribute("TinyAgents.HubHost")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TinyAgents.HubHost")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

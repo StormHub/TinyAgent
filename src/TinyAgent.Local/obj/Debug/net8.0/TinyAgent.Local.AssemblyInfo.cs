@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TinyAgent.Local")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+853e8f9260f220199ea202ea0d679b8fae5581c5")]
 [assembly: System.Reflection.AssemblyProductAttribute("TinyAgent.Local")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TinyAgent.Local")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

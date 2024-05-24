@@ -71,3 +71,4 @@
 /Users/johnny/development/Github/TinyAgent/src/TinyAgents.HubHost/obj/Debug/net8.0/TinyAgents.HubHost.pdb
 /Users/johnny/development/Github/TinyAgent/src/TinyAgents.HubHost/obj/Debug/net8.0/TinyAgents.HubHost.genruntimeconfig.cache
 /Users/johnny/development/Github/TinyAgent/src/TinyAgents.HubHost/obj/Debug/net8.0/ref/TinyAgents.HubHost.dll
+/Users/johnny/development/Github/TinyAgent/src/TinyAgents.HubHost/obj/Debug/net8.0/TinyAgents.HubHost.sourcelink.json
