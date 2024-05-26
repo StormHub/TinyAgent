@@ -58,6 +58,7 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
         {
             var settings = new OpenAIPromptExecutionSettings
             {
+                Temperature = 0,
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
             };
             

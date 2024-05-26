@@ -30,8 +30,8 @@ internal sealed class LocationPlugin
         var buffer = new StringBuilder();
         var position = results[0].Position;
 
-        buffer.AppendLine($" - latitude: {position.Latitude}");
-        buffer.AppendLine($" - longitude: {position.Longitude}");
+        buffer.AppendLine($"latitude: {position.Latitude}");
+        buffer.AppendLine($"longitude: {position.Longitude}");
 
         return buffer.ToString();
     }
@@ -46,17 +46,26 @@ internal sealed class LocationPlugin
         {
             Coordinates = new GeoPosition(longitude, latitude)
         };
+        
         var response = await _mapsSearchClient.ReverseSearchAddressAsync(options);
+        var address = response.Value.Addresses.Count > 0 
+            ? response.Value.Addresses[0] 
+            : default;
+        
         var buffer = new StringBuilder();
-        foreach (var address in response.Value.Addresses)
+        if (address is not null)
         {
-            buffer.AppendLine($" - latitude, longitude: {address.Position}");
-            buffer.AppendLine($" - street number: {address.Address.StreetNumber}");
-            buffer.AppendLine($" - street name: {address.Address.StreetName}");
-            buffer.AppendLine($" - suburb: {address.Address.MunicipalitySubdivision}");
-            buffer.AppendLine($" - state: {address.Address.CountrySubdivision}");
-            buffer.AppendLine($" - postcode: {address.Address.PostalCode}");
-            buffer.AppendLine($" - country: {address.Address.Country}");
+            buffer.AppendLine($"latitude, longitude: {address.Position}");
+            buffer.AppendLine($"street number: {address.Address.StreetNumber}");
+            buffer.AppendLine($"street name: {address.Address.StreetName}");
+            buffer.AppendLine($"suburb: {address.Address.MunicipalitySubdivision}");
+            buffer.AppendLine($"state: {address.Address.CountrySubdivision}");
+            buffer.AppendLine($"postcode: {address.Address.PostalCode}");
+            buffer.AppendLine($"country: {address.Address.Country}");
+        }
+        else
+        {
+            buffer.AppendLine("Unknown");
         }
 
         return buffer.ToString();

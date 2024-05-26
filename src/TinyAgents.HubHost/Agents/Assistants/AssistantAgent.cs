@@ -14,13 +14,13 @@ internal sealed class AssistantAgent : IAsyncDisposable
     internal AssistantAgent(KernelAgent agent)
     {
         _agent = agent;
-        _chat = new AgentGroupChat(_agent);
+        _chat = new AgentGroupChat();
     }
 
     public async IAsyncEnumerable<ChatMessageContent> Invoke(string input, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         _chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, input));
-        await foreach (var content in _chat.InvokeAsync(cancellationToken))
+        await foreach (var content in _chat.InvokeAsync(_agent, cancellationToken))
         {
             yield return content;
         }

@@ -4,7 +4,6 @@ IHost? host = default;
 try
 {
     host = AgentHostBuilder.Build(args);
-
     await host.RunAsync();
 }
 catch (Exception ex)
