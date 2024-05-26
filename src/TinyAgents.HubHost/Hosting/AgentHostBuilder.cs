@@ -12,7 +12,7 @@ internal static class AgentHostBuilder
         builder.Host.UseLogging();
 
         builder.Services.AddSignalR();
-        builder.Services.AddApplication();
+        builder.Services.AddApplication(builder.Configuration);
 
         var app = builder.Build();
         app.MapHub<AgentHub>("/agent");

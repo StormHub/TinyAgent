@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TinyAgents.HubHost.Agents;
+namespace TinyAgents.HubHost.Agents.Locations;
 
 public sealed class LocationOptions
 {

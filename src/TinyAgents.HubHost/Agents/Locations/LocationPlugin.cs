@@ -2,7 +2,7 @@
 using Azure.Maps.Search;
 using Microsoft.SemanticKernel;
 
-namespace TinyAgents.HubHost.Agents;
+namespace TinyAgents.HubHost.Agents.Locations;
 
 internal sealed class LocationPlugin
 {
@@ -13,12 +13,10 @@ internal sealed class LocationPlugin
         _mapsSearchClient = mapsSearchClient;
     }
 
-    [KernelFunction("FindGpsPosition")]
-    [Description(
-        "Find GPS positions in 'latitude, longitude' string format for postal address, postcode, suburbs in Australia")]
-    public async Task<string> FindGpsPosition(
-        [Description("Postal address, postcode, suburbs in Australia to search for")]
-        string location)
+    [KernelFunction("GetPosition")]
+    [Description("Find GPS positions in 'latitude, longitude' string format for postal address, postcode, suburbs in Australia")]
+    public async Task<string> GetPosition(
+        [Description("Postal address, postcode, suburbs in Australia to search for")] string location)
     {
         var response = await _mapsSearchClient.SearchAddressAsync(location);
         var results = response?.Value?.Results;

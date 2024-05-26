@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TinyAgents.HubHost.Agents;
+namespace TinyAgents.HubHost.Agents.Assistants;
 
 public sealed class AssistantOptions
 {
