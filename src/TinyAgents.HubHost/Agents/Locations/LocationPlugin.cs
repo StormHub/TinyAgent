@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Azure.Core.GeoJson;
 using Azure.Maps.Search;
 using Microsoft.SemanticKernel;
 
@@ -13,26 +14,52 @@ internal sealed class LocationPlugin
         _mapsSearchClient = mapsSearchClient;
     }
 
-    [KernelFunction("GetPosition")]
-    [Description("Find GPS positions in 'latitude, longitude' string format for postal address, postcode, suburbs in Australia")]
+    [KernelFunction("GetPosition"),
+     Description("Get GPS positions for postal address, postcode, suburbs in Australia")]
     public async Task<string> GetPosition(
-        [Description("Postal address, postcode, suburbs in Australia to search for")] string location)
+        [Description("Postal address, postcode, suburbs in Australia to search for")] 
+        string location)
     {
         var response = await _mapsSearchClient.SearchAddressAsync(location);
         var results = response?.Value?.Results;
-        if (results is not null && results.Count > 0)
+        if (results is null || results.Count <= 0)
         {
-            var buffer = new StringBuilder();
-            var position = results[0].Position;
-            var address = results[0].Address;
+            return "Unknown";
+        }
+        
+        var buffer = new StringBuilder();
+        var position = results[0].Position;
 
-            buffer.AppendLine($" - address: {address.CountrySubdivisionName} {address.CountrySecondarySubdivision}");
-            buffer.AppendLine($" - gps position: {position.Latitude}, {position.Longitude}");
+        buffer.AppendLine($" - latitude: {position.Latitude}");
+        buffer.AppendLine($" - longitude: {position.Longitude}");
 
-            return buffer.ToString();
+        return buffer.ToString();
+    }
+
+    [KernelFunction("GetAddress"), 
+     Description("Get the address for the given GPS latitude and longitude in Australia")]
+    public async Task<string> GetAddress(
+        [Description("GPS latitude")] double latitude, 
+        [Description("GPS longitude")] double longitude)
+    {
+        var options = new ReverseSearchOptions
+        {
+            Coordinates = new GeoPosition(longitude, latitude)
+        };
+        var response = await _mapsSearchClient.ReverseSearchAddressAsync(options);
+        var buffer = new StringBuilder();
+        foreach (var address in response.Value.Addresses)
+        {
+            buffer.AppendLine($" - latitude, longitude: {address.Position}");
+            buffer.AppendLine($" - street number: {address.Address.StreetNumber}");
+            buffer.AppendLine($" - street name: {address.Address.StreetName}");
+            buffer.AppendLine($" - suburb: {address.Address.MunicipalitySubdivision}");
+            buffer.AppendLine($" - state: {address.Address.CountrySubdivision}");
+            buffer.AppendLine($" - postcode: {address.Address.PostalCode}");
+            buffer.AppendLine($" - country: {address.Address.Country}");
         }
 
-        return "Unknown";
+        return buffer.ToString();
     }
 
     public static Task<LocationPlugin> ScopeTo(Kernel kernel)
