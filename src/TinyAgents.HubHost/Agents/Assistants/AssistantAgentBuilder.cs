@@ -62,15 +62,13 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
             };
             
-            var chatAgent = new ChatCompletionAgent
+            agent = new ChatCompletionAgent
             {
                 Kernel = kernel,
                 Name = Name,
                 Instructions = Instructions,
                 ExecutionSettings = settings
             };
-
-            agent = chatAgent;
         }
 
         return new AssistantAgent(agent);
