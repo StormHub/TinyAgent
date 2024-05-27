@@ -37,12 +37,12 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddKeyedLocationPlugin(this IServiceCollection services, IServiceProvider provider)
+    public static IKernelBuilder ConfigureLocationPlugin(this IKernelBuilder builder, IServiceProvider provider)
     {
-        services.AddKeyedSingleton(
+        builder.Services.AddKeyedSingleton(
             nameof(LocationPlugin),
             provider.GetRequiredService<MapsSearchClient>());
-        return services;
+        return builder;
     }
 
     public static void AddLocationPlugin(this Kernel kernel)

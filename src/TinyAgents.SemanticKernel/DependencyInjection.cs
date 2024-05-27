@@ -15,7 +15,7 @@ public static class DependencyInjection
     {
         services.AddLocations();
         services.AddOpenAI(environment,
-            (builder, provider) => { builder.Services.AddKeyedLocationPlugin(provider); });
+            (builder, provider) => { builder.ConfigureLocationPlugin(provider); });
         services.AddAssistant(configuration);
 
         return services;
