@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace TinyAgents.SemanticKernel.Assistants;
+
 internal sealed class AssistantAgent : IAssistantAgent
 {
     private readonly KernelAgent _agent;
@@ -16,21 +17,16 @@ internal sealed class AssistantAgent : IAssistantAgent
         _chat = new AgentGroupChat();
     }
 
-    public async IAsyncEnumerable<ChatMessageContent> Invoke(string input, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ChatMessageContent> Invoke(string input,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         _chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, input));
-        await foreach (var content in _chat.InvokeAsync(_agent, cancellationToken))
-        {
-            yield return content;
-        }
+        await foreach (var content in _chat.InvokeAsync(_agent, cancellationToken)) yield return content;
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_agent is OpenAIAssistantAgent openAIAssistantAgent)
-        {
-            await openAIAssistantAgent.DeleteAsync();
-        }
+        if (_agent is OpenAIAssistantAgent openAIAssistantAgent) await openAIAssistantAgent.DeleteAsync();
         _chat.IsComplete = true;
     }
 }

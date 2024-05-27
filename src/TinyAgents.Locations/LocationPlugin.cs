@@ -15,19 +15,16 @@ internal sealed class LocationPlugin
         _mapsSearchClient = mapsSearchClient;
     }
 
-    [KernelFunction("GetPosition"),
-     Description("Get GPS positions for postal address, postcode, suburbs in Australia")]
+    [KernelFunction("GetPosition")]
+    [Description("Get GPS positions for postal address, postcode, suburbs in Australia")]
     public async Task<string> GetPosition(
-        [Description("Postal address, postcode, suburbs in Australia to search for")] 
+        [Description("Postal address, postcode, suburbs in Australia to search for")]
         string location)
     {
         var response = await _mapsSearchClient.SearchAddressAsync(location);
         var results = response?.Value?.Results;
-        if (results is null || results.Count <= 0)
-        {
-            return "Unknown";
-        }
-        
+        if (results is null || results.Count <= 0) return "Unknown";
+
         var buffer = new StringBuilder();
         var position = results[0].Position;
 
@@ -37,22 +34,22 @@ internal sealed class LocationPlugin
         return buffer.ToString();
     }
 
-    [KernelFunction("GetAddress"), 
-     Description("Get the address for the given GPS latitude and longitude in Australia")]
+    [KernelFunction("GetAddress")]
+    [Description("Get the address for the given GPS latitude and longitude in Australia")]
     public async Task<string> GetAddress(
-        [Description("GPS latitude")] double latitude, 
+        [Description("GPS latitude")] double latitude,
         [Description("GPS longitude")] double longitude)
     {
         var options = new ReverseSearchOptions
         {
             Coordinates = new GeoPosition(longitude, latitude)
         };
-        
+
         var response = await _mapsSearchClient.ReverseSearchAddressAsync(options);
-        var address = response.Value.Addresses.Count > 0 
-            ? response.Value.Addresses[0] 
+        var address = response.Value.Addresses.Count > 0
+            ? response.Value.Addresses[0]
             : default;
-        
+
         var buffer = new StringBuilder();
         if (address is not null)
         {

@@ -10,7 +10,7 @@ internal static class AgentHostBuilder
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Host.UseLogging();
-        
+
         builder.Services.AddSignalR();
         builder.Services.AddAssistanceAgent(builder.Configuration, builder.Environment);
 

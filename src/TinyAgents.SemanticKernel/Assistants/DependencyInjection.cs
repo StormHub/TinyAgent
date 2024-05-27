@@ -15,12 +15,12 @@ internal static class DependencyInjection
             services.AddOptions<AssistantOptions>()
                 .BindConfiguration(nameof(AssistantOptions))
                 .ValidateDataAnnotations();
-            
+
             services.AddTransient<AssistantAgentBuilder>(provider =>
             {
                 var builder = provider.GetRequiredService<IKernelBuilder>();
                 var options = provider.GetRequiredService<IOptions<AssistantOptions>>();
-            
+
                 return new AssistantAgentBuilder(builder, options);
             });
         }

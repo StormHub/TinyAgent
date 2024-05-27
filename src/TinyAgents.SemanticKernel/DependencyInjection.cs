@@ -9,18 +9,15 @@ namespace TinyAgents.SemanticKernel;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAssistanceAgent(this IServiceCollection services, 
+    public static IServiceCollection AddAssistanceAgent(this IServiceCollection services,
         IConfiguration configuration,
         IHostEnvironment environment)
     {
         services.AddLocations();
-        services.AddOpenAI( environment, 
-            (builder, provider) =>
-            {
-                builder.Services.AddKeyedLocationPlugin(provider);
-            });
+        services.AddOpenAI(environment,
+            (builder, provider) => { builder.Services.AddKeyedLocationPlugin(provider); });
         services.AddAssistant(configuration);
-        
+
         return services;
-    }   
+    }
 }

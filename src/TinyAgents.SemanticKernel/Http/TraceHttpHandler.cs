@@ -6,7 +6,8 @@ internal sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Deleg
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+        CancellationToken cancellationToken)
     {
 #if DEBUG
         if (request.Content is not null)
@@ -17,9 +18,9 @@ internal sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Deleg
             _logger.LogInformation("{RequestUri} {RequestContent}", request.RequestUri, requestContent);
         }
 #endif
-        
+
         var response = await base.SendAsync(request, cancellationToken);
-        
+
 #if DEBUG
         var responseStream = await GetContentStream(response.Content);
         var responseStreamContent = new StreamContent(responseStream);
@@ -30,7 +31,7 @@ internal sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Deleg
         responseStream.Position = 0;
         response.Content = responseStreamContent;
 #endif
-        
+
         return response;
     }
 

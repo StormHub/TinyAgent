@@ -33,14 +33,14 @@ public static class DependencyInjection
 
             return client;
         });
-        
+
         return services;
     }
 
     public static IServiceCollection AddKeyedLocationPlugin(this IServiceCollection services, IServiceProvider provider)
     {
         services.AddKeyedSingleton(
-            nameof(LocationPlugin), 
+            nameof(LocationPlugin),
             provider.GetRequiredService<MapsSearchClient>());
         return services;
     }

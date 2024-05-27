@@ -9,7 +9,8 @@ using TinyAgents.Locations;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
-internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptions<AssistantOptions>? options) : IAssistantAgentBuilder
+internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptions<AssistantOptions>? options)
+    : IAssistantAgentBuilder
 {
     private const string Name = "Assistant";
 
@@ -33,9 +34,9 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
         if (_options is not null)
         {
             var httpClient = kernel.Services.GetRequiredKeyedService<HttpClient>(nameof(OpenAIClient));
-            
+
             var configuration = new OpenAIAssistantConfiguration(
-                _options.ApiKey, 
+                _options.ApiKey,
                 _options.Uri.ToString())
             {
                 HttpClient = httpClient
@@ -47,7 +48,7 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
                 Name = Name,
                 ModelId = _options.ModelId
             };
-                
+
             agent = await OpenAIAssistantAgent.CreateAsync(
                 kernel,
                 configuration,
@@ -62,7 +63,7 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
                 Temperature = 0,
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
             };
-            
+
             agent = new ChatCompletionAgent
             {
                 Kernel = kernel,

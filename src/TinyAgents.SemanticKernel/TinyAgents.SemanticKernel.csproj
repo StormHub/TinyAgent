@@ -17,13 +17,13 @@
         <PackageReference Include="Azure.Identity" Version="1.11.3"/>
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.13.0"/>
         <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.13.0-alpha"/>
-        <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.13.0-alpha" />
+        <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.13.0-alpha"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.OpenApi" Version="1.13.0-alpha"/>
         <PackageReference Include="Serilog" Version="3.1.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TinyAgents.Locations\TinyAgents.Locations.csproj" />
+        <ProjectReference Include="..\TinyAgents.Locations\TinyAgents.Locations.csproj"/>
     </ItemGroup>
 
 </Project>
