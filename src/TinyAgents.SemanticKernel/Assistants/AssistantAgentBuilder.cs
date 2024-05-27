@@ -26,9 +26,8 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
 
     public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
-        var kernel = kernelBuilder.Build();
-
-        kernel.AddLocationPlugin();
+        var kernel = kernelBuilder.Build()
+            .WithLocationPlugin();
 
         KernelAgent? agent = default;
         if (_options is not null)

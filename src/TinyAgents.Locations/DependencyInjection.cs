@@ -44,9 +44,10 @@ public static class DependencyInjection
             provider.GetRequiredService<MapsSearchClient>());
         return builder;
     }
-
-    public static void AddLocationPlugin(this Kernel kernel)
+    
+    public static Kernel WithLocationPlugin(this Kernel kernel)
     {
         LocationPlugin.ScopeTo(kernel);
+        return kernel;
     }
 }
