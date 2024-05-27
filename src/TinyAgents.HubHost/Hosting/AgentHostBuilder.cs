@@ -1,6 +1,6 @@
 ﻿using Serilog;
 using Serilog.Events;
-using TinyAgents.HubHost.Agents;
+using TinyAgents.SemanticKernel;
 
 namespace TinyAgents.HubHost.Hosting;
 
@@ -10,9 +10,9 @@ internal static class AgentHostBuilder
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Host.UseLogging();
-
+        
         builder.Services.AddSignalR();
-        builder.Services.AddApplication(builder.Configuration);
+        builder.Services.AddAssistanceAgent(builder.Configuration, builder.Environment);
 
         var app = builder.Build();
         app.MapHub<AgentHub>("/agent");

@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyAgents.HubHost", "TinyA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyAgent.Local", "TinyAgent.Local\TinyAgent.Local.csproj", "{CE6AF5AC-01B3-4F20-AC14-D03ED0C90D7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.SemanticKernel", "TinyAgents.SemanticKernel\TinyAgents.SemanticKernel.csproj", "{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Locations", "TinyAgents.Locations\TinyAgents.Locations.csproj", "{12AE7B62-B259-46AB-822E-9AA78BBFBBCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{CE6AF5AC-01B3-4F20-AC14-D03ED0C90D7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE6AF5AC-01B3-4F20-AC14-D03ED0C90D7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE6AF5AC-01B3-4F20-AC14-D03ED0C90D7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12AE7B62-B259-46AB-822E-9AA78BBFBBCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12AE7B62-B259-46AB-822E-9AA78BBFBBCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12AE7B62-B259-46AB-822E-9AA78BBFBBCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12AE7B62-B259-46AB-822E-9AA78BBFBBCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

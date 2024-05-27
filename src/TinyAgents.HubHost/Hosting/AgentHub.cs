@@ -1,13 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.SignalR;
-using TinyAgents.HubHost.Agents.Assistants;
+using TinyAgents.SemanticKernel.Assistants;
 
 namespace TinyAgents.HubHost.Hosting;
 
-internal sealed class AgentHub(AssistantAgentBuilder builder) : Hub
+internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
 {
-    private static readonly ConcurrentDictionary<string, AssistantAgent> Agents = new();
+    private static readonly ConcurrentDictionary<string, IAssistantAgent> Agents = new();
     public override async Task OnConnectedAsync()
     {
         var id = Context.ConnectionId;
