@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.SemanticKernel",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Locations", "TinyAgents.Locations\TinyAgents.Locations.csproj", "{12AE7B62-B259-46AB-822E-9AA78BBFBBCD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{CF199974-D4A9-40D1-89E6-C48ADC59EE84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,5 +41,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {87DB9F22-CA1B-4A2B-8886-764B7F523156}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{12AE7B62-B259-46AB-822E-9AA78BBFBBCD} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
 	EndGlobalSection
 EndGlobal
