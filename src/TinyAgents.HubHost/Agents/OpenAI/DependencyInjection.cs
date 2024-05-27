@@ -1,6 +1,7 @@
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using TinyAgents.HubHost.Http;
 
 namespace TinyAgents.HubHost.Agents.OpenAI;
 
@@ -12,7 +13,9 @@ internal static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
-        services.AddHttpClient(nameof(OpenAIClient));
+        services.AddTransient<TraceHttpHandler>();
+        services.AddHttpClient(nameof(OpenAIClient))
+            .AddHttpMessageHandler<TraceHttpHandler>();
 
         services.AddTransient(provider =>
         {
