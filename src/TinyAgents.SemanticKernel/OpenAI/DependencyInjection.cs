@@ -31,9 +31,9 @@ internal static class DependencyInjection
 
             var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
 
-            var builder = Kernel.CreateBuilder();
+            var kernelBuilder = Kernel.CreateBuilder();
             if (openAIOptions.Uri.Host.EndsWith("openai.azure.com"))
-                builder.AddAzureOpenAIChatCompletion(
+                kernelBuilder.AddAzureOpenAIChatCompletion(
                     openAIOptions.ModelId,
                     openAIOptions.Uri.ToString(),
                     openAIOptions.ApiKey,
@@ -41,18 +41,18 @@ internal static class DependencyInjection
                     openAIOptions.ModelId,
                     httpClient);
             else
-                builder.AddOpenAIChatCompletion(
+                kernelBuilder.AddOpenAIChatCompletion(
                     openAIOptions.ModelId,
                     apiKey: openAIOptions.ApiKey,
                     endpoint: openAIOptions.Uri,
                     httpClient: httpClient);
 
-            builder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
-            builder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
+            kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
+            kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 
-            configureKernel?.Invoke(builder, provider);
+            configureKernel?.Invoke(kernelBuilder, provider);
 
-            return builder;
+            return kernelBuilder;
         });
 
         return services;
