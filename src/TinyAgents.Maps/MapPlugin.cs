@@ -4,13 +4,13 @@ using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 
-namespace TinyAgents.Locations;
+namespace TinyAgents.Maps;
 
-internal sealed class LocationPlugin
+internal sealed class MapPlugin
 {
     private readonly MapsSearchClient _mapsSearchClient;
 
-    private LocationPlugin(MapsSearchClient mapsSearchClient)
+    private MapPlugin(MapsSearchClient mapsSearchClient)
     {
         _mapsSearchClient = mapsSearchClient;
     }
@@ -71,8 +71,8 @@ internal sealed class LocationPlugin
 
     public static void ScopeTo(Kernel kernel)
     {
-        var mapsSearchClient = kernel.Services.GetRequiredKeyedService<MapsSearchClient>(nameof(LocationPlugin));
-        var plugin = new LocationPlugin(mapsSearchClient);
+        var mapsSearchClient = kernel.Services.GetRequiredKeyedService<MapsSearchClient>(nameof(MapPlugin));
+        var plugin = new MapPlugin(mapsSearchClient);
         kernel.Plugins.AddFromObject(plugin);
     }
 }

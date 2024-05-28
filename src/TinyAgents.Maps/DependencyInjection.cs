@@ -5,14 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 
-namespace TinyAgents.Locations;
+namespace TinyAgents.Maps;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddLocations(this IServiceCollection services)
+    public static IServiceCollection AddMaps(this IServiceCollection services)
     {
-        services.AddOptions<LocationOptions>()
-            .BindConfiguration(nameof(LocationOptions))
+        services.AddOptions<MapOptions>()
+            .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
         services.AddHttpClient(nameof(MapsSearchClient));
@@ -22,7 +22,7 @@ public static class DependencyInjection
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(MapsSearchClient));
 
-            var options = provider.GetRequiredService<IOptions<LocationOptions>>().Value;
+            var options = provider.GetRequiredService<IOptions<MapOptions>>().Value;
 
             var client = new MapsSearchClient(
                 new AzureKeyCredential(options.ApiKey),
@@ -37,17 +37,17 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IKernelBuilder ConfigureLocationPlugin(this IKernelBuilder builder, IServiceProvider provider)
+    public static IKernelBuilder ConfigureMapPlugin(this IKernelBuilder builder, IServiceProvider provider)
     {
         builder.Services.AddKeyedSingleton(
-            nameof(LocationPlugin),
+            nameof(MapPlugin),
             provider.GetRequiredService<MapsSearchClient>());
         return builder;
     }
     
-    public static Kernel WithLocationPlugin(this Kernel kernel)
+    public static Kernel WithMapPlugin(this Kernel kernel)
     {
-        LocationPlugin.ScopeTo(kernel);
+        MapPlugin.ScopeTo(kernel);
         return kernel;
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using TinyAgents.Locations;
+using TinyAgents.Maps;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
@@ -27,7 +27,7 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
     public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
         var kernel = kernelBuilder.Build()
-            .WithLocationPlugin();
+            .WithMapPlugin();
 
         KernelAgent? agent = default;
         if (_options is not null)

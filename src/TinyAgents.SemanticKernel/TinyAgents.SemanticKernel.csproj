@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TinyAgents.Locations\TinyAgents.Locations.csproj"/>
+      <ProjectReference Include="..\TinyAgents.Maps\TinyAgents.Maps.csproj" />
     </ItemGroup>
 
 </Project>
