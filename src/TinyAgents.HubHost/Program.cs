@@ -8,8 +8,7 @@ try
     
     await using (var scope = host.Services.CreateAsyncScope())
     {
-        var indexInitializer = scope.ServiceProvider.GetRequiredService<ISearchIndexInitializer>();
-        await indexInitializer.EnsureExists();
+        await scope.ServiceProvider.EnsureIndexExists();
     }
     
     await host.RunAsync();

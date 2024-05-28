@@ -18,11 +18,11 @@ public static class DependencyInjection
             .ValidateDataAnnotations();
 
         services.AddHttpClient(nameof(SearchIndexClient));
-        
+
         services.AddTransient<SearchIndexClient>(provider =>
         {
             var indexOptions = provider.GetRequiredService<IOptions<IndexOptions>>().Value;
-            
+
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var searchOptions = new SearchClientOptions
             {
@@ -31,21 +31,26 @@ public static class DependencyInjection
             };
 
             return new SearchIndexClient(
-                indexOptions.Uri, 
-                new AzureKeyCredential(indexOptions.ApiKey), 
+                indexOptions.Uri,
+                new AzureKeyCredential(indexOptions.ApiKey),
                 searchOptions);
         });
 
         services.AddTransient<SearchPlugin>();
-        services.AddTransient<ISearchIndexInitializer>(provider => provider.GetRequiredService<SearchPlugin>());
-        
+
         return services;
     }
-    
+
     public static IKernelBuilder ConfigureLocationPlugin(this IKernelBuilder builder, IServiceProvider provider)
     {
         var searchPlugin = provider.GetRequiredService<SearchPlugin>();
         builder.Plugins.AddFromObject(searchPlugin);
         return builder;
+    }
+
+    public static async Task EnsureIndexExists(this IServiceProvider provider)
+    {
+        var searchPlugin = provider.GetRequiredService<SearchPlugin>();
+        await searchPlugin.EnsureExists();
     }
 }

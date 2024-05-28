@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Search.Documents" Version="11.5.1" />
-        <PackageReference Include="Microsoft.Azure.Core.Spatial" Version="1.1.0" />
+        <PackageReference Include="Azure.Search.Documents" Version="11.5.1"/>
+        <PackageReference Include="Microsoft.Azure.Core.Spatial" Version="1.1.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0"/>

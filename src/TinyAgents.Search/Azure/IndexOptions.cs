@@ -7,16 +7,6 @@ namespace TinyAgents.Search.Azure;
 
 public sealed class IndexOptions
 {
-    [Required]
-    public required Uri Uri { get; init; }
-    
-    [Required(AllowEmptyStrings = false)]
-    public required string ApiKey { get; init; }
-
-    public string Name { get; init; } = "locations-index";
-    
-    internal static JsonObjectSerializer JsonObjectSerializer { get; }
-
     static IndexOptions()
     {
         var jsonOptions = new JsonSerializerOptions
@@ -28,6 +18,14 @@ public sealed class IndexOptions
         jsonOptions.Converters.Add(new JsonStringEnumConverter());
         jsonOptions.Converters.Add(new MicrosoftSpatialGeoJsonConverter());
 
-        JsonObjectSerializer = new (jsonOptions);
+        JsonObjectSerializer = new(jsonOptions);
     }
+
+    [Required] public required Uri Uri { get; init; }
+
+    [Required(AllowEmptyStrings = false)] public required string ApiKey { get; init; }
+
+    public string Name { get; init; } = "locations-index";
+
+    internal static JsonObjectSerializer JsonObjectSerializer { get; }
 }

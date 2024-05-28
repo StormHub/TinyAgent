@@ -8,31 +8,28 @@ namespace TinyAgents.Search.Azure;
 
 public sealed class LocationIndex
 {
-    [SimpleField(IsKey = true)]
-    public required string Id { get; init; }
-    
-    [SearchableField]
-    public required string Name { get; init; }
-    
-    [SearchableField]
-    public required string Address { get; init; }
-    
-    [SimpleField(IsFilterable = true, IsSortable = true)]
-    [DataType("Edm.GeographyPoint")]
-    public required GeographyPoint Point { get; init; }
-    
-    [SearchableField]
-    public string? Description { get; init; }
-
     private const string DefaultVectorSearchProfile = "KMDefaultProfile";
     private const string DefaultVectorSearchConfiguration = "KMDefaultAlgorithm";
 
     // Fixed vector size of ada-002 text embedding model
     private const int DefaultVectorDimensions = 1536;
-    
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = DefaultVectorDimensions, VectorSearchProfileName = DefaultVectorSearchProfile)] 
+
+    [SimpleField(IsKey = true)] public required string Id { get; init; }
+
+    [SearchableField] public required string Name { get; init; }
+
+    [SearchableField] public required string Address { get; init; }
+
+    [SimpleField(IsFilterable = true, IsSortable = true)]
+    [DataType("Edm.GeographyPoint")]
+    public required GeographyPoint Point { get; init; }
+
+    [SearchableField] public string? Description { get; init; }
+
+    [VectorSearchField(IsHidden = true, VectorSearchDimensions = DefaultVectorDimensions,
+        VectorSearchProfileName = DefaultVectorSearchProfile)]
     public float[]? Embedding { get; set; }
-    
+
     public static SearchIndex Index(string name, JsonObjectSerializer jsonObjectSerializer)
     {
         var builder = new FieldBuilder { Serializer = jsonObjectSerializer };

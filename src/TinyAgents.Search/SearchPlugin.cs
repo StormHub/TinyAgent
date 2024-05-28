@@ -8,12 +8,12 @@ using TinyAgents.Search.Azure;
 
 namespace TinyAgents.Search;
 
-internal sealed class SearchPlugin : ISearchIndexInitializer
+internal sealed class SearchPlugin
 {
     private readonly SearchIndexClient _indexClient;
     private readonly string _indexName;
     private readonly ILogger _logger;
-    
+
     public SearchPlugin(SearchIndexClient indexClient, IOptions<IndexOptions> options, ILogger<SearchPlugin> logger)
     {
         _indexClient = indexClient;
@@ -29,17 +29,15 @@ internal sealed class SearchPlugin : ISearchIndexInitializer
     {
         return Task.FromResult("Unknown"); // TODO: Search index
     }
-    
-    public async Task EnsureExists(CancellationToken cancellationToken = default)
+
+    internal async Task EnsureExists(CancellationToken cancellationToken = default)
     {
         await foreach (var name in _indexClient.GetIndexNamesAsync(cancellationToken))
-        {
             if (string.Equals(name, _indexName, StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogInformation("Index {Name} already exists", _indexName);
                 return;
             }
-        }
 
         try
         {
