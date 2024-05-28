@@ -19,6 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Resources/csl_ev_qld.csv" />
+        <EmbeddedResource Include="Resources/csl_ev_qld.csv"/>
     </ItemGroup>
 </Project>

@@ -64,7 +64,7 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
             }
         };
-        
+
         return new AssistantAgent(agent);
     }
 }
