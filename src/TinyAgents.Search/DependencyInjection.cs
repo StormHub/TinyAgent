@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using TinyAgents.Search.Azure;
+using TinyAgents.Search.Resources;
 
 namespace TinyAgents.Search;
 
@@ -37,6 +38,7 @@ public static class DependencyInjection
         });
 
         services.AddTransient<SearchPlugin>();
+        services.AddTransient<IndexBuilder>();
 
         return services;
     }
@@ -50,7 +52,7 @@ public static class DependencyInjection
 
     public static async Task EnsureIndexExists(this IServiceProvider provider)
     {
-        var searchPlugin = provider.GetRequiredService<SearchPlugin>();
-        await searchPlugin.EnsureExists();
+        var indexBuilder = provider.GetRequiredService<IndexBuilder>();
+        await indexBuilder.EnsureExists();
     }
 }

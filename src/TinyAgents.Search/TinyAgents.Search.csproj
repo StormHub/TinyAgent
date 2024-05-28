@@ -18,4 +18,7 @@
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.13.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Resources/csl_ev_qld.csv" />
+    </ItemGroup>
 </Project>
