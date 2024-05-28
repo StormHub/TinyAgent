@@ -2,8 +2,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Azure;
 using Azure.Search.Documents.Indexes;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.Spatial;
 using TinyAgents.Search.Azure;
 
@@ -13,16 +16,22 @@ internal sealed class IndexBuilder
 {
     private readonly SearchIndexClient _indexClient;
     private readonly string _indexName;
+    private readonly IKernelBuilder _kernelBuilder;
     private readonly ILogger _logger;
 
-    public IndexBuilder(SearchIndexClient indexClient, IOptions<IndexOptions> options, ILogger<IndexBuilder> logger)
+    public IndexBuilder(
+        SearchIndexClient indexClient, 
+        IOptions<IndexOptions> options,
+        IKernelBuilder kernelBuilder,
+        ILogger<IndexBuilder> logger)
     {
         _indexClient = indexClient;
         _indexName = options.Value.Name.ToLowerInvariant();
+        _kernelBuilder = kernelBuilder;
         _logger = logger;
     }
 
-    internal async Task EnsureExists(CancellationToken cancellationToken = default)
+    internal async Task EnsureExists(string textEmbeddingModelId, CancellationToken cancellationToken = default)
     {
         await foreach (var name in _indexClient.GetIndexNamesAsync(cancellationToken))
             if (string.Equals(name, _indexName, StringComparison.OrdinalIgnoreCase))
@@ -42,12 +51,24 @@ internal sealed class IndexBuilder
             _logger.LogWarning("Index {Name} already exists {Message}", _indexName, ex.Message);
         }
 
+        var kernel = _kernelBuilder.Build();
         var searchClient = _indexClient.GetSearchClient(_indexName);
-        await foreach (var index in Build(cancellationToken))
+        await foreach (var index in LoadEmbeddedResources(cancellationToken))
+        {
+            await GenerateEmbedding(index, kernel, textEmbeddingModelId, cancellationToken);
             await searchClient.UploadDocumentsAsync([index], cancellationToken: cancellationToken);
+        }
     }
 
-    private async IAsyncEnumerable<LocationIndex> Build([EnumeratorCancellation] CancellationToken cancellationToken)
+    private static async Task GenerateEmbedding(LocationIndex index, Kernel kernel, string textEmbeddingModelId, CancellationToken cancellationToken)
+    {
+        var generator = kernel.Services.GetRequiredKeyedService<ITextEmbeddingGenerationService>(textEmbeddingModelId);
+        var text = index.GetEmbeddingText();
+        var embedding = await generator.GenerateEmbeddingAsync(text, kernel, cancellationToken);
+        index.Embedding = embedding.ToArray();
+    }
+    
+    private async IAsyncEnumerable<LocationIndex> LoadEmbeddedResources([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var assembly = typeof(IndexBuilder).Assembly;
         foreach (var name in assembly
@@ -86,25 +107,26 @@ internal sealed class IndexBuilder
         if (data.Length < 5) return false;
 
         var name = data[0];
-        if (!double.TryParse(data[1], out var latitude)) return false;
-        if (!double.TryParse(data[2], out var longitude)) return false;
-        var address = data[3];
-        var description = data[4];
-
-        if (string.IsNullOrEmpty(name)
-            || string.IsNullOrEmpty(address))
+        if (string.IsNullOrEmpty(name)) return false;
+        
+        if (!double.TryParse(data[1], out var latitude)
+            || !double.TryParse(data[2], out var longitude))
+        {
             return false;
+        }
+        
+        var address = data[3];
+        if (string.IsNullOrEmpty(address)) return false;
 
-        var binaryData = new byte[16];
-        Buffer.BlockCopy(BitConverter.GetBytes(latitude), 0, binaryData, 0, 8);
-        Buffer.BlockCopy(BitConverter.GetBytes(longitude), 0, binaryData, 8, 8);
-        var id = new Guid(binaryData);
+        var point = GeographyPoint.Create(latitude, longitude);
+        var id = LocationIndex.GenerateId(point);
 
+        var description = data[4];
         locationIndex = new LocationIndex
         {
             Id = id.ToString(),
             Name = name,
-            Point = GeographyPoint.Create(latitude, longitude),
+            Point = point,
             Address = address,
             Description = description
         };

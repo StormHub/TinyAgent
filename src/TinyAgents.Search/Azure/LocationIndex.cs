@@ -24,12 +24,34 @@ public sealed class LocationIndex
     [DataType("Edm.GeographyPoint")]
     public required GeographyPoint Point { get; init; }
 
+    internal static Guid GenerateId(GeographyPoint point)
+    {
+        var binaryData = new byte[16];
+        Buffer.BlockCopy(BitConverter.GetBytes(point.Latitude), 0, binaryData, 0, 8);
+        Buffer.BlockCopy(BitConverter.GetBytes(point.Longitude), 0, binaryData, 8, 8);
+        var id = new Guid(binaryData);
+
+        return id;
+    }
+    
     [SearchableField] public string? Description { get; init; }
 
     [VectorSearchField(IsHidden = true, VectorSearchDimensions = DefaultVectorDimensions,
         VectorSearchProfileName = DefaultVectorSearchProfile)]
     public float[]? Embedding { get; set; }
 
+    public string GetEmbeddingText()
+    {
+        var buffer = new StringBuilder();
+        buffer.AppendLine($" name: {Name}");
+        buffer.AppendLine($" address: {Address}");
+        buffer.AppendLine($" latitude: {Point.Latitude}");
+        buffer.AppendLine($" longitude: {Point.Longitude}");
+        buffer.AppendLine($" description: {Description}");
+
+        return buffer.ToString();
+    }
+    
     public static SearchIndex Index(string name, JsonObjectSerializer jsonObjectSerializer)
     {
         var builder = new FieldBuilder { Serializer = jsonObjectSerializer };

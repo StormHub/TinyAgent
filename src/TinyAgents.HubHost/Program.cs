@@ -1,5 +1,7 @@
-﻿using TinyAgents.HubHost.Hosting;
+﻿using Microsoft.Extensions.Options;
+using TinyAgents.HubHost.Hosting;
 using TinyAgents.Search;
+using TinyAgents.SemanticKernel.OpenAI;
 
 IHost? host = default;
 try
@@ -8,7 +10,8 @@ try
     
     await using (var scope = host.Services.CreateAsyncScope())
     {
-        await scope.ServiceProvider.EnsureIndexExists();
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+        await scope.ServiceProvider.EnsureIndexExists(options.TextEmbeddingModelId);
     }
     
     await host.RunAsync();
