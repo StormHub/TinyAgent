@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TinyAgents.Maps;
+using TinyAgents.Search;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.OpenAI;
 
@@ -14,8 +15,13 @@ public static class DependencyInjection
         IHostEnvironment environment)
     {
         services.AddMaps();
+        services.AddSearch();
         services.AddOpenAI(environment,
-            (builder, provider) => { builder.ConfigureMapPlugin(provider); });
+            (builder, provider) =>
+            {
+                builder.ConfigureMapPlugin(provider);
+                builder.ConfigureLocationPlugin(provider);
+            });
         services.AddAssistant(configuration);
 
         return services;

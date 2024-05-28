@@ -5,7 +5,6 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using TinyAgents.Maps;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
@@ -26,8 +25,7 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
 
     public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
-        var kernel = kernelBuilder.Build()
-            .WithMapPlugin();
+        var kernel = kernelBuilder.Build();
 
         KernelAgent? agent = default;
         if (_options is not null)
@@ -55,23 +53,18 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
                 cancellationToken);
         }
 
-        if (agent is null)
+        agent ??= new ChatCompletionAgent
         {
-            var settings = new OpenAIPromptExecutionSettings
+            Kernel = kernel,
+            Name = Name,
+            Instructions = Instructions,
+            ExecutionSettings = new OpenAIPromptExecutionSettings
             {
                 Temperature = 0,
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-            };
-
-            agent = new ChatCompletionAgent
-            {
-                Kernel = kernel,
-                Name = Name,
-                Instructions = Instructions,
-                ExecutionSettings = settings
-            };
-        }
-
+            }
+        };
+        
         return new AssistantAgent(agent);
     }
 }

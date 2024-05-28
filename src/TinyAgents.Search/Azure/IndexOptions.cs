@@ -12,6 +12,8 @@ public sealed class IndexOptions
     
     [Required(AllowEmptyStrings = false)]
     public required string ApiKey { get; init; }
+
+    public string Name { get; init; } = "locations-index";
     
     internal static JsonObjectSerializer JsonObjectSerializer { get; }
 

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using Azure.Core.GeoJson;
 using Azure.Maps.Search;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 
 namespace TinyAgents.Maps;
@@ -10,12 +9,12 @@ internal sealed class MapPlugin
 {
     private readonly MapsSearchClient _mapsSearchClient;
 
-    private MapPlugin(MapsSearchClient mapsSearchClient)
+    public MapPlugin(MapsSearchClient mapsSearchClient)
     {
         _mapsSearchClient = mapsSearchClient;
     }
 
-    [KernelFunction("GetPosition")]
+    [KernelFunction(nameof(GetPosition))]
     [Description("Get GPS positions for postal address, postcode, suburbs in Australia")]
     public async Task<string> GetPosition(
         [Description("Postal address, postcode, suburbs in Australia to search for")]
@@ -34,7 +33,7 @@ internal sealed class MapPlugin
         return buffer.ToString();
     }
 
-    [KernelFunction("GetAddress")]
+    [KernelFunction(nameof(GetAddress))]
     [Description("Get the address for the given GPS latitude and longitude in Australia")]
     public async Task<string> GetAddress(
         [Description("GPS latitude")] double latitude,
@@ -67,12 +66,5 @@ internal sealed class MapPlugin
         }
 
         return buffer.ToString();
-    }
-
-    public static void ScopeTo(Kernel kernel)
-    {
-        var mapsSearchClient = kernel.Services.GetRequiredKeyedService<MapsSearchClient>(nameof(MapPlugin));
-        var plugin = new MapPlugin(mapsSearchClient);
-        kernel.Plugins.AddFromObject(plugin);
     }
 }

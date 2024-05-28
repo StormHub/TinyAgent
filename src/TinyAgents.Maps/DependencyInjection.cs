@@ -34,20 +34,15 @@ public static class DependencyInjection
             return client;
         });
 
+        services.AddTransient<MapPlugin>();
+
         return services;
     }
 
     public static IKernelBuilder ConfigureMapPlugin(this IKernelBuilder builder, IServiceProvider provider)
     {
-        builder.Services.AddKeyedSingleton(
-            nameof(MapPlugin),
-            provider.GetRequiredService<MapsSearchClient>());
+        var mapPlugin = provider.GetRequiredService<MapPlugin>();
+        builder.Plugins.AddFromObject(mapPlugin);
         return builder;
-    }
-    
-    public static Kernel WithMapPlugin(this Kernel kernel)
-    {
-        MapPlugin.ScopeTo(kernel);
-        return kernel;
     }
 }
