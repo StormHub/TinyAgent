@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Azure;
 using Azure.Search.Documents.Indexes;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
-using Microsoft.Spatial;
 using TinyAgents.Search.Azure;
 
 namespace TinyAgents.Search.Resources;
@@ -20,7 +18,7 @@ internal sealed class IndexBuilder
     private readonly ILogger _logger;
 
     public IndexBuilder(
-        SearchIndexClient indexClient, 
+        SearchIndexClient indexClient,
         IOptions<IndexOptions> options,
         IKernelBuilder kernelBuilder,
         ILogger<IndexBuilder> logger)
@@ -60,15 +58,17 @@ internal sealed class IndexBuilder
         }
     }
 
-    private static async Task GenerateEmbedding(LocationIndex index, Kernel kernel, string textEmbeddingModelId, CancellationToken cancellationToken)
+    private static async Task GenerateEmbedding(LocationIndex index, Kernel kernel, string textEmbeddingModelId,
+        CancellationToken cancellationToken)
     {
         var generator = kernel.Services.GetRequiredKeyedService<ITextEmbeddingGenerationService>(textEmbeddingModelId);
         var text = index.GetEmbeddingText();
         var embedding = await generator.GenerateEmbeddingAsync(text, kernel, cancellationToken);
         index.Embedding = embedding.ToArray();
     }
-    
-    private async IAsyncEnumerable<LocationIndex> LoadEmbeddedResources([EnumeratorCancellation] CancellationToken cancellationToken)
+
+    private async IAsyncEnumerable<LocationIndex> LoadEmbeddedResources(
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var assembly = typeof(IndexBuilder).Assembly;
         foreach (var name in assembly
@@ -79,84 +79,8 @@ internal sealed class IndexBuilder
 
             await using var stream = assembly.GetManifestResourceStream(name)
                                      ?? throw new InvalidOperationException($"Unable to load resource {name}");
-            using var reader = new StreamReader(stream);
-
-            // First line is title
-            var line = await reader.ReadLineAsync(cancellationToken);
-            if (line is null) yield break;
-
-            line = await reader.ReadLineAsync(cancellationToken);
-            while (line != null)
-            {
-                if (!TryParse(line, out var locationIndex))
-                    _logger.LogWarning("Invalid {Line}", line);
-                else
-                    yield return locationIndex;
-
-                cancellationToken.ThrowIfCancellationRequested();
-                line = await reader.ReadLineAsync(cancellationToken);
-            }
+            using var reader = new EmbeddedReader(stream);
+            await foreach (var index in reader.Read(cancellationToken)) yield return index;
         }
-    }
-
-    private static bool TryParse(string line, [NotNullWhen(true)] out LocationIndex? locationIndex)
-    {
-        locationIndex = default;
-
-        var data = SplitLine(line).ToArray();
-        if (data.Length < 5) return false;
-
-        var name = data[0];
-        if (string.IsNullOrEmpty(name)) return false;
-        
-        if (!double.TryParse(data[1], out var latitude)
-            || !double.TryParse(data[2], out var longitude))
-        {
-            return false;
-        }
-        
-        var address = data[3];
-        if (string.IsNullOrEmpty(address)) return false;
-
-        var point = GeographyPoint.Create(latitude, longitude);
-        var id = LocationIndex.GenerateId(point);
-
-        var description = data[4];
-        locationIndex = new LocationIndex
-        {
-            Id = id.ToString(),
-            Name = name,
-            Point = point,
-            Address = address,
-            Description = description
-        };
-
-        return true;
-    }
-
-    private static IEnumerable<string> SplitLine(string line)
-    {
-        var quotes = false;
-        var buffer = new List<char>();
-        foreach (var c in line)
-            switch (c)
-            {
-                case '"':
-                    quotes = !quotes;
-                    break;
-                case ',' when !quotes:
-                {
-                    var chars = buffer.ToArray();
-                    buffer.Clear();
-                    if (chars.Length > 0) yield return new string(chars);
-
-                    break;
-                }
-                default:
-                    buffer.Add(c);
-                    break;
-            }
-
-        if (buffer.Count > 0) yield return new string(buffer.ToArray());
     }
 }

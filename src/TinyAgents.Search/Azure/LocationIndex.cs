@@ -24,6 +24,12 @@ public sealed class LocationIndex
     [DataType("Edm.GeographyPoint")]
     public required GeographyPoint Point { get; init; }
 
+    [SearchableField] public string? Description { get; init; }
+
+    [VectorSearchField(IsHidden = true, VectorSearchDimensions = DefaultVectorDimensions,
+        VectorSearchProfileName = DefaultVectorSearchProfile)]
+    public float[]? Embedding { get; set; }
+
     internal static Guid GenerateId(GeographyPoint point)
     {
         var binaryData = new byte[16];
@@ -33,12 +39,6 @@ public sealed class LocationIndex
 
         return id;
     }
-    
-    [SearchableField] public string? Description { get; init; }
-
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = DefaultVectorDimensions,
-        VectorSearchProfileName = DefaultVectorSearchProfile)]
-    public float[]? Embedding { get; set; }
 
     public string GetEmbeddingText()
     {
@@ -51,7 +51,7 @@ public sealed class LocationIndex
 
         return buffer.ToString();
     }
-    
+
     public static SearchIndex Index(string name, JsonObjectSerializer jsonObjectSerializer)
     {
         var builder = new FieldBuilder { Serializer = jsonObjectSerializer };
