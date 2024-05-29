@@ -37,6 +37,24 @@ public static class DependencyInjection
                 searchOptions);
         });
 
+        services.AddTransient<SearchClient>(provider =>
+        {
+            var indexOptions = provider.GetRequiredService<IOptions<IndexOptions>>().Value;
+
+            var factory = provider.GetRequiredService<IHttpClientFactory>();
+            var searchOptions = new SearchClientOptions
+            {
+                Serializer = IndexOptions.JsonObjectSerializer,
+                Transport = new HttpClientTransport(factory.CreateClient(nameof(SearchIndexClient)))
+            };
+
+            return new SearchClient(
+                indexOptions.Uri,
+                indexOptions.Name,
+                new AzureKeyCredential(indexOptions.ApiKey),
+                searchOptions);
+        });
+
         services.AddTransient<SearchPlugin>();
         services.AddTransient<IndexBuilder>();
 

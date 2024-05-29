@@ -34,7 +34,7 @@ internal sealed class MapPlugin
     }
 
     [KernelFunction(nameof(GetAddress))]
-    [Description("Get the address for the given GPS latitude and longitude in Australia")]
+    [Description("Get the address for a given GPS latitude and longitude in Australia")]
     public async Task<string> GetAddress(
         [Description("GPS latitude")] double latitude,
         [Description("GPS longitude")] double longitude)

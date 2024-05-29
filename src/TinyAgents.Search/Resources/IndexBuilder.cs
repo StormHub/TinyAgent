@@ -62,7 +62,7 @@ internal sealed class IndexBuilder
         CancellationToken cancellationToken)
     {
         var generator = kernel.Services.GetRequiredKeyedService<ITextEmbeddingGenerationService>(textEmbeddingModelId);
-        var text = index.GetEmbeddingText();
+        var text = index.GetText();
         var embedding = await generator.GenerateEmbeddingAsync(text, kernel, cancellationToken);
         index.Embedding = embedding.ToArray();
     }

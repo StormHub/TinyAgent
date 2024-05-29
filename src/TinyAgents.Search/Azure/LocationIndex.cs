@@ -40,7 +40,7 @@ public sealed class LocationIndex
         return id;
     }
 
-    public string GetEmbeddingText()
+    public string GetText()
     {
         var buffer = new StringBuilder();
         buffer.AppendLine($" name: {Name}");

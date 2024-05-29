@@ -1,31 +1,70 @@
 using System.ComponentModel;
-using Azure.Search.Documents.Indexes;
+using Azure.Search.Documents;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using Microsoft.Spatial;
 using TinyAgents.Search.Azure;
 
 namespace TinyAgents.Search;
 
 internal sealed class SearchPlugin
 {
-    private readonly SearchIndexClient _indexClient;
-    private readonly string _indexName;
+    private readonly SearchClient _searchClient;
     private readonly ILogger _logger;
-
-    public SearchPlugin(SearchIndexClient indexClient, IOptions<IndexOptions> options, ILogger<SearchPlugin> logger)
+    
+    public SearchPlugin(SearchClient searchClient, ILogger<SearchPlugin> logger)
     {
-        _indexClient = indexClient;
-        _indexName = options.Value.Name.ToLowerInvariant();
+        _searchClient = searchClient;
         _logger = logger;
     }
 
     [KernelFunction(nameof(GetLocations))]
     [Description("Get electric vehicle charging locations for a given GPS latitude and longitude in Australia")]
-    public Task<string> GetLocations(
+    public async Task<string> GetLocations(
         [Description("GPS latitude")] double latitude,
         [Description("GPS longitude")] double longitude)
     {
-        return Task.FromResult("Unknown"); // TODO: Search index
+        var searchOptions = new SearchOptions
+        {
+            IncludeTotalCount = true,
+            Size = 5
+        };
+        var fieldName = nameof(LocationIndex.Point).ToLowerInvariant();
+        var point = GeographyPoint.Create(latitude, longitude);
+        
+        searchOptions.Filter = GeographyDistanceInRange(
+            point, 100, fieldName);
+        searchOptions.OrderBy.Add(DistanceAscending(point, fieldName));
+
+        var response = await _searchClient.SearchAsync<LocationIndex>("*", searchOptions);
+        _logger.LogInformation("Location ({latitude}, {longitude}) {TotalCount}", 
+            latitude, longitude, response.Value.TotalCount);
+
+        var buffer = new StringBuilder();
+        await foreach (var result in response.Value.GetResultsAsync())
+        {
+            buffer.Append(result.Document.GetText());
+            
+            var distance = result.Document.Point.Distance(point);
+            buffer.AppendLine($" kilometers: {distance}");
+        }
+
+        return buffer.ToString();
+    }
+
+    private static string DistanceAscending(GeographyPoint point, string fieldName) =>
+        $"{GeographyDistanceTo(point, fieldName)} asc";
+    
+    private static string GeographyDistanceInRange(GeographyPoint point, int kilometers, string fieldName) =>
+        $"{GeographyDistanceTo(point, fieldName)} le {kilometers}";
+  
+    private static string GeographyDistanceTo(GeographyPoint point, string fieldName) =>
+        $"geo.distance({fieldName}, {GeographyPointOf(point)})";
+    private static string GeographyPointOf(GeographyPoint point) => 
+        $"geography'POINT({point.Longitude} {point.Latitude})'";
+    
+    static SearchPlugin()
+    {
+        SpatialImplementation.CurrentImplementation.Operations = new GeographyPointOperations();
     }
 }
