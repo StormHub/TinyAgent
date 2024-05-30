@@ -5,17 +5,12 @@ using TinyAgents.Search.Azure;
 
 namespace TinyAgents.Search.Resources;
 
-internal sealed class EmbeddedReader : IDisposable
+internal sealed class EmbeddedReader(Stream stream) : IDisposable
 {
     private const char Comma = ',';
     private const char Quote = '"';
 
-    private readonly StreamReader _streamReader;
-
-    public EmbeddedReader(Stream stream)
-    {
-        _streamReader = new StreamReader(stream);
-    }
+    private readonly StreamReader _streamReader = new(stream);
 
     public void Dispose()
     {

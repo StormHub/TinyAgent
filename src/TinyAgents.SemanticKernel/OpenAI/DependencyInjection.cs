@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Http;
+using TinyAgents.SemanticKernel.OpenAI.Plugins;
 
 namespace TinyAgents.SemanticKernel.OpenAI;
 
 internal static class DependencyInjection
 {
-    public static IServiceCollection AddOpenAI(this IServiceCollection services, IHostEnvironment environment,
-        Action<IKernelBuilder, IServiceProvider>? configureKernel = default)
+    public static IServiceCollection AddOpenAI(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<OpenAIOptions>()
             .BindConfiguration(nameof(OpenAIOptions))
@@ -24,6 +24,9 @@ internal static class DependencyInjection
             builder.AddHttpMessageHandler<TraceHttpHandler>();
         }
 
+        services.AddTransient<MapPlugin>();
+        services.AddTransient<SearchPlugin>();
+
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
@@ -35,20 +38,20 @@ internal static class DependencyInjection
             if (openAIOptions.Uri.Host.EndsWith("openai.azure.com"))
             {
                 kernelBuilder.AddAzureOpenAIChatCompletion(
-                    deploymentName:openAIOptions.TextGenerationModelId,
-                    endpoint: openAIOptions.Uri.ToString(),
+                    openAIOptions.TextGenerationModelId,
+                    openAIOptions.Uri.ToString(),
                     openAIOptions.ApiKey,
-                    serviceId: openAIOptions.TextGenerationModelId,
+                    openAIOptions.TextGenerationModelId,
                     openAIOptions.TextGenerationModelId,
                     httpClient);
 
                 kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(
-                    deploymentName: openAIOptions.TextEmbeddingModelId, 
-                    endpoint: openAIOptions.Uri.ToString(),
-                    apiKey: openAIOptions.ApiKey,
-                    serviceId: openAIOptions.TextEmbeddingModelId,
-                    modelId: openAIOptions.TextEmbeddingModelId,
-                    httpClient: httpClient);
+                    openAIOptions.TextEmbeddingModelId,
+                    openAIOptions.Uri.ToString(),
+                    openAIOptions.ApiKey,
+                    openAIOptions.TextEmbeddingModelId,
+                    openAIOptions.TextEmbeddingModelId,
+                    httpClient);
             }
             else
             {
@@ -60,16 +63,20 @@ internal static class DependencyInjection
 
                 kernelBuilder.AddOpenAITextEmbeddingGeneration(
                     openAIOptions.TextGenerationModelId,
-                    apiKey: openAIOptions.ApiKey,
-                    orgId: default,
-                    serviceId: openAIOptions.TextGenerationModelId,
-                    httpClient: httpClient);
+                    openAIOptions.ApiKey,
+                    default,
+                    openAIOptions.TextGenerationModelId,
+                    httpClient);
             }
 
             kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 
-            configureKernel?.Invoke(kernelBuilder, provider);
+            var mapPlugin = provider.GetRequiredService<MapPlugin>();
+            kernelBuilder.Plugins.AddFromObject(mapPlugin);
+
+            var searchPlugin = provider.GetRequiredService<SearchPlugin>();
+            kernelBuilder.Plugins.AddFromObject(searchPlugin);
 
             return kernelBuilder;
         });

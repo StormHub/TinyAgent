@@ -4,7 +4,6 @@ using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel;
 using TinyAgents.Search.Azure;
 using TinyAgents.Search.Resources;
 
@@ -55,17 +54,10 @@ public static class DependencyInjection
                 searchOptions);
         });
 
-        services.AddTransient<SearchPlugin>();
+        services.AddTransient<ISearchApi, SearchApi>();
         services.AddTransient<IndexBuilder>();
 
         return services;
-    }
-
-    public static IKernelBuilder ConfigureLocationPlugin(this IKernelBuilder builder, IServiceProvider provider)
-    {
-        var searchPlugin = provider.GetRequiredService<SearchPlugin>();
-        builder.Plugins.AddFromObject(searchPlugin);
-        return builder;
     }
 
     public static async Task EnsureIndexExists(this IServiceProvider provider, string textEmbeddingModelId)

@@ -7,6 +7,9 @@ namespace TinyAgents.Search.Azure;
 
 public sealed class IndexOptions
 {
+    internal const int MaximumDistanceInKilometers = 100;
+    internal const int MaximumResultCount = 5;
+
     static IndexOptions()
     {
         var jsonOptions = new JsonSerializerOptions

@@ -10,28 +10,18 @@ using TinyAgents.Search.Azure;
 
 namespace TinyAgents.Search.Resources;
 
-internal sealed class IndexBuilder
+internal sealed class IndexBuilder(
+    SearchIndexClient indexClient,
+    IOptions<IndexOptions> options,
+    IKernelBuilder kernelBuilder,
+    ILogger<IndexBuilder> logger)
 {
-    private readonly SearchIndexClient _indexClient;
-    private readonly string _indexName;
-    private readonly IKernelBuilder _kernelBuilder;
-    private readonly ILogger _logger;
-
-    public IndexBuilder(
-        SearchIndexClient indexClient,
-        IOptions<IndexOptions> options,
-        IKernelBuilder kernelBuilder,
-        ILogger<IndexBuilder> logger)
-    {
-        _indexClient = indexClient;
-        _indexName = options.Value.Name.ToLowerInvariant();
-        _kernelBuilder = kernelBuilder;
-        _logger = logger;
-    }
+    private readonly string _indexName = options.Value.Name.ToLowerInvariant();
+    private readonly ILogger _logger = logger;
 
     internal async Task EnsureExists(string textEmbeddingModelId, CancellationToken cancellationToken = default)
     {
-        await foreach (var name in _indexClient.GetIndexNamesAsync(cancellationToken))
+        await foreach (var name in indexClient.GetIndexNamesAsync(cancellationToken))
             if (string.Equals(name, _indexName, StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogInformation("Index {Name} already exists", _indexName);
@@ -42,15 +32,15 @@ internal sealed class IndexBuilder
         {
             _logger.LogInformation("Creating index {Name}", _indexName);
             var index = LocationIndex.Index(_indexName, IndexOptions.JsonObjectSerializer);
-            await _indexClient.CreateIndexAsync(index, cancellationToken);
+            await indexClient.CreateIndexAsync(index, cancellationToken);
         }
         catch (RequestFailedException ex) when (ex.Status == 409) // Already exists
         {
             _logger.LogWarning("Index {Name} already exists {Message}", _indexName, ex.Message);
         }
 
-        var kernel = _kernelBuilder.Build();
-        var searchClient = _indexClient.GetSearchClient(_indexName);
+        var kernel = kernelBuilder.Build();
+        var searchClient = indexClient.GetSearchClient(_indexName);
         await foreach (var index in LoadEmbeddedResources(cancellationToken))
         {
             await GenerateEmbedding(index, kernel, textEmbeddingModelId, cancellationToken);

@@ -3,7 +3,7 @@ using Azure.Core.Pipeline;
 using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel;
+using TinyAgents.Maps.Azure;
 
 namespace TinyAgents.Maps;
 
@@ -33,16 +33,7 @@ public static class DependencyInjection
 
             return client;
         });
-
-        services.AddTransient<MapPlugin>();
-
+        services.AddTransient<IMapApi, MapApi>();
         return services;
-    }
-
-    public static IKernelBuilder ConfigureMapPlugin(this IKernelBuilder builder, IServiceProvider provider)
-    {
-        var mapPlugin = provider.GetRequiredService<MapPlugin>();
-        builder.Plugins.AddFromObject(mapPlugin);
-        return builder;
     }
 }

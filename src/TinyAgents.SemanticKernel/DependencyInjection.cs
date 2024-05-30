@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using TinyAgents.Maps;
 using TinyAgents.Search;
 using TinyAgents.SemanticKernel.Assistants;
@@ -16,14 +17,15 @@ public static class DependencyInjection
     {
         services.AddMaps();
         services.AddSearch();
-        services.AddOpenAI(environment,
-            (builder, provider) =>
-            {
-                builder.ConfigureMapPlugin(provider);
-                builder.ConfigureLocationPlugin(provider);
-            });
+        services.AddOpenAI(environment);
         services.AddAssistant(configuration);
 
         return services;
+    }
+
+    public static async Task EnsureIndexExists(this AsyncServiceScope scope)
+    {
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+        await scope.ServiceProvider.EnsureIndexExists(options.TextEmbeddingModelId);
     }
 }
