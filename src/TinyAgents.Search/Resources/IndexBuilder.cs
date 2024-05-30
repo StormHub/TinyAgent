@@ -1,25 +1,18 @@
 using System.Runtime.CompilerServices;
 using Azure;
 using Azure.Search.Documents.Indexes;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Embeddings;
 using TinyAgents.Search.Azure;
 
 namespace TinyAgents.Search.Resources;
 
-internal sealed class IndexBuilder(
-    SearchIndexClient indexClient,
-    IOptions<IndexOptions> options,
-    IKernelBuilder kernelBuilder,
-    ILogger<IndexBuilder> logger)
+internal sealed class IndexBuilder(SearchIndexClient indexClient, IOptions<IndexOptions> options, ILogger<IndexBuilder> logger)
 {
     private readonly string _indexName = options.Value.Name.ToLowerInvariant();
     private readonly ILogger _logger = logger;
 
-    internal async Task EnsureExists(string textEmbeddingModelId, CancellationToken cancellationToken = default)
+    internal async Task EnsureExists(ITextEmbedding textEmbedding, CancellationToken cancellationToken = default)
     {
         await foreach (var name in indexClient.GetIndexNamesAsync(cancellationToken))
             if (string.Equals(name, _indexName, StringComparison.OrdinalIgnoreCase))
@@ -39,22 +32,14 @@ internal sealed class IndexBuilder(
             _logger.LogWarning("Index {Name} already exists {Message}", _indexName, ex.Message);
         }
 
-        var kernel = kernelBuilder.Build();
         var searchClient = indexClient.GetSearchClient(_indexName);
         await foreach (var index in LoadEmbeddedResources(cancellationToken))
         {
-            await GenerateEmbedding(index, kernel, textEmbeddingModelId, cancellationToken);
+            var text = index.GetText();
+            var embedding = await textEmbedding.Generate(text, cancellationToken);
+            index.Embedding = embedding.ToArray();
             await searchClient.UploadDocumentsAsync([index], cancellationToken: cancellationToken);
         }
-    }
-
-    private static async Task GenerateEmbedding(LocationIndex index, Kernel kernel, string textEmbeddingModelId,
-        CancellationToken cancellationToken)
-    {
-        var generator = kernel.Services.GetRequiredKeyedService<ITextEmbeddingGenerationService>(textEmbeddingModelId);
-        var text = index.GetText();
-        var embedding = await generator.GenerateEmbeddingAsync(text, kernel, cancellationToken);
-        index.Embedding = embedding.ToArray();
     }
 
     private async IAsyncEnumerable<LocationIndex> LoadEmbeddedResources(

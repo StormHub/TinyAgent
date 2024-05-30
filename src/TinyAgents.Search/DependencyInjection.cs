@@ -60,9 +60,9 @@ public static class DependencyInjection
         return services;
     }
 
-    public static async Task EnsureIndexExists(this IServiceProvider provider, string textEmbeddingModelId)
+    public static async Task EnsureIndexExists(this IServiceProvider provider, ITextEmbedding textEmbedding)
     {
         var indexBuilder = provider.GetRequiredService<IndexBuilder>();
-        await indexBuilder.EnsureExists(textEmbeddingModelId);
+        await indexBuilder.EnsureExists(textEmbedding);
     }
 }
