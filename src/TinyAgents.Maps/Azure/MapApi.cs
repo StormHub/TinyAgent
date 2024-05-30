@@ -9,9 +9,8 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
     {
         var options = request.GetOptions();
         var response = await mapsSearchClient.SearchAddressAsync(request.Address, options, cancellationToken);
-        var result = response?.Value;
-
-        return new GetPositionsResponse(result?.Results ?? []);
+        
+        return new GetPositionsResponse(response?.Value?.Results ?? []);
     }
 
     public async Task<GetAddressesResponse> GetAddresses(GetAddressesRequest request,
@@ -19,8 +18,7 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
     {
         var options = request.GetOptions();
         var response = await mapsSearchClient.ReverseSearchAddressAsync(options, cancellationToken);
-        var result = response?.Value;
 
-        return new GetAddressesResponse(result?.Addresses ?? []);
+        return new GetAddressesResponse(response?.Value?.Addresses ?? []);
     }
 }
