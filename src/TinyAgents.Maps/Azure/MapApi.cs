@@ -9,7 +9,7 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
     {
         var options = request.GetOptions();
         var response = await mapsSearchClient.SearchAddressAsync(request.Address, options, cancellationToken);
-        
+
         return new GetPositionsResponse(response?.Value?.Results ?? []);
     }
 
