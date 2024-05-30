@@ -11,13 +11,14 @@ namespace TinyAgents.SemanticKernel.Assistants;
 
 internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
 {
-    private readonly AssistantOptions? _options;
-    private readonly IKernelBuilder _kernelBuilder;
     private readonly IAgentSetup _agentSetup;
+    private readonly IKernelBuilder _kernelBuilder;
+    private readonly AssistantOptions? _options;
 
     public AssistantAgentBuilder(
-        IKernelBuilder kernelBuilder, 
-        [FromKeyedServices(nameof(ChargingLocationsSetup))] IAgentSetup agentSetup, 
+        IKernelBuilder kernelBuilder,
+        [FromKeyedServices(nameof(ChargingLocationsSetup))]
+        IAgentSetup agentSetup,
         IConfiguration configuration)
     {
         var section = configuration.GetSection(nameof(AssistantOptions));

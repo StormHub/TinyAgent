@@ -21,7 +21,7 @@ internal sealed class ChargingLocationsSetup(IServiceProvider serviceProvider) :
     {
         var mapPlugin = serviceProvider.GetRequiredService<MapPlugin>();
         builder.Plugins.AddFromObject(mapPlugin);
-        
+
         var searchPlugin = serviceProvider.GetRequiredService<SearchPlugin>();
         builder.Plugins.AddFromObject(searchPlugin);
 
