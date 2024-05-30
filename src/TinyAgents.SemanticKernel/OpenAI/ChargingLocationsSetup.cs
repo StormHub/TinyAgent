@@ -1,10 +1,11 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.OpenAI.Plugins;
 
 namespace TinyAgents.SemanticKernel.OpenAI;
 
-internal sealed class ChargingLocationsSetup(MapPlugin mapPlugin, SearchPlugin searchPlugin) : IAgentSetup
+internal sealed class ChargingLocationsSetup(IServiceProvider serviceProvider) : IAgentSetup
 {
     public string Name => "ChargingLocationsAssistant";
 
@@ -18,7 +19,10 @@ internal sealed class ChargingLocationsSetup(MapPlugin mapPlugin, SearchPlugin s
 
     public IKernelBuilder Configure(IKernelBuilder builder)
     {
+        var mapPlugin = serviceProvider.GetRequiredService<MapPlugin>();
         builder.Plugins.AddFromObject(mapPlugin);
+        
+        var searchPlugin = serviceProvider.GetRequiredService<SearchPlugin>();
         builder.Plugins.AddFromObject(searchPlugin);
 
         return builder;

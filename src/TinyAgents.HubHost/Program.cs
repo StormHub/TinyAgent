@@ -5,12 +5,12 @@ IHost? host = default;
 try
 {
     host = AgentHostBuilder.Build(args);
-    
+
     await using (var scope = host.Services.CreateAsyncScope())
     {
         await scope.EnsureIndexExists();
     }
-    
+
     await host.RunAsync();
 }
 catch (Exception ex)

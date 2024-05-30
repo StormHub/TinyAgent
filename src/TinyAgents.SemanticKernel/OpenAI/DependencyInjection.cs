@@ -27,7 +27,7 @@ internal static class DependencyInjection
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
-        services.AddKeyedTransient<IAgentSetup, ChargingLocationsSetup>(nameof(ChargingLocationsSetup));
+        services.AddKeyedSingleton<IAgentSetup, ChargingLocationsSetup>(nameof(ChargingLocationsSetup));
 
         services.AddTransient(provider =>
         {

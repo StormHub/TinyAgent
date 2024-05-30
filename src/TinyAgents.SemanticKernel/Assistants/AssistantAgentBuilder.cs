@@ -12,23 +12,24 @@ namespace TinyAgents.SemanticKernel.Assistants;
 internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
 {
     private readonly AssistantOptions? _options;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IKernelBuilder _kernelBuilder;
+    private readonly IAgentSetup _agentSetup;
 
-    public AssistantAgentBuilder(IServiceProvider serviceProvider)
+    public AssistantAgentBuilder(
+        IKernelBuilder kernelBuilder, 
+        [FromKeyedServices(nameof(ChargingLocationsSetup))] IAgentSetup agentSetup, 
+        IConfiguration configuration)
     {
-        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
         var section = configuration.GetSection(nameof(AssistantOptions));
         _options = section.Exists() ? section.Get<AssistantOptions>() : default;
 
-        _serviceProvider = serviceProvider;
+        _kernelBuilder = kernelBuilder;
+        _agentSetup = agentSetup;
     }
 
     public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
-        var builder = _serviceProvider.GetRequiredService<IKernelBuilder>();
-        var setup = _serviceProvider.GetRequiredKeyedService<IAgentSetup>(nameof(ChargingLocationsSetup));
-
-        var kernel = setup.Configure(builder).Build();
+        var kernel = _agentSetup.Configure(_kernelBuilder).Build();
 
         KernelAgent? agent = default;
         if (_options is not null)
@@ -44,8 +45,8 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
 
             var definition = new OpenAIAssistantDefinition
             {
-                Name = setup.Name,
-                Instructions = setup.Instructions,
+                Name = _agentSetup.Name,
+                Instructions = _agentSetup.Instructions,
                 ModelId = _options.ModelId
             };
 
@@ -59,8 +60,8 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
         agent ??= new ChatCompletionAgent
         {
             Kernel = kernel,
-            Name = setup.Name,
-            Instructions = setup.Instructions,
+            Name = _agentSetup.Name,
+            Instructions = _agentSetup.Instructions,
             ExecutionSettings = new OpenAIPromptExecutionSettings
             {
                 Temperature = 0,
