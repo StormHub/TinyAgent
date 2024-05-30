@@ -18,14 +18,14 @@ internal sealed class ChargingLocationsSetup(IServiceProvider serviceProvider) :
         Don't waste time with chit chat.
         """;
 
-    public IKernelBuilder Configure(IKernelBuilder builder)
+    public Kernel Configure(Kernel kernel)
     {
         var mapPlugin = serviceProvider.GetRequiredService<MapPlugin>();
-        builder.Plugins.AddFromObject(mapPlugin);
+        kernel.Plugins.AddFromObject(mapPlugin);
 
         var searchPlugin = serviceProvider.GetRequiredService<SearchPlugin>();
-        builder.Plugins.AddFromObject(searchPlugin);
+        kernel.Plugins.AddFromObject(searchPlugin);
 
-        return builder;
+        return kernel;
     }
 }

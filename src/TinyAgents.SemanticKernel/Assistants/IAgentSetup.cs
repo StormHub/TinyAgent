@@ -2,11 +2,11 @@ using Microsoft.SemanticKernel;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
-public interface IAgentSetup
+internal interface IAgentSetup
 {
     string Name { get; }
 
     string Instructions { get; }
 
-    IKernelBuilder Configure(IKernelBuilder builder);
+    Kernel Configure(Kernel kernel);
 }

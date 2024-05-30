@@ -14,7 +14,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
         var id = Context.ConnectionId;
         if (!Agents.TryGetValue(id, out var agent))
         {
-            agent = await builder.Build(Context.ConnectionAborted);
+            agent = await builder.Build(AssistantAgentType.ChargingLocationFinder, Context.ConnectionAborted);
             Agents.AddOrUpdate(id, _ => agent, (_, _) => agent);
         }
 

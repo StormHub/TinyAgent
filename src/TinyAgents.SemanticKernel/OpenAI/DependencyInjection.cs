@@ -27,7 +27,7 @@ internal static class DependencyInjection
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
-        services.AddKeyedSingleton<IAgentSetup, ChargingLocationsSetup>(nameof(ChargingLocationsSetup));
+        services.AddSingleton<ChargingLocationsSetup>();
 
         services.AddTransient(provider =>
         {
@@ -71,6 +71,9 @@ internal static class DependencyInjection
                     httpClient);
             }
 
+            var chargingLocationsSetup = provider.GetRequiredService<ChargingLocationsSetup>();
+            kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
+                AssistantAgentType.ChargingLocationFinder, chargingLocationsSetup);
             kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 
