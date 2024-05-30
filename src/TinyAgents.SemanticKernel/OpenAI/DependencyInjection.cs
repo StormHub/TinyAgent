@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.Http;
 using TinyAgents.SemanticKernel.OpenAI.Plugins;
 
@@ -26,6 +27,7 @@ internal static class DependencyInjection
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
+        services.AddKeyedTransient<IAgentSetup, ChargingLocationsSetup>(nameof(ChargingLocationsSetup));
 
         services.AddTransient(provider =>
         {
@@ -71,12 +73,6 @@ internal static class DependencyInjection
 
             kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
-
-            var mapPlugin = provider.GetRequiredService<MapPlugin>();
-            kernelBuilder.Plugins.AddFromObject(mapPlugin);
-
-            var searchPlugin = provider.GetRequiredService<SearchPlugin>();
-            kernelBuilder.Plugins.AddFromObject(searchPlugin);
 
             return kernelBuilder;
         });

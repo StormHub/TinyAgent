@@ -1,31 +1,34 @@
 using Azure.AI.OpenAI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using TinyAgents.SemanticKernel.OpenAI;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
-internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptions<AssistantOptions>? options)
-    : IAssistantAgentBuilder
+internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
 {
-    private const string Name = "Assistant";
+    private readonly AssistantOptions? _options;
+    private readonly IServiceProvider _serviceProvider;
 
-    private const string Instructions =
-        """
-        You are an assistent helping users to find vehicle charging locations from Postal address, postcode, suburbs in Australia.
-        The goal is to find the closest vehicle charging locations for users.
-        You're laser focused on the goal at hand.
-        Don't waste time with chit chat.
-        """;
+    public AssistantAgentBuilder(IServiceProvider serviceProvider)
+    {
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var section = configuration.GetSection(nameof(AssistantOptions));
+        _options = section.Exists() ? section.Get<AssistantOptions>() : default;
 
-    private readonly AssistantOptions? _options = options?.Value;
+        _serviceProvider = serviceProvider;
+    }
 
     public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
-        var kernel = kernelBuilder.Build();
+        var builder = _serviceProvider.GetRequiredService<IKernelBuilder>();
+        var setup = _serviceProvider.GetRequiredKeyedService<IAgentSetup>(nameof(ChargingLocationsSetup));
+
+        var kernel = setup.Configure(builder).Build();
 
         KernelAgent? agent = default;
         if (_options is not null)
@@ -41,8 +44,8 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
 
             var definition = new OpenAIAssistantDefinition
             {
-                Instructions = Instructions,
-                Name = Name,
+                Name = setup.Name,
+                Instructions = setup.Instructions,
                 ModelId = _options.ModelId
             };
 
@@ -56,8 +59,8 @@ internal sealed class AssistantAgentBuilder(IKernelBuilder kernelBuilder, IOptio
         agent ??= new ChatCompletionAgent
         {
             Kernel = kernel,
-            Name = Name,
-            Instructions = Instructions,
+            Name = setup.Name,
+            Instructions = setup.Instructions,
             ExecutionSettings = new OpenAIPromptExecutionSettings
             {
                 Temperature = 0,

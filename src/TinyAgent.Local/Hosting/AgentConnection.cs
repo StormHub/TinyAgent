@@ -6,6 +6,7 @@ namespace TinyAgent.Local.Hosting;
 internal sealed class AgentConnection : IAsyncDisposable
 {
     private readonly HubConnection _connection;
+
     public AgentConnection(IOptions<AgentOptions> options)
     {
         var options1 = options.Value;
