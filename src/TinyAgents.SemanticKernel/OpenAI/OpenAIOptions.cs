@@ -8,7 +8,8 @@ public sealed class OpenAIOptions
 
     [Required(AllowEmptyStrings = false)] public required string TextGenerationModelId { get; init; }
 
-    [Required(AllowEmptyStrings = false)] public required string TextEmbeddingModelId { get; init; }
-
     [Required] public required string ApiKey { get; init; }
+
+    // Optional for OpenAI
+    public string? OrganizationId { get; init; }
 }

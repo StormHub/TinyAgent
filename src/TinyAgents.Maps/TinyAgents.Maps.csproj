@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TinyAgents.Shared\TinyAgents.Shared.csproj" />
+        <ProjectReference Include="..\TinyAgents.Shared\TinyAgents.Shared.csproj"/>
     </ItemGroup>
 
 </Project>

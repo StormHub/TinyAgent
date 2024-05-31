@@ -40,7 +40,7 @@ public static class DependencyInjection
 
         services.AddHttpClient(nameof(RouteApi))
             .AddHttpMessageHandler<TraceHttpHandler>();
-        
+
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
@@ -50,9 +50,9 @@ public static class DependencyInjection
 
             var options = new MapsRoutingClientOptions
             {
-                Transport = new HttpClientTransport(httpClient),
+                Transport = new HttpClientTransport(httpClient)
             };
-            
+
             return new MapsRoutingClient(
                 new AzureKeyCredential(mapOptions.ApiKey),
                 options);

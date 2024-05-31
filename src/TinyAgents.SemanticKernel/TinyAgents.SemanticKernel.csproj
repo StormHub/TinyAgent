@@ -22,7 +22,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\TinyAgents.Maps\TinyAgents.Maps.csproj"/>
-        <ProjectReference Include="..\TinyAgents.Search\TinyAgents.Search.csproj"/>
     </ItemGroup>
 
 </Project>

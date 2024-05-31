@@ -32,12 +32,8 @@ internal sealed class RoutingPlugin(IRouteApi routeApi)
 
             buffer.AppendLine(" Route path:");
             if (route.Guidance is not null)
-            {
                 foreach (var instruction in route.Guidance.Instructions)
-                {
                     buffer.AppendLine(instruction.Message);
-                }
-            }
         }
 
         return buffer.ToString();

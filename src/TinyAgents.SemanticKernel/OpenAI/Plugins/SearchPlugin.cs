@@ -22,9 +22,7 @@ internal sealed class SearchPlugin(IMapApi mapApi)
         {
             buffer.AppendLine($"address: {result.Address.FreeformAddress}");
             if (result.DistanceInMeters.HasValue)
-            {
                 buffer.AppendLine($"kilometers: {Math.Round(result.DistanceInMeters.Value / 1000, 2)}");
-            }
             buffer.AppendLine($"name: {result.PointOfInterest.Name}");
         }
 

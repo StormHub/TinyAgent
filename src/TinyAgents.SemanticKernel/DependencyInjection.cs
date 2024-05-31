@@ -1,10 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel;
 using TinyAgents.Maps;
-using TinyAgents.Search;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.OpenAI;
 
@@ -17,19 +14,9 @@ public static class DependencyInjection
         IHostEnvironment environment)
     {
         services.AddMaps();
-        services.AddSearch();
         services.AddOpenAI(environment);
         services.AddAssistant(configuration);
 
         return services;
-    }
-
-    public static async Task EnsureIndexExists(this AsyncServiceScope scope)
-    {
-        var options = scope.ServiceProvider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
-        var builder = scope.ServiceProvider.GetRequiredService<IKernelBuilder>();
-        var kernel = builder.Build();
-        var textEmbedding = new TextEmbedding(kernel, options.TextEmbeddingModelId);
-        await scope.ServiceProvider.EnsureIndexExists(textEmbedding);
     }
 }

@@ -36,7 +36,6 @@ internal static class DependencyInjection
 
             var kernelBuilder = Kernel.CreateBuilder();
             if (openAIOptions.Uri.Host.EndsWith("openai.azure.com"))
-            {
                 kernelBuilder.AddAzureOpenAIChatCompletion(
                     openAIOptions.TextGenerationModelId,
                     openAIOptions.Uri.ToString(),
@@ -44,30 +43,13 @@ internal static class DependencyInjection
                     openAIOptions.TextGenerationModelId,
                     openAIOptions.TextGenerationModelId,
                     httpClient);
-
-                kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(
-                    openAIOptions.TextEmbeddingModelId,
-                    openAIOptions.Uri.ToString(),
-                    openAIOptions.ApiKey,
-                    openAIOptions.TextEmbeddingModelId,
-                    openAIOptions.TextEmbeddingModelId,
-                    httpClient);
-            }
             else
-            {
                 kernelBuilder.AddOpenAIChatCompletion(
                     openAIOptions.TextGenerationModelId,
                     apiKey: openAIOptions.ApiKey,
                     endpoint: openAIOptions.Uri,
+                    orgId: openAIOptions.OrganizationId,
                     httpClient: httpClient);
-
-                kernelBuilder.AddOpenAITextEmbeddingGeneration(
-                    openAIOptions.TextGenerationModelId,
-                    openAIOptions.ApiKey,
-                    default,
-                    openAIOptions.TextGenerationModelId,
-                    httpClient);
-            }
 
             kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
                 AssistantAgentType.ChargingLocations,

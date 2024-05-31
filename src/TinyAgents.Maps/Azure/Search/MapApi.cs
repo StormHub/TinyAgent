@@ -22,13 +22,13 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
         return new GetAddressesResponse(response?.Value?.Addresses ?? []);
     }
 
-    public async Task<GetPointOfInterestResponse> GetPointOfInterest(GetPointOfInterestRequest request, 
+    public async Task<GetPointOfInterestResponse> GetPointOfInterest(GetPointOfInterestRequest request,
         CancellationToken cancellationToken = default)
     {
         var options = request.GetOptions();
         var response = await mapsSearchClient.SearchPointOfInterestAsync(
             request.Query,
-            options: options, 
+            options: options,
             cancellationToken: cancellationToken);
 
         return new GetPointOfInterestResponse(response?.Value.Results ?? []);
