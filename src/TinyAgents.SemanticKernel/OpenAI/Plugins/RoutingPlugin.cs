@@ -31,7 +31,13 @@ internal sealed class RoutingPlugin(IRouteApi routeApi)
                 $" Total length: {route.Summary.LengthInMeters} meters, travel time: {route.Summary.TravelTimeDuration} seconds");
 
             buffer.AppendLine(" Route path:");
-            foreach (var instruction in route.Guidance.Instructions) buffer.AppendLine(instruction.Message);
+            if (route.Guidance is not null)
+            {
+                foreach (var instruction in route.Guidance.Instructions)
+                {
+                    buffer.AppendLine(instruction.Message);
+                }
+            }
         }
 
         return buffer.ToString();

@@ -15,10 +15,10 @@ public sealed class GetRouteDirectionsRequest(
     {
         var options = new RouteDirectionOptions
         {
-            RouteType = RouteType.Fastest,
+            RouteType = RouteType.Shortest,
             TravelMode = TravelMode.Car,
             UseTrafficData = UseTrafficInformation,
-            InstructionsType = RouteInstructionsType.Text
+            InstructionsType = RouteInstructionsType.Tagged
         };
 
         return options;

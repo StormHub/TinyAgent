@@ -1,11 +1,10 @@
 using System.ComponentModel;
 using Microsoft.SemanticKernel;
-using Microsoft.Spatial;
-using TinyAgents.Search.Azure;
+using TinyAgents.Maps.Azure.Search;
 
 namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 
-internal sealed class SearchPlugin(ISearchApi searchApi)
+internal sealed class SearchPlugin(IMapApi mapApi)
 {
     [KernelFunction(nameof(GetLocations))]
     [Description(
@@ -15,16 +14,18 @@ internal sealed class SearchPlugin(ISearchApi searchApi)
         [Description("GPS longitude")] double longitude,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetLocationsRequest(latitude, longitude);
-        var response = await searchApi.GetLocations(request, cancellationToken);
+        var request = new GetPointOfInterestRequest("electric vehicle station", latitude, longitude);
+        var response = await mapApi.GetPointOfInterest(request, cancellationToken);
 
         var buffer = new StringBuilder();
-        foreach (var location in response.Locations)
+        foreach (var result in response.Results)
         {
-            buffer.Append(location.GetText());
-
-            var distance = location.Point.Distance(request.Point);
-            buffer.AppendLine($" kilometers: {distance}\r\n");
+            buffer.AppendLine($"address: {result.Address.FreeformAddress}");
+            if (result.DistanceInMeters.HasValue)
+            {
+                buffer.AppendLine($"kilometers: {Math.Round(result.DistanceInMeters.Value / 1000, 2)}");
+            }
+            buffer.AppendLine($"name: {result.PointOfInterest.Name}");
         }
 
         return buffer.ToString();

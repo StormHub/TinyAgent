@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TinyAgents.Maps.Azure.Routing;
 using TinyAgents.Maps.Azure.Search;
+using TinyAgents.Shared.Http;
 
 namespace TinyAgents.Maps;
 
@@ -23,10 +24,10 @@ public static class DependencyInjection
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(MapApi));
 
-            var options = provider.GetRequiredService<IOptions<MapOptions>>().Value;
+            var mapOptions = provider.GetRequiredService<IOptions<MapOptions>>().Value;
 
             return new MapsSearchClient(
-                new AzureKeyCredential(options.ApiKey),
+                new AzureKeyCredential(mapOptions.ApiKey),
                 new MapsSearchClientOptions
                 {
                     Transport = new HttpClientTransport(httpClient)
@@ -34,20 +35,25 @@ public static class DependencyInjection
         });
         services.AddTransient<IMapApi, MapApi>();
 
-        services.AddHttpClient(nameof(RouteApi));
+        services.AddTransient<TraceHttpHandler>();
+        services.AddHttpClient(nameof(RouteApi))
+            .AddHttpMessageHandler<TraceHttpHandler>();
+        
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(RouteApi));
 
-            var options = provider.GetRequiredService<IOptions<MapOptions>>().Value;
+            var mapOptions = provider.GetRequiredService<IOptions<MapOptions>>().Value;
 
+            var options = new MapsRoutingClientOptions
+            {
+                Transport = new HttpClientTransport(httpClient),
+            };
+            
             return new MapsRoutingClient(
-                new AzureKeyCredential(options.ApiKey),
-                new MapsRoutingClientOptions
-                {
-                    Transport = new HttpClientTransport(httpClient)
-                });
+                new AzureKeyCredential(mapOptions.ApiKey),
+                options);
         });
         services.AddTransient<IRouteApi, RouteApi>();
 

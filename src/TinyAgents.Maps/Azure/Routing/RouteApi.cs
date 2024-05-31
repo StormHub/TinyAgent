@@ -9,7 +9,6 @@ internal sealed class RouteApi(MapsRoutingClient mapsRoutingClient) : IRouteApi
     {
         var options = request.GetOptions();
         var query = new RouteDirectionQuery(request.RoutePoints.ToList(), options);
-
         var response = await mapsRoutingClient.GetDirectionsAsync(query, cancellationToken);
         return new GetRouteDirectionsResponse(response.Value);
     }
