@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
-using TinyAgents.SemanticKernel.Http;
 using TinyAgents.SemanticKernel.OpenAI.Plugins;
 using TinyAgents.SemanticKernel.OpenAI.Setup;
 
@@ -19,12 +18,7 @@ internal static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
-        var builder = services.AddHttpClient(nameof(OpenAIClient));
-        if (environment.IsDevelopment())
-        {
-            services.AddTransient<TraceHttpHandler>();
-            builder.AddHttpMessageHandler<TraceHttpHandler>();
-        }
+        services.AddHttpClient(nameof(OpenAIClient));
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
