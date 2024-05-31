@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using Azure.Core.GeoJson;
 using Microsoft.SemanticKernel;
 using TinyAgents.Maps.Azure.Search;
 
@@ -14,15 +13,14 @@ internal sealed class MapPlugin(IMapApi mapApi)
         string location, CancellationToken cancellationToken = default)
     {
         var response = await mapApi.GetPositions(new GetPositionsRequest(location), cancellationToken);
-        var position = response.Positions.Count > 0
-            ? response.Positions.First()
-            : default(GeoPosition?);
+        var result = response.Results.FirstOrDefault();
 
         var buffer = new StringBuilder();
-        if (position.HasValue)
+        if (result is not null)
         {
-            buffer.AppendLine($"latitude: {position.Value.Latitude}");
-            buffer.AppendLine($"longitude: {position.Value.Longitude}");
+            var position = result.Position;
+            buffer.AppendLine($"latitude: {position.Latitude}");
+            buffer.AppendLine($"longitude: {position.Longitude}");
         }
         else
         {
@@ -44,25 +42,9 @@ internal sealed class MapPlugin(IMapApi mapApi)
 
         var buffer = new StringBuilder();
         if (result is not null)
-        {
-            if (!string.IsNullOrEmpty(result.Address.StreetNumber))
-                buffer.AppendLine($"street number: {result.Address.StreetNumber}");
-            buffer.AppendLine($"street name: {result.Address.StreetName}");
-
-            if (!string.IsNullOrEmpty(result.Address.MunicipalitySubdivision))
-                buffer.AppendLine($"suburb: {result.Address.MunicipalitySubdivision}");
-
-            buffer.AppendLine($"state: {result.Address.CountrySubdivision}");
-            buffer.AppendLine($"postcode: {result.Address.PostalCode}");
-            buffer.AppendLine($"country: {result.Address.Country}");
-
-            buffer.AppendLine($"latitude: {result.Position.Latitude}");
-            buffer.AppendLine($"longitude: {result.Position.Longitude}");
-        }
+            buffer.AppendLine($"address: {result.Address.FreeformAddress}");
         else
-        {
             buffer.AppendLine("Not found");
-        }
 
         return buffer.ToString();
     }

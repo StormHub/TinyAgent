@@ -18,7 +18,7 @@ public sealed class GetRouteDirectionsRequest(
             RouteType = RouteType.Shortest,
             TravelMode = TravelMode.Car,
             UseTrafficData = UseTrafficInformation,
-            InstructionsType = RouteInstructionsType.Tagged
+            InstructionsType = RouteInstructionsType.Text
         };
 
         return options;
