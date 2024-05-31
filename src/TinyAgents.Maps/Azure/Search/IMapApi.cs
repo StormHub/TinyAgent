@@ -6,6 +6,6 @@ public interface IMapApi
 
     Task<GetAddressesResponse> GetAddresses(GetAddressesRequest request, CancellationToken cancellationToken = default);
 
-    Task<GetPointOfInterestResponse> GetPointOfInterest(GetPointOfInterestRequest request,
+    Task<GetLocationsResponse> GetLocations(GetLocationsRequest request,
         CancellationToken cancellationToken = default);
 }

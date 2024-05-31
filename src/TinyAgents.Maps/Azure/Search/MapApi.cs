@@ -22,15 +22,15 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
         return new GetAddressesResponse(response?.Value?.Addresses ?? []);
     }
 
-    public async Task<GetPointOfInterestResponse> GetPointOfInterest(GetPointOfInterestRequest request,
+    public async Task<GetLocationsResponse> GetLocations(GetLocationsRequest request,
         CancellationToken cancellationToken = default)
     {
         var options = request.GetOptions();
         var response = await mapsSearchClient.SearchPointOfInterestAsync(
-            request.Query,
+            "electric vehicle station",
             options: options,
             cancellationToken: cancellationToken);
 
-        return new GetPointOfInterestResponse(response?.Value.Results ?? []);
+        return new GetLocationsResponse(response?.Value.Results ?? []);
     }
 }

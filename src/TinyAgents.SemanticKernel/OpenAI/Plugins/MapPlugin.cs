@@ -16,8 +16,8 @@ internal sealed class MapPlugin(IMapApi mapApi)
     {
         var response = await mapApi.GetPositions(new GetPositionsRequest(location), cancellationToken);
         var result = response.Results.FirstOrDefault();
-        return result is not null 
-            ? JsonSerializer.Serialize(result.Position, DefaultJsonOptions.DefaultSerializerOptions) 
+        return result is not null
+            ? JsonSerializer.Serialize(result.Position, DefaultJsonOptions.DefaultSerializerOptions)
             : default;
     }
 

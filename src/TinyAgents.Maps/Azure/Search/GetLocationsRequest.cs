@@ -4,10 +4,10 @@ using Azure.Maps.Search;
 
 namespace TinyAgents.Maps.Azure.Search;
 
-public sealed class GetPointOfInterestRequest(string query, double latitude, double longitude)
+public sealed class GetLocationsRequest(double latitude, double longitude)
 {
-    public string Query { get; } = query;
-
+    private const int DefaultMaximumResultCount = 5;
+    
     [Required] public GeoPosition Position { get; } = new(longitude, latitude);
 
     public SearchPointOfInterestOptions GetOptions()
@@ -15,7 +15,7 @@ public sealed class GetPointOfInterestRequest(string query, double latitude, dou
         var options = new SearchPointOfInterestOptions
         {
             Coordinates = Position,
-            Top = 5
+            Top = DefaultMaximumResultCount
         };
 
         return options;

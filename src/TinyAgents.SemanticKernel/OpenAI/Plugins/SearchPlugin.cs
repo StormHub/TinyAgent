@@ -1,6 +1,8 @@
 using System.ComponentModel;
+using System.Text.Json;
 using Microsoft.SemanticKernel;
 using TinyAgents.Maps.Azure.Search;
+using TinyAgents.Shared.Json;
 
 namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 
@@ -14,18 +16,9 @@ internal sealed class SearchPlugin(IMapApi mapApi)
         [Description("GPS longitude")] double longitude,
         CancellationToken cancellationToken = default)
     {
-        var request = new GetPointOfInterestRequest("electric vehicle station", latitude, longitude);
-        var response = await mapApi.GetPointOfInterest(request, cancellationToken);
+        var request = new GetLocationsRequest(latitude, longitude);
+        var response = await mapApi.GetLocations(request, cancellationToken);
 
-        var buffer = new StringBuilder();
-        foreach (var result in response.Results)
-        {
-            buffer.AppendLine($"address: {result.Address.FreeformAddress}");
-            if (result.DistanceInMeters.HasValue)
-                buffer.AppendLine($"kilometers: {Math.Round(result.DistanceInMeters.Value / 1000, 2)}");
-            buffer.AppendLine($"name: {result.PointOfInterest.Name}");
-        }
-
-        return buffer.ToString();
+        return JsonSerializer.Serialize(response, DefaultJsonOptions.DefaultSerializerOptions);
     }
 }
