@@ -12,10 +12,11 @@ internal sealed class SearchPlugin(ISearchApi searchApi)
         "Get electric vehicle charging locations within 100 kilometers radius from a given GPS latitude and longitude in Australia")]
     public async Task<string> GetLocations(
         [Description("GPS latitude")] double latitude,
-        [Description("GPS longitude")] double longitude)
+        [Description("GPS longitude")] double longitude,
+        CancellationToken cancellationToken = default)
     {
         var request = new GetLocationsRequest(latitude, longitude);
-        var response = await searchApi.GetLocations(request);
+        var response = await searchApi.GetLocations(request, cancellationToken);
 
         var buffer = new StringBuilder();
         foreach (var location in response.Locations)

@@ -3,9 +3,9 @@ using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.OpenAI.Plugins;
 
-namespace TinyAgents.SemanticKernel.OpenAI;
+namespace TinyAgents.SemanticKernel.OpenAI.Setup;
 
-internal sealed class ChargingLocationsSetup(IServiceProvider serviceProvider) : IAgentSetup
+internal sealed class ChargingLocationsSetup(IServiceProvider provider) : IAgentSetup
 {
     public string Name => "ChargingLocationsAssistant";
 
@@ -20,11 +20,8 @@ internal sealed class ChargingLocationsSetup(IServiceProvider serviceProvider) :
 
     public Kernel Configure(Kernel kernel)
     {
-        var mapPlugin = serviceProvider.GetRequiredService<MapPlugin>();
-        kernel.Plugins.AddFromObject(mapPlugin);
-
-        var searchPlugin = serviceProvider.GetRequiredService<SearchPlugin>();
-        kernel.Plugins.AddFromObject(searchPlugin);
+        kernel.Plugins.AddFromObject(provider.GetRequiredService<MapPlugin>());
+        kernel.Plugins.AddFromObject(provider.GetRequiredService<SearchPlugin>());
 
         return kernel;
     }

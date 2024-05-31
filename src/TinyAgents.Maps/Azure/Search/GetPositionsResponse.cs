@@ -1,7 +1,7 @@
 using Azure.Core.GeoJson;
 using Azure.Maps.Search.Models;
 
-namespace TinyAgents.Maps.Azure;
+namespace TinyAgents.Maps.Azure.Search;
 
 public sealed class GetPositionsResponse
 {

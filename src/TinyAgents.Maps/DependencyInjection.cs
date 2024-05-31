@@ -1,9 +1,11 @@
 using Azure;
 using Azure.Core.Pipeline;
+using Azure.Maps.Routing;
 using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TinyAgents.Maps.Azure;
+using TinyAgents.Maps.Azure.Routing;
+using TinyAgents.Maps.Azure.Search;
 
 namespace TinyAgents.Maps;
 
@@ -15,25 +17,40 @@ public static class DependencyInjection
             .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
-        services.AddHttpClient(nameof(MapsSearchClient));
-
+        services.AddHttpClient(nameof(MapApi));
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = factory.CreateClient(nameof(MapsSearchClient));
+            var httpClient = factory.CreateClient(nameof(MapApi));
 
             var options = provider.GetRequiredService<IOptions<MapOptions>>().Value;
 
-            var client = new MapsSearchClient(
+            return new MapsSearchClient(
                 new AzureKeyCredential(options.ApiKey),
                 new MapsSearchClientOptions
                 {
                     Transport = new HttpClientTransport(httpClient)
                 });
-
-            return client;
         });
         services.AddTransient<IMapApi, MapApi>();
+
+        services.AddHttpClient(nameof(RouteApi));
+        services.AddTransient(provider =>
+        {
+            var factory = provider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = factory.CreateClient(nameof(RouteApi));
+
+            var options = provider.GetRequiredService<IOptions<MapOptions>>().Value;
+
+            return new MapsRoutingClient(
+                new AzureKeyCredential(options.ApiKey),
+                new MapsRoutingClientOptions
+                {
+                    Transport = new HttpClientTransport(httpClient)
+                });
+        });
+        services.AddTransient<IRouteApi, RouteApi>();
+
         return services;
     }
 }

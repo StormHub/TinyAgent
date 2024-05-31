@@ -1,4 +1,4 @@
-namespace TinyAgents.Maps.Azure;
+namespace TinyAgents.Maps.Azure.Search;
 
 public interface IMapApi
 {

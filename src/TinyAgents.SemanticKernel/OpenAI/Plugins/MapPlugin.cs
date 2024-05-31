@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Azure.Core.GeoJson;
 using Microsoft.SemanticKernel;
-using TinyAgents.Maps.Azure;
+using TinyAgents.Maps.Azure.Search;
 
 namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 
@@ -11,9 +11,9 @@ internal sealed class MapPlugin(IMapApi mapApi)
     [Description("Get GPS positions for postal address, postcode, suburbs in Australia")]
     public async Task<string> GetPosition(
         [Description("Postal address, postcode, suburbs in Australia to search for")]
-        string location)
+        string location, CancellationToken cancellationToken = default)
     {
-        var response = await mapApi.GetPositions(new GetPositionsRequest(location));
+        var response = await mapApi.GetPositions(new GetPositionsRequest(location), cancellationToken);
         var position = response.Positions.Count > 0
             ? response.Positions.First()
             : default(GeoPosition?);
@@ -36,9 +36,10 @@ internal sealed class MapPlugin(IMapApi mapApi)
     [Description("Get the address for a given GPS latitude and longitude in Australia")]
     public async Task<string> GetAddress(
         [Description("GPS latitude")] double latitude,
-        [Description("GPS longitude")] double longitude)
+        [Description("GPS longitude")] double longitude,
+        CancellationToken cancellationToken = default)
     {
-        var response = await mapApi.GetAddresses(new GetAddressesRequest(latitude, longitude));
+        var response = await mapApi.GetAddresses(new GetAddressesRequest(latitude, longitude), cancellationToken);
         var result = response.Addresses.FirstOrDefault();
 
         var buffer = new StringBuilder();

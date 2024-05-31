@@ -1,6 +1,6 @@
 using Azure.Maps.Search;
 
-namespace TinyAgents.Maps.Azure;
+namespace TinyAgents.Maps.Azure.Search;
 
 internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
 {

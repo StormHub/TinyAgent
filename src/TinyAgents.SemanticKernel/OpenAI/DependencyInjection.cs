@@ -7,6 +7,7 @@ using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.Http;
 using TinyAgents.SemanticKernel.OpenAI.Plugins;
+using TinyAgents.SemanticKernel.OpenAI.Setup;
 
 namespace TinyAgents.SemanticKernel.OpenAI;
 
@@ -27,7 +28,10 @@ internal static class DependencyInjection
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
+        services.AddTransient<RoutingPlugin>();
+
         services.AddSingleton<ChargingLocationsSetup>();
+        services.AddSingleton<RouteDirectionsSetup>();
 
         services.AddTransient(provider =>
         {
@@ -71,9 +75,14 @@ internal static class DependencyInjection
                     httpClient);
             }
 
-            var chargingLocationsSetup = provider.GetRequiredService<ChargingLocationsSetup>();
             kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
-                AssistantAgentType.ChargingLocationFinder, chargingLocationsSetup);
+                AssistantAgentType.ChargingLocations,
+                provider.GetRequiredService<ChargingLocationsSetup>());
+
+            kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
+                AssistantAgentType.RouteDirections,
+                provider.GetRequiredService<RouteDirectionsSetup>());
+
             kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 

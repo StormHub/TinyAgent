@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Azure.Core.GeoJson;
 using Azure.Maps.Search;
 
-namespace TinyAgents.Maps.Azure;
+namespace TinyAgents.Maps.Azure.Search;
 
 public sealed class GetAddressesRequest(double latitude, double longitude)
 {

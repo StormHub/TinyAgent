@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Azure.Maps.Search;
 
-namespace TinyAgents.Maps.Azure;
+namespace TinyAgents.Maps.Azure.Search;
 
 public sealed class GetPositionsRequest(string address, bool extendedPostalCodes = true)
 {
