@@ -14,11 +14,8 @@ internal sealed class MapPlugin(IMapApi mapApi)
     {
         var response = await mapApi.GetPositions(new GetPositionsRequest(location), cancellationToken);
         var result = response.Results.FirstOrDefault();
-        if (result is null)
-        {
-            return default;
-        }
-        
+        if (result is null) return default;
+
         var buffer = new StringBuilder();
         buffer.AppendLine($"latitude: {result.Position.Latitude}");
         buffer.AppendLine($"longitude: {result.Position.Longitude}");
