@@ -25,12 +25,20 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
     public async Task<GetLocationsResponse> GetLocations(GetLocationsRequest request,
         CancellationToken cancellationToken = default)
     {
+        const string electricVehicleStation = "electric vehicle station";
+        
         var options = request.GetOptions();
         var response = await mapsSearchClient.SearchPointOfInterestAsync(
-            "electric vehicle station",
+            query: electricVehicleStation,
             options: options,
             cancellationToken: cancellationToken);
 
-        return new GetLocationsResponse(response?.Value.Results ?? []);
+        var results = new List<ChargingPark>();
+        await foreach (var result in response.AsEnumerable(cancellationToken))
+        {
+            results.Add(result);
+        }
+        
+        return new GetLocationsResponse(results);
     }
 }

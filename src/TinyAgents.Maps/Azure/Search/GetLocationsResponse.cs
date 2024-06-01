@@ -1,30 +1,214 @@
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using Azure;
 using Azure.Maps.Search.Models;
 
 namespace TinyAgents.Maps.Azure.Search;
 
-public record DistanceResult(double Kilometers);
-
-public sealed class LocationResult
+public sealed class ChargingConnector
 {
-    internal LocationResult(SearchAddressResultItem result)
+    internal ChargingConnector(string type, int ratedPowerInKilowatts, int voltage, string currentType, int currentAmpere)
     {
-        Address = result.Address.FreeformAddress;
-        Distance = result.DistanceInMeters.HasValue
-            ? new DistanceResult(Math.Round(result.DistanceInMeters.Value / 1000, 2))
-            : default;
+        Type = type;
+        RatedPowerInKilowatts = ratedPowerInKilowatts;
+        Voltage = voltage;
+        CurrentType = currentType;
+        CurrentAmpere = currentAmpere;
+    }
+    
+    public string Type { get; }
+    
+    public int RatedPowerInKilowatts { get; }
+    
+    public int Voltage { get; }
+    
+    public string CurrentType { get; }
+    
+    public int CurrentAmpere { get; }
+}
+
+internal static class ResponseExtensions
+{
+    public static async IAsyncEnumerable<ChargingPark> AsEnumerable(this Response<SearchAddressResult> response, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var connectors = await FromJson(
+            response.GetRawResponse().Content.ToStream(), 
+            cancellationToken);
+        
+        foreach (var result in response.Value.Results)
+        {
+            var distance = result.DistanceInMeters.HasValue
+                ? Math.Round(result.DistanceInMeters.Value / 1000, 2)
+                : default(double?);
+            
+            IEnumerable<ChargingConnector>? chargingConnectors = default;
+            if (connectors.TryGetValue(result.Id, out var value))
+            {
+                chargingConnectors = value;
+            }
+
+            yield return new ChargingPark(
+                result.PointOfInterest.Name, 
+                result.Address.FreeformAddress, 
+                chargingConnectors ?? [], 
+                distance);
+        }
     }
 
+    private static async Task<IReadOnlyDictionary<string, IReadOnlyCollection<ChargingConnector>>> FromJson(Stream stream, CancellationToken cancellationToken = default)
+    {
+        var results = new Dictionary<string, IReadOnlyCollection<ChargingConnector>>();
+
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken : cancellationToken);
+        foreach (var property in document.RootElement.EnumerateObject())
+        {
+            if (!property.NameEquals("results"u8))
+            {
+                continue;
+            }
+            
+            foreach (var item in property.Value.EnumerateArray())
+            {
+                var entry = GetResultEntry(item);
+                if (entry is not null)
+                {
+                    results.Add(entry.Value.Item1, entry.Value.Item2);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private static (string, IReadOnlyCollection<ChargingConnector>)? GetResultEntry(JsonElement jsonElement)
+    {
+        string? id = default;
+        var connectors = new List<ChargingConnector>();
+        foreach (var property in jsonElement.EnumerateObject())
+        {
+            if (property.NameEquals("id"u8))
+            {
+                id = property.Value.GetString();
+                continue;
+            }
+
+            if (property.NameEquals("chargingPark"u8))
+            {
+                foreach (var chargingParkProperty in property.Value.EnumerateObject())
+                {
+                    if (!chargingParkProperty.NameEquals("connectors"u8))
+                    {
+                        continue;
+                    }
+                    
+                    foreach (var item in chargingParkProperty.Value.EnumerateArray())
+                    {
+                        var connector = GetValue(item);
+                        if (connector is not null)
+                        {
+                            connectors.Add(connector);
+                        }
+                    }
+                }
+            }
+        }
+
+        return !string.IsNullOrEmpty(id) && connectors.Count > 0
+            ? (id, connectors)
+            : default((string, IReadOnlyCollection<ChargingConnector>)?);
+    }
+
+    private static ChargingConnector? GetValue(JsonElement jsonElement)
+    {
+        string? type = default;
+        int? ratedPowerInKilowatts = default;
+        int? voltage = default;
+        int? currentAmpere = default;
+        string? currentType = default;
+        
+        foreach (var connectorProperty in jsonElement.EnumerateObject())
+        {
+            if (connectorProperty.NameEquals("connectorType"u8))
+            {
+                type = connectorProperty.Value.GetString();
+                continue;
+            }
+
+            if (connectorProperty.NameEquals("ratedPowerKW"u8))
+            {
+                ratedPowerInKilowatts = connectorProperty.Value.GetInt32();
+                continue;
+            }
+
+            if (connectorProperty.NameEquals("voltageV"u8))
+            {
+                voltage = connectorProperty.Value.GetInt32();
+                continue;
+            }
+
+            if (connectorProperty.NameEquals("currentA"u8))
+            {
+                currentAmpere = connectorProperty.Value.GetInt32();
+                continue;
+            }
+
+            if (connectorProperty.NameEquals("currentType"u8))
+            {
+                var value = connectorProperty.Value.GetString();
+                if (value is not null)
+                {
+                    if (value.StartsWith("AC", StringComparison.OrdinalIgnoreCase))
+                    {
+                        currentType = "Alternating Current";
+                    }
+                    else if (value.StartsWith("DC", StringComparison.OrdinalIgnoreCase))
+                    {
+                        currentType = "Direct Current";
+                    }
+                }
+            }
+        }
+
+        return type is not null
+               && ratedPowerInKilowatts is not null
+               && voltage is not null
+               && currentAmpere is not null
+               && currentType is not null
+            ? new ChargingConnector(
+                type,
+                ratedPowerInKilowatts.Value,
+                voltage.Value,
+                currentType,
+                currentAmpere.Value)
+            : default;
+    }
+}
+
+public sealed class ChargingPark
+{
+    internal ChargingPark(string name, string address, IEnumerable<ChargingConnector> connectors, double? distanceInKilometers)
+    {
+        Name = name;
+        Address = address;
+        Connectors = connectors.ToArray();
+        DistanceInKilometers = distanceInKilometers;
+    }
+
+    public string Name { get; }
+    
     public string Address { get; }
 
-    public DistanceResult? Distance { get; }
+    public IReadOnlyCollection<ChargingConnector> Connectors { get; }
+    
+    public double? DistanceInKilometers { get; }
 }
 
 public sealed class GetLocationsResponse
 {
-    internal GetLocationsResponse(IReadOnlyList<SearchAddressResultItem> results)
+    internal GetLocationsResponse(IEnumerable<ChargingPark> results)
     {
-        Results = results.Select(x => new LocationResult(x)).ToArray();
+        Results = results.ToArray();
     }
 
-    public IReadOnlyCollection<LocationResult> Results { get; }
+    public IReadOnlyCollection<ChargingPark> Results { get; }
 }
