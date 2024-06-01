@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Text.Json;
 using Microsoft.SemanticKernel;
 using TinyAgents.Maps.Azure.Search;
-using TinyAgents.Shared.Json;
 
 namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 
@@ -16,9 +14,15 @@ internal sealed class MapPlugin(IMapApi mapApi)
     {
         var response = await mapApi.GetPositions(new GetPositionsRequest(location), cancellationToken);
         var result = response.Results.FirstOrDefault();
-        return result is not null
-            ? JsonSerializer.Serialize(result.Position, DefaultJsonOptions.DefaultSerializerOptions)
-            : default;
+        if (result is null)
+        {
+            return default;
+        }
+        
+        var buffer = new StringBuilder();
+        buffer.AppendLine($"latitude: {result.Position.Latitude}");
+        buffer.AppendLine($"longitude: {result.Position.Longitude}");
+        return buffer.ToString();
     }
 
     [KernelFunction(nameof(GetAddress))]

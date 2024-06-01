@@ -26,19 +26,16 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
         CancellationToken cancellationToken = default)
     {
         const string electricVehicleStation = "electric vehicle station";
-        
+
         var options = request.GetOptions();
         var response = await mapsSearchClient.SearchPointOfInterestAsync(
-            query: electricVehicleStation,
+            electricVehicleStation,
             options: options,
             cancellationToken: cancellationToken);
 
         var results = new List<ChargingPark>();
-        await foreach (var result in response.AsEnumerable(cancellationToken))
-        {
-            results.Add(result);
-        }
-        
+        await foreach (var result in response.AsEnumerable(cancellationToken)) results.Add(result);
+
         return new GetLocationsResponse(results);
     }
 }

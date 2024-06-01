@@ -7,7 +7,7 @@ namespace TinyAgents.Maps.Azure.Search;
 public sealed class GetLocationsRequest(double latitude, double longitude)
 {
     private const int DefaultMaximumResultCount = 5;
-    
+
     [Required] public GeoPosition Position { get; } = new(longitude, latitude);
 
     public SearchPointOfInterestOptions GetOptions()

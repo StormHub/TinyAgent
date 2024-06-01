@@ -1,8 +1,6 @@
 using System.ComponentModel;
-using System.Text.Json;
 using Microsoft.SemanticKernel;
 using TinyAgents.Maps.Azure.Search;
-using TinyAgents.Shared.Json;
 
 namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 
@@ -19,6 +17,22 @@ internal sealed class SearchPlugin(IMapApi mapApi)
         var request = new GetLocationsRequest(latitude, longitude);
         var response = await mapApi.GetLocations(request, cancellationToken);
 
-        return JsonSerializer.Serialize(response, DefaultJsonOptions.DefaultSerializerOptions);
+        var buffer = new StringBuilder();
+        foreach (var result in response.Results)
+        {
+            buffer.AppendLine($"name: {result.Name}");
+            buffer.AppendLine($"address: {result.Address}");
+            buffer.AppendLine($"distance: {result.DistanceInKilometers} kilometers");
+            foreach (var connector in result.Connectors)
+            {
+                buffer.Append($"connector type: {connector.Type}");
+                buffer.Append($"power type: {connector.CurrentType}");
+                buffer.Append($"rated power: {connector.RatedPowerInKilowatts} kilowatts");
+                buffer.Append($"voltage: {connector.Voltage}");
+                buffer.AppendLine($"current: {connector.CurrentAmpere} amp");
+            }
+        }
+
+        return buffer.ToString();
     }
 }
