@@ -15,7 +15,7 @@ internal static class AgentHostBuilder
         builder.Services.AddAssistanceAgent(builder.Configuration, builder.Environment);
 
         var app = builder.Build();
-        app.MapHub<AgentHub>("/agent/chat/completions");
+        app.MapHub<AgentHub>("/agent");
 
         return app;
     }
