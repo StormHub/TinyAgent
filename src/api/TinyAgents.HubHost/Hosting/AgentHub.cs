@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
 
 namespace TinyAgents.HubHost.Hosting;
@@ -30,7 +31,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async IAsyncEnumerable<string> Streaming(string input,
+    public async IAsyncEnumerable<ChatMessageContent> Streaming(string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var id = Context.ConnectionId;
@@ -38,8 +39,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
 
         await foreach (var message in agent.Invoke(input, cancellationToken))
         {
-            var content = message.Content;
-            if (!string.IsNullOrEmpty(content)) yield return content;
+            yield return message;
         }
     }
 }

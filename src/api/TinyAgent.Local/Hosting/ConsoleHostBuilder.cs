@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 
 namespace TinyAgent.Local.Hosting;
 
@@ -25,7 +26,7 @@ internal static class ConsoleHostBuilder
             .Build();
     }
 
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    private static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddOptions<AgentOptions>()
             .BindConfiguration(nameof(AgentOptions))
@@ -45,10 +46,13 @@ internal static class ConsoleHostBuilder
                 "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {CorrelationId} {Level:u3}] {Username} {Message:lj}{NewLine}{Exception}")
             .CreateBootstrapLogger();
 
-        builder.UseSerilog((hostContext, provider, configuration) =>
+        builder.UseSerilog((hostContext, _, configuration) =>
         {
             if (hostContext.Configuration.GetSection(nameof(Serilog)).Exists())
+            {
+                logger.Write(LogEventLevel.Information, "Load from Serilog configuration");
                 configuration.ReadFrom.Configuration(hostContext.Configuration);
+            }
         });
 
         return builder;
