@@ -12,7 +12,7 @@ internal sealed class ChargingLocationsSetup(IServiceProvider provider) : IAgent
     public string Instructions =>
         """
         You are an assistant helping users to find electric vehicle charging locations offer compatible charging connectors from Postal address, postcode, suburbs in Australia.
-        The goal is to find the closest vehicle charging locations offers compatible charger types for users.
+        The goal is to find the closest vehicle charging locations with compatible charger types for users.
         Answer questions only from given facts.
         """;
 

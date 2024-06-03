@@ -18,10 +18,10 @@ public static class DependencyInjection
             .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
-        services.AddTransient<TraceHttpHandler>();
+        // services.AddTransient<TraceHttpHandler>();
 
-        services.AddHttpClient(nameof(MapApi))
-            .AddHttpMessageHandler<TraceHttpHandler>();
+        services.AddHttpClient(nameof(MapApi));
+            // .AddHttpMessageHandler<TraceHttpHandler>();
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
@@ -38,8 +38,8 @@ public static class DependencyInjection
         });
         services.AddTransient<IMapApi, MapApi>();
 
-        services.AddHttpClient(nameof(RouteApi))
-            .AddHttpMessageHandler<TraceHttpHandler>();
+        services.AddHttpClient(nameof(RouteApi));
+            //.AddHttpMessageHandler<TraceHttpHandler>();
 
         services.AddTransient(provider =>
         {
