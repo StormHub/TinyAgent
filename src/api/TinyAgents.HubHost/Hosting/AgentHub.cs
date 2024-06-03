@@ -6,9 +6,10 @@ using TinyAgents.SemanticKernel.Assistants;
 
 namespace TinyAgents.HubHost.Hosting;
 
-internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
+internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub> logger) : Hub
 {
     private static readonly ConcurrentDictionary<string, IAssistantAgent> Agents = new();
+    private readonly ILogger _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
@@ -18,6 +19,8 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
             // agent = await builder.Build(AssistantAgentType.RouteDirections, Context.ConnectionAborted);
             agent = await builder.Build(AssistantAgentType.ChargingLocations, Context.ConnectionAborted);
             Agents.AddOrUpdate(id, _ => agent, (_, _) => agent);
+            
+            _logger.LogInformation("Connected {Id}", id);
         }
 
         await base.OnConnectedAsync();
@@ -27,6 +30,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder) : Hub
     {
         var id = Context.ConnectionId;
         if (Agents.TryRemove(id, out var agent)) await agent.DisposeAsync();
+        _logger.LogInformation("Disconnected {Id}", id);
 
         await base.OnDisconnectedAsync(exception);
     }
