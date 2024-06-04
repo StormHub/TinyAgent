@@ -10,11 +10,22 @@ internal static class AgentHostBuilder
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Host.UseLogging();
-
+        builder.Services.AddCors(
+            options => options.AddPolicy("AllowCors",
+                policyBuilder =>
+                {
+                    policyBuilder
+                        .WithOrigins("http://localhost:3000")
+                        .AllowCredentials()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                })
+        );
         builder.Services.AddSignalR();
         builder.Services.AddAssistanceAgent(builder.Configuration, builder.Environment);
 
         var app = builder.Build();
+        app.UseCors("AllowCors");
         app.MapHub<AgentHub>("/agent");
 
         return app;
