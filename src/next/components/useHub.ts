@@ -96,16 +96,15 @@ export const useHub = ({
             "Streaming",
             message.content
           );
-          console.log("invoke", messages);
+
           // Do an optimistic update to the chat state to show the updated messages
-          // immediately.
+          // immediately. Otherwise, users have to wait until message comes back to 
+          // see the input
           const previousMessages = messagesRef.current;
           mutate(data, false);
 
-          // mutate([...(messages || []), message]);
           const subscription = result.subscribe({
             next: (value) => {
-              console.log("subscribe", messages, value);
               const item = value.items.length ? value.items[0] : undefined;
               if (item) {
                 mutate(
