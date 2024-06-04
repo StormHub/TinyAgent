@@ -1,10 +1,18 @@
-'use client';
+"use client";
 
-import { Message, useChat } from 'ai/react';
+import { Message, useHub } from "@/components/useHub";
+
+// import { Message, useChat } from 'ai/react';
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, data } = useChat({
+  /*
+  const { messages, input, handleInputChange, handleSubmit, error } = useChat({
     api: '/api/use-chat-streamdata',
+  });
+  */
+
+  const { messages, input, handleInputChange, handleSubmit } = useHub({
+    initialMessages: [],
   });
 
   return (
