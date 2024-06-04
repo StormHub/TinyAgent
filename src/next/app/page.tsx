@@ -1,6 +1,6 @@
 "use client";
 
-import { Message, useHub } from "@/components/useHub";
+import { MessageContent, useHub } from "@/components/useHub";
 
 // import { Message, useChat } from 'ai/react';
 
@@ -17,10 +17,10 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col w-full max-w-screen-md py-24 mx-auto stretch">
-      {messages?.map((m: Message) => (
-        <div key={m.id} className="whitespace-pre-wrap">
-          <strong>{`${m.role}: `}</strong>
-          {m.content}
+      {messages?.map((x: MessageContent) => (
+        <div key={x.id} className="whitespace-pre-wrap">
+          <strong>{`${x.role}: `}</strong>
+          {x.content}
           <br />
           <br />
         </div>

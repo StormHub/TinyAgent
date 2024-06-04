@@ -5,21 +5,7 @@ import * as signalR from "@microsoft/signalr";
 import useSWR from "swr";
 import { generateId } from "ai";
 
-export type MessageTextContent = {
-  metadata: {
-    Id: string;
-  };
-  text: string;
-};
-
 export type MessageContent = {
-  role: {
-    label: string;
-  };
-  items: MessageTextContent[];
-};
-
-export type Message = {
   id: string;
   role: string;
   content: string;
@@ -35,23 +21,23 @@ export type JSONValue =
 
 export const useHub = ({
   initialInput = "",
-  initialMessages,
+  initialMessages = [],
 }: {
   initialInput?: string;
-  initialMessages?: Message[];
+  initialMessages?: MessageContent[];
 }) => {
   const chatKey = "agent";
 
   const [initialMessagesFallback] = React.useState([]);
 
   // Store the chat state in SWR, using the chatId as the key to share states.
-  const { data: messages, mutate } = useSWR<Message[]>(
+  const { data: messages, mutate } = useSWR<MessageContent[]>(
     [chatKey, "messages"],
     null,
     { fallbackData: initialMessages ?? initialMessagesFallback }
   );
   // Keep the latest messages in a ref.
-  const messagesRef = React.useRef<Message[]>(messages || []);
+  const messagesRef = React.useRef<MessageContent[]>(messages || []);
   React.useEffect(() => {
     messagesRef.current = messages || [];
   }, [messages]);
@@ -89,7 +75,7 @@ export const useHub = ({
   }, [connectionRef]);
 
   const triggerRequest = React.useCallback(
-    async ({ data, message }: { data: Message[]; message: Message }) => {
+    async ({ data, message }: { data: MessageContent[]; message: MessageContent }) => {
       try {
         if (connectionRef.current) {
           const result = connectionRef.current.stream<MessageContent>(
@@ -98,27 +84,22 @@ export const useHub = ({
           );
 
           // Do an optimistic update to the chat state to show the updated messages
-          // immediately. Otherwise, users have to wait until message comes back to 
+          // immediately. Otherwise, users have to wait until message comes back to
           // see the input
           const previousMessages = messagesRef.current;
           mutate(data, false);
 
           const subscription = result.subscribe({
             next: (value) => {
-              const item = value.items.length ? value.items[0] : undefined;
-              if (item) {
-                mutate(
-                  [
-                    ...data,
-                    {
-                      id: item.metadata.Id,
-                      role: value.role.label,
-                      content: item.text,
-                    },
-                  ],
-                  false
-                );
-              }
+              mutate(
+                [
+                  ...data,
+                  {
+                    ...value,
+                  },
+                ],
+                false
+              );
             },
             error: (err) => {
               // Restore the previous messages if the request fails.
@@ -143,7 +124,7 @@ export const useHub = ({
     async (input: string) => {
       const message = { id: generateId(), role: "user", content: input };
       return triggerRequest({
-        data: messagesRef.current.concat(message as Message),
+        data: messagesRef.current.concat(message as MessageContent),
         message,
       });
     },

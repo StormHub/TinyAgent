@@ -12,7 +12,6 @@
     "@ai-sdk/openai": "latest",
     "@microsoft/signalr": "^8.0.0",
     "ai": "latest",
-    "nanoid": "^5.0.7",
     "next": "latest",
     "openai": "4.47.1",
     "react": "^18",

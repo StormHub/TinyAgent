@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Serilog.Events;
 using TinyAgents.SemanticKernel;
+using TinyAgents.Shared.Json;
 
 namespace TinyAgents.HubHost.Hosting;
 
@@ -21,7 +22,8 @@ internal static class AgentHostBuilder
                         .AllowAnyMethod();
                 })
         );
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(options => { options.PayloadSerializerOptions.Setup(); });
         builder.Services.AddAssistanceAgent(builder.Configuration, builder.Environment);
 
         var app = builder.Build();
