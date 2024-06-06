@@ -62,6 +62,7 @@ export const useHub = ({
   const triggerRequest = React.useCallback(
     async ({ data, message }: { data: Message[]; message: Message }) => {
       try {
+        mutateLoading(true);
         if (connectionRef.current) {
           const result = connectionRef.current.stream<Message>(
             "Streaming",
@@ -93,13 +94,12 @@ export const useHub = ({
             },
             complete: () => {
               subscription.dispose();
+              mutateLoading(false);
             },
           });
         }
       } catch (err) {
         setError(err as Error);
-      } finally {
-        mutateLoading(false);
       }
     },
     [mutate, mutateLoading, setError, connectionRef, messagesRef]

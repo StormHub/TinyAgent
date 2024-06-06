@@ -8,9 +8,11 @@ import { Message } from "@/lib/types";
 
 export const Chat = ({
   messages,
+  isLoading,
   onSubmit,
 }: {
   messages: Message[];
+  isLoading: boolean;
   onSubmit: (input: string) => Promise<void>;
 }) => {
   const [input, setInput] = React.useState("");
@@ -23,7 +25,7 @@ export const Chat = ({
       ref={scrollRef}
     >
       <div ref={messagesRef}>
-        <ChatList messages={messages} />
+        <ChatList messages={messages} isLoading={isLoading} />
       </div>
       <div className="w-full h-px" ref={visibilityRef} />
       <ChatPanel
