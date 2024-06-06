@@ -13,8 +13,8 @@ export const ChatList = ({ messages }: { messages: Message[] }) => {
               className={cn(
                 "flex size-6 shrink-0 select-none items-center justify-center rounded-md border shadow",
                 message.role === "user"
-                  ? "bg-background"
-                  : "bg-primary text-primary-foreground"
+                  ? "bg-gray-500 text-gray-100"
+                  : "bg-gray-100 text-current"
               )}
             >
               {message.role === "user" ? <IconUser /> : <IconOpenAI />}
