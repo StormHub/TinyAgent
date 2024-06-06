@@ -3,41 +3,26 @@
 import * as React from "react";
 import * as signalR from "@microsoft/signalr";
 import useSWR from "swr";
-import { generateId } from "ai";
-
-export type MessageContent = {
-  id: string;
-  role: string;
-  content: string;
-};
-
-export type JSONValue =
-  | null
-  | string
-  | number
-  | boolean
-  | { [x: string]: JSONValue }
-  | Array<JSONValue>;
+import { Message } from "../types";
+import { nanoid } from "../utils";
 
 export const useHub = ({
-  initialInput = "",
   initialMessages = [],
 }: {
-  initialInput?: string;
-  initialMessages?: MessageContent[];
+  initialMessages?: Message[];
 }) => {
   const chatKey = "agent";
 
   const [initialMessagesFallback] = React.useState([]);
 
   // Store the chat state in SWR, using the chatId as the key to share states.
-  const { data: messages, mutate } = useSWR<MessageContent[]>(
+  const { data: messages, mutate } = useSWR<Message[]>(
     [chatKey, "messages"],
     null,
     { fallbackData: initialMessages ?? initialMessagesFallback }
   );
   // Keep the latest messages in a ref.
-  const messagesRef = React.useRef<MessageContent[]>(messages || []);
+  const messagesRef = React.useRef<Message[]>(messages || []);
   React.useEffect(() => {
     messagesRef.current = messages || [];
   }, [messages]);
@@ -75,10 +60,10 @@ export const useHub = ({
   }, [connectionRef]);
 
   const triggerRequest = React.useCallback(
-    async ({ data, message }: { data: MessageContent[]; message: MessageContent }) => {
+    async ({ data, message }: { data: Message[]; message: Message }) => {
       try {
         if (connectionRef.current) {
-          const result = connectionRef.current.stream<MessageContent>(
+          const result = connectionRef.current.stream<Message>(
             "Streaming",
             message.content
           );
@@ -122,40 +107,27 @@ export const useHub = ({
 
   const append = React.useCallback(
     async (input: string) => {
-      const message = { id: generateId(), role: "user", content: input };
+      const message = { id: nanoid(), role: "user", content: input };
       return triggerRequest({
-        data: messagesRef.current.concat(message as MessageContent),
+        data: messagesRef.current.concat(message as Message),
         message,
       });
     },
     [triggerRequest]
   );
 
-  // Input state and handlers.
-  const [input, setInput] = React.useState(initialInput);
-
   const handleSubmit = React.useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!input) return;
-
-      append(input);
-
-      setInput("");
+    async (value: string) => {
+      await append(value);
     },
-    [input, append]
+    [append]
   );
-
-  const handleInputChange = (e: any) => {
-    setInput(e.target.value);
-  };
 
   return {
     messages: messages || [],
     error,
-    input,
-    handleInputChange,
     handleSubmit,
+    append,
     isLoading,
   };
 };
