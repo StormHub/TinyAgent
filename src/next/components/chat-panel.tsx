@@ -22,8 +22,8 @@ export const ChatPanel = ({
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
       />
-      <div className="mx-auto sm:max-w-2xl sm:px-4">
-        <div className="space-y-4 border-t bg-background px-4 py-2 shadow-lg sm:rounded-xl sm:border md:py-4">
+      <div className="mx-auto mb-6 sm:max-w-2xl sm:px-2">
+        <div className="space-y-4 border-t bg-gray-50 shadow-lg sm:rounded-xl sm:border md:py-2">
           <PromptForm input={input} setInput={setInput} onSubmit={onSubmit} />
         </div>
       </div>

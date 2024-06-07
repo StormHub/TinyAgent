@@ -39,13 +39,13 @@ export const PromptForm = ({
         await onSubmit(value);
       }}
     >
-      <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-4 sm:rounded-md sm:border sm:px-8">
+      <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-transparent px-1 sm:rounded-md sm:border sm:px-4 border-none">
         <Textarea
           ref={inputRef}
           tabIndex={0}
           onKeyDown={onKeyDown}
           placeholder="Send a message."
-          className="min-h-[60px] w-full resize-none bg-transparent px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
+          className="min-h-[60px] w-full resize-none bg-transparent px-1 py-[1rem] focus-within:outline-none sm:text-sm border-none"
           autoFocus
           spellCheck={false}
           autoComplete="off"
