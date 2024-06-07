@@ -34,7 +34,7 @@ export const ChatMessage = ({ message }: { message: Message }) => {
               );
             },
             p({ children }) {
-              return <p className="mb-2 last:mb-0">{children}</p>;
+              return <p className="mb-2 last:mb-1">{children}</p>;
             },
             ul({ children }) {
               return <ul className="list-decimal">{children}</ul>;
@@ -43,7 +43,7 @@ export const ChatMessage = ({ message }: { message: Message }) => {
               return <ol className="list-decimal">{children}</ol>;
             },
             li({ children }) {
-              return <li className="list-none mb-2 last:mb-0">{children}</li>;
+              return <li className="list-none mb-2 last:mb-1">{children}</li>;
             },
           }}
         >

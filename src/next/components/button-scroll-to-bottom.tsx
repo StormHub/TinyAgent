@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { IconArrowDown } from "./ui/icons";
+import { Button } from "./ui/button";
 
 export function ButtonScrollToBottom({
   className,
@@ -15,9 +16,9 @@ export function ButtonScrollToBottom({
   scrollToBottom: () => void;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button
+    <Button
       className={cn(
-        "absolute right-4 top-1 z-10 bg-background transition-opacity duration-300 sm:right-8 md:top-2",
+        "absolute right-4 top-1 z-10  bg-gray-50 transition-opacity duration-300 sm:right-8 md:top-2",
         isAtBottom ? "opacity-0" : "opacity-100",
         className
       )}
@@ -26,6 +27,6 @@ export function ButtonScrollToBottom({
     >
       <IconArrowDown />
       <span className="sr-only">Scroll to bottom</span>
-    </button>
+    </Button>
   );
 }

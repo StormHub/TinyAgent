@@ -19,12 +19,18 @@ export const Chat = ({
   const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
     useScrollAnchor();
 
+  React.useEffect(() => {
+    if (isLoading && !isAtBottom) {
+      scrollToBottom();
+    }
+  }, [isLoading, isAtBottom, scrollToBottom]);
+
   return (
     <div
-      className="flex flex-col w-full max-w-screen-md py-24 mx-auto stretch"
+      className="group w-full overflow-auto pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]"
       ref={scrollRef}
     >
-      <div ref={messagesRef}>
+      <div className="pb-[48px] pt-4 md:pt-10" ref={messagesRef}>
         <ChatList messages={messages} isLoading={isLoading} />
       </div>
       <div className="w-full h-px" ref={visibilityRef} />

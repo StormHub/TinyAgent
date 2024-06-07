@@ -15,7 +15,7 @@ export const useScrollAnchor = () => {
         behavior: "smooth",
       });
     }
-  }, []);
+  }, [messagesRef]);
 
   React.useEffect(() => {
     if (messagesRef.current) {
@@ -25,19 +25,17 @@ export const useScrollAnchor = () => {
         });
       }
     }
-  }, [isAtBottom, isVisible]);
+  }, [isAtBottom, isVisible, messagesRef]);
 
   React.useEffect(() => {
     const { current } = scrollRef;
-
     if (current) {
       const handleScroll = (event: Event) => {
         const target = event.target as HTMLDivElement;
-        const offset = 25;
+        const offset = 72;
         const isAtBottom =
           target.scrollTop + target.clientHeight >=
           target.scrollHeight - offset;
-
         setIsAtBottom(isAtBottom);
       };
 
@@ -49,7 +47,7 @@ export const useScrollAnchor = () => {
         current.removeEventListener("scroll", handleScroll);
       };
     }
-  }, []);
+  }, [scrollRef]);
 
   React.useEffect(() => {
     if (visibilityRef.current) {
@@ -64,7 +62,7 @@ export const useScrollAnchor = () => {
           });
         },
         {
-          rootMargin: "0px 0px -150px 0px",
+          rootMargin: "0px 0px -48px 0px",
         }
       );
 
@@ -74,7 +72,7 @@ export const useScrollAnchor = () => {
         observer.disconnect();
       };
     }
-  });
+  }, [visibilityRef]);
 
   return {
     messagesRef,
