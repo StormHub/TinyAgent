@@ -4,7 +4,6 @@ import * as React from "react";
 import { IconOpenAI, IconUser } from "./ui/icons";
 import { spinner } from "./ui/spinner";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
 import { MemoizedReactMarkdown } from "./ui/markdown";
 
 export const ChatMessage = ({ message }: { message: Message }) => {
@@ -23,7 +22,7 @@ export const ChatMessage = ({ message }: { message: Message }) => {
       <div className="flex-1 px-2 ml-4 space-y-2 overflow-hidden">
         <MemoizedReactMarkdown
           className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
-          remarkPlugins={[remarkGfm, remarkMath]}
+          remarkPlugins={[remarkGfm]}
           components={{
             a(props) {
               return (
