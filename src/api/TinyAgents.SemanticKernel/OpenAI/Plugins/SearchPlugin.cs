@@ -20,16 +20,16 @@ internal sealed class SearchPlugin(IMapApi mapApi)
         var buffer = new StringBuilder();
         foreach (var result in response.Results)
         {
-            buffer.AppendLine($"name: {result.Name}");
-            buffer.AppendLine($"address: {result.Address}");
-            buffer.AppendLine($"distance: {result.DistanceInKilometers} kilometers");
+            buffer.AppendLine($" name: {result.Name}");
+            buffer.AppendLine($" address: {result.Address}");
+            buffer.AppendLine($" distance: {result.DistanceInKilometers} kilometers");
             foreach (var connector in result.Connectors)
             {
-                buffer.Append($"connector type: {connector.Type}");
-                buffer.Append($"power type: {connector.CurrentType}");
-                buffer.Append($"rated power: {connector.RatedPowerInKilowatts} kilowatts");
-                buffer.Append($"voltage: {connector.Voltage}");
-                buffer.AppendLine($"current: {connector.CurrentAmpere} amp");
+                buffer.Append($" connector type: {connector.Type}");
+                buffer.Append($" power type: {connector.CurrentType}");
+                buffer.Append($" rated power: {connector.RatedPowerInKilowatts} kilowatts");
+                buffer.Append($" voltage: {connector.Voltage}");
+                buffer.AppendLine($" current: {connector.CurrentAmpere} amp");
             }
         }
 

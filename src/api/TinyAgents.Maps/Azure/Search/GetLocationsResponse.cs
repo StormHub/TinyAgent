@@ -7,7 +7,7 @@ namespace TinyAgents.Maps.Azure.Search;
 
 public sealed class ChargingConnector
 {
-    internal ChargingConnector(string type, int ratedPowerInKilowatts, int voltage, string currentType,
+    private ChargingConnector(string type, int ratedPowerInKilowatts, int voltage, string currentType,
         int currentAmpere)
     {
         Type = type;

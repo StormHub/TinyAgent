@@ -7,7 +7,6 @@ using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.OpenAI.Plugins;
 using TinyAgents.SemanticKernel.OpenAI.Setup;
-using TinyAgents.Shared.Http;
 
 namespace TinyAgents.SemanticKernel.OpenAI;
 
@@ -19,7 +18,7 @@ internal static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
-        services.AddTransient<TraceHttpHandler>();
+        // services.AddTransient<TraceHttpHandler>();
         services.AddHttpClient(nameof(OpenAIClient));
             // .AddHttpMessageHandler<TraceHttpHandler>();
 

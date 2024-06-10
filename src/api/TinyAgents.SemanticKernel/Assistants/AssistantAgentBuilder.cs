@@ -1,6 +1,7 @@
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
@@ -12,15 +13,18 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
 {
     private readonly IKernelBuilder _kernelBuilder;
     private readonly AssistantOptions? _options;
+    private readonly ILogger _logger;
 
     public AssistantAgentBuilder(
         IKernelBuilder kernelBuilder,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<AssistantAgentBuilder> logger)
     {
         var section = configuration.GetSection(nameof(AssistantOptions));
         _options = section.Exists() ? section.Get<AssistantOptions>() : default;
 
         _kernelBuilder = kernelBuilder;
+        _logger = logger;
     }
 
     public async Task<IAssistantAgent> Build(AssistantAgentType agentType,
@@ -67,6 +71,8 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
                 ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
             }
         };
+
+        _logger.LogInformation("Build {AgentType}", agent.GetType().Name);
 
         return new AssistantAgent(agent);
     }

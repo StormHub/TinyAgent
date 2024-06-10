@@ -17,8 +17,8 @@ internal sealed class MapPlugin(IMapApi mapApi)
         if (result is null) return default;
 
         var buffer = new StringBuilder();
-        buffer.AppendLine($"latitude: {result.Position.Latitude}");
-        buffer.AppendLine($"longitude: {result.Position.Longitude}");
+        buffer.Append($" latitude: {result.Position.Latitude}");
+        buffer.Append($" longitude: {result.Position.Longitude}");
         return buffer.ToString();
     }
 
