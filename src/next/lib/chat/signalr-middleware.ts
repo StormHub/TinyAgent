@@ -20,7 +20,6 @@ export const signalRMiddleware: Middleware<
     const result = next(signalRAction);
 
     const hubConnection = getHubConnection(store);
-    console.log("middleware", signalRAction.type);
 
     switch (signalRAction.type) {
       case "app/addMessage": {

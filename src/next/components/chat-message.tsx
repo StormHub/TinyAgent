@@ -6,6 +6,25 @@ import { spinner } from "./ui/spinner";
 import remarkGfm from "remark-gfm";
 import { MemoizedReactMarkdown } from "./ui/markdown";
 
+const LinkAnchor = ({
+  href,
+  children,
+}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  const handleOnClick = () => {
+    if (window) {
+      window.open(href, "_blank");
+    }
+  };
+  return (
+    <span
+      className="text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
+      onClick={handleOnClick}
+    >
+      {children}
+    </span>
+  );
+};
+
 export const ChatMessage = ({ message }: { message: Message }) => {
   return (
     <div className={cn("group relative flex items-start md:-ml-12")}>
@@ -25,12 +44,7 @@ export const ChatMessage = ({ message }: { message: Message }) => {
           remarkPlugins={[remarkGfm]}
           components={{
             a(props) {
-              return (
-                <a
-                  className="text-blue-600 dark:text-blue-500 hover:underline"
-                  {...props}
-                />
-              );
+              return <LinkAnchor {...props} />;
             },
             p({ children }) {
               return <p className="mb-2 last:mb-1">{children}</p>;
