@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Providers } from "@/components/providers";
 
 export const metadata = {
   title: "Tiny Agent",
@@ -23,9 +24,11 @@ export default function RootLayout({
           GeistMono.variable
         )}
       >
-        <div className="flex flex-col min-h-screen">
-          <main className="flex flex-col flex-1 bg-muted/50">{children}</main>
-        </div>
+        <Providers>
+          <div className="flex flex-col min-h-screen">
+            <main className="flex flex-col flex-1 bg-muted/50">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

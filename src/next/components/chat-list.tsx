@@ -8,10 +8,10 @@ const Divider = () => {
 
 export const ChatList = ({
   messages,
-  isLoading,
+  status,
 }: {
   messages: Message[];
-  isLoading: boolean;
+  status?: string;
 }) => {
   return (
     <div className="relative mx-auto max-w-2xl px-4 pb-8">
@@ -21,10 +21,10 @@ export const ChatList = ({
           {index < messages.length - 1 && <Divider />}
         </div>
       ))}
-      {isLoading && (
+      {status && (
         <div key="spinner">
           <Divider />
-          <SpinnerMessage />
+          <SpinnerMessage status={status} />
         </div>
       )}
     </div>

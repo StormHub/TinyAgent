@@ -53,7 +53,7 @@ export const ChatMessage = ({ message }: { message: Message }) => {
   );
 };
 
-export const SpinnerMessage = () => {
+export const SpinnerMessage = ({ status }: { status: string }) => {
   return (
     <div className={cn("group relative flex items-start md:-ml-12")}>
       <div
@@ -64,7 +64,10 @@ export const SpinnerMessage = () => {
         <IconOpenAI />
       </div>
       <div className="flex flex-row items-center flex-1 px-2 ml-4 space-y-2 overflow-hidden">
-        {spinner}
+        <div className="flex flex-column items-center">
+          <div className="text-gray-400 me-1">{status}</div>
+          <div>{spinner}</div>
+        </div>
       </div>
     </div>
   );

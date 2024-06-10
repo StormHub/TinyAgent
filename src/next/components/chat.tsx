@@ -4,26 +4,20 @@ import * as React from "react";
 import { useScrollAnchor } from "@/lib/hooks/use-scroll-anchor";
 import { ChatList } from "./chat-list";
 import { ChatPanel } from "./chat-panel";
-import { Message } from "@/lib/types";
+import { RootState } from "@/lib/redux/store";
+import { useAppSelector } from "@/lib/redux/hooks";
 
-export const Chat = ({
-  messages,
-  isLoading,
-  onSubmit,
-}: {
-  messages: Message[];
-  isLoading: boolean;
-  onSubmit: (input: string) => Promise<void>;
-}) => {
+export const Chat = () => {
   const [input, setInput] = React.useState("");
+  const { messages, status } = useAppSelector((state: RootState) => state.app);
   const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
     useScrollAnchor();
 
   React.useEffect(() => {
-    if (isLoading && !isAtBottom) {
+    if (status && !isAtBottom) {
       scrollToBottom();
     }
-  }, [isLoading, isAtBottom, scrollToBottom]);
+  }, [status, isAtBottom, scrollToBottom]);
 
   return (
     <div
@@ -31,7 +25,7 @@ export const Chat = ({
       ref={scrollRef}
     >
       <div className="pb-[48px] pt-4 md:pt-10" ref={messagesRef}>
-        <ChatList messages={messages} isLoading={isLoading} />
+        <ChatList messages={messages} status={status} />
       </div>
       <div className="w-full h-px" ref={visibilityRef} />
       <ChatPanel
@@ -39,7 +33,6 @@ export const Chat = ({
         setInput={setInput}
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
-        onSubmit={onSubmit}
       />
     </div>
   );

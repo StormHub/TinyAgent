@@ -3,16 +3,17 @@
 import * as React from "react";
 import { useEnterSubmit } from "@/lib/hooks/use-enter-submit";
 import Textarea from "react-textarea-autosize";
+import { useChat } from "@/lib/hooks/use-chat";
 
 export const PromptForm = ({
   input,
   setInput,
-  onSubmit,
 }: {
   input: string;
   setInput: (value: string) => void;
-  onSubmit: (input: string) => Promise<void>;
 }) => {
+  const { sendMessage } = useChat();
+
   const { formRef, onKeyDown } = useEnterSubmit();
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   React.useEffect(() => {
@@ -24,7 +25,7 @@ export const PromptForm = ({
   return (
     <form
       ref={formRef}
-      onSubmit={async (e: any) => {
+      onSubmit={(e: any) => {
         e.preventDefault();
 
         // Blur focus on mobile
@@ -36,7 +37,7 @@ export const PromptForm = ({
         setInput("");
         if (!value) return;
 
-        await onSubmit(value);
+        sendMessage(value);
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-transparent px-1 sm:rounded-md sm:border sm:px-4 border-none">
