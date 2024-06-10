@@ -12,6 +12,9 @@ export const appSlice = createSlice({
       }
       state.alerts.push(action.payload);
     },
+    removeAlert: (state: AppState, action: PayloadAction<number>) => {
+      state.alerts.splice(action.payload, 1);
+    },
     addMessage: (
       state: AppState,
       action: PayloadAction<{ message: Message }>
@@ -36,7 +39,7 @@ export const appSlice = createSlice({
   },
 });
 
-export const { addAlert, addMessage, addMessages, setStatus } =
+export const { addAlert, removeAlert, addMessage, addMessages, setStatus } =
   appSlice.actions;
 
 export default appSlice.reducer;

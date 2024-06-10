@@ -5,11 +5,16 @@ import { useScrollAnchor } from "@/lib/hooks/use-scroll-anchor";
 import { ChatList } from "./chat-list";
 import { ChatPanel } from "./chat-panel";
 import { RootState } from "@/lib/redux/store";
-import { useAppSelector } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { toast } from "sonner";
+import { removeAlert } from "@/lib/chat/app-slice";
 
 export const Chat = () => {
   const [input, setInput] = React.useState("");
-  const { messages, status } = useAppSelector((state: RootState) => state.app);
+  const dispatch = useAppDispatch();
+  const { messages, status, alerts } = useAppSelector(
+    (state: RootState) => state.app
+  );
   const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
     useScrollAnchor();
 
@@ -18,6 +23,14 @@ export const Chat = () => {
       scrollToBottom();
     }
   }, [status, isAtBottom, scrollToBottom]);
+
+  React.useEffect(() => {
+    alerts.map((x, index) => {
+      toast.error(`${x.message}`, {
+        onAutoClose: () => dispatch(removeAlert(index))
+      });
+    });
+  }, [alerts]);
 
   return (
     <div

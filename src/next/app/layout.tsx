@@ -1,9 +1,10 @@
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-
-import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
+import { Toaster } from "@/components/ui/sonner";
+
+import "@/app/globals.css";
 
 export const metadata = {
   title: "Tiny Agent",
@@ -24,6 +25,7 @@ export default function RootLayout({
           GeistMono.variable
         )}
       >
+        <Toaster position="top-center" />
         <Providers>
           <div className="flex flex-col min-h-screen">
             <main className="flex flex-col flex-1 bg-muted/50">{children}</main>

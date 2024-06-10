@@ -58,6 +58,10 @@ export const signalRMiddleware: Middleware<
           });
         } catch (err) {
           store.dispatch(addAlert({ message: String(err), type: "Error" }));
+          store.dispatch({
+            type: "app/addMessages",
+            payload: { messages: [], status: undefined },
+          });
         }
       }
     }
