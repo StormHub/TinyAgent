@@ -7,7 +7,7 @@ namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 internal sealed class MapPlugin(IMapApi mapApi)
 {
     [KernelFunction(nameof(GetPosition))]
-    [Description("Get GPS positions for postal address, postcode, suburbs in Australia")]
+    [Description("Get GPS latitude and longitude for a given postal address, postcode, suburbs in Australia")]
     public async Task<string?> GetPosition(
         [Description("Postal address, postcode, suburbs in Australia to search for")]
         string location, CancellationToken cancellationToken = default)

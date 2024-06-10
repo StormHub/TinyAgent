@@ -8,7 +8,7 @@ internal sealed class SearchPlugin(IMapApi mapApi)
 {
     [KernelFunction(nameof(GetLocations))]
     [Description(
-        "Get electric vehicle charging locations fro a given GPS latitude and longitude in Australia")]
+        "Get electric vehicle charging locations for a given GPS latitude and longitude in Australia")]
     public async Task<string> GetLocations(
         [Description("GPS latitude")] double latitude,
         [Description("GPS longitude")] double longitude,
