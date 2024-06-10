@@ -1,6 +1,8 @@
 import { Message } from "@/lib/types";
 import * as React from "react";
 import { ChatMessage, SpinnerMessage } from "./chat-message";
+import { random } from "nanoid";
+import { nanoid } from "@/lib/utils";
 
 const Divider = () => {
   return <div className="shrink-0 bg-gray-200 h-[1px] w-full my-4" />;
@@ -22,7 +24,7 @@ export const ChatList = ({
         </div>
       ))}
       {status && (
-        <div key="spinner">
+        <div key={nanoid()}>
           <Divider />
           <SpinnerMessage status={status} />
         </div>
