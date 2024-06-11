@@ -4,7 +4,8 @@ namespace TinyAgents.Maps.Azure.Search;
 
 internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
 {
-    public async Task<GetPositionsResponse> GetPositions(GetPositionsRequest request,
+    public async Task<GetPositionsResponse> GetPositions(
+        GetPositionsRequest request,
         CancellationToken cancellationToken = default)
     {
         var options = request.GetOptions();
@@ -13,7 +14,8 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
         return new GetPositionsResponse(response?.Value?.Results ?? []);
     }
 
-    public async Task<GetAddressesResponse> GetAddresses(GetAddressesRequest request,
+    public async Task<GetAddressesResponse> GetAddresses(
+        GetAddressesRequest request,
         CancellationToken cancellationToken = default)
     {
         var options = request.GetOptions();
@@ -22,7 +24,8 @@ internal sealed class MapApi(MapsSearchClient mapsSearchClient) : IMapApi
         return new GetAddressesResponse(response?.Value?.Addresses ?? []);
     }
 
-    public async Task<GetLocationsResponse> GetLocations(GetLocationsRequest request,
+    public async Task<GetLocationsResponse> GetLocations(
+        GetLocationsRequest request,
         CancellationToken cancellationToken = default)
     {
         const string electricVehicleStation = "electric vehicle station";

@@ -22,9 +22,10 @@ internal sealed class SearchPlugin(IMapApi mapApi)
         {
             buffer.Append($" name: {result.Name}");
             buffer.Append($" address: {result.Address}");
-            
+
             // https://google.com/maps/?q=<lat>,<long>
-            var uri = Uri.EscapeDataString($"https://google.com/maps/?q={result.Position.Latitude},{result.Position.Longitude}");
+            var uri = Uri.EscapeDataString(
+                $"https://google.com/maps/?q={result.Position.Latitude},{result.Position.Longitude}");
             buffer.Append($" map: {uri}");
 
             buffer.Append($" distance: {result.DistanceInKilometers} kilometers");

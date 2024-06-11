@@ -10,7 +10,8 @@ internal sealed class MapPlugin(IMapApi mapApi)
     [Description("Get GPS latitude and longitude for a given postal address, postcode, suburbs in Australia")]
     public async Task<string?> GetPosition(
         [Description("Postal address, postcode, suburbs in Australia to search for")]
-        string location, CancellationToken cancellationToken = default)
+        string location,
+        CancellationToken cancellationToken = default)
     {
         var response = await mapApi.GetPositions(new GetPositionsRequest(location), cancellationToken);
         var result = response.Results.FirstOrDefault();

@@ -6,7 +6,8 @@ public sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Delegat
 {
     private readonly ILogger _logger = logger;
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
 #if DEBUG

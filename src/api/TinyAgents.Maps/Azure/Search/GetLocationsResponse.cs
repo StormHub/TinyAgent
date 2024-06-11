@@ -8,7 +8,11 @@ namespace TinyAgents.Maps.Azure.Search;
 
 public sealed class ChargingConnector
 {
-    private ChargingConnector(string type, int ratedPowerInKilowatts, int voltage, string currentType,
+    private ChargingConnector(
+        string type,
+        int ratedPowerInKilowatts,
+        int voltage,
+        string currentType,
         int currentAmpere)
     {
         Type = type;
@@ -82,7 +86,8 @@ public sealed class ChargingConnector
 
 internal static class ResponseExtensions
 {
-    public static async IAsyncEnumerable<ChargingPark> AsEnumerable(this Response<SearchAddressResult> response,
+    public static async IAsyncEnumerable<ChargingPark> AsEnumerable(
+        this Response<SearchAddressResult> response,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var connectors = await FromJson(
@@ -97,7 +102,7 @@ internal static class ResponseExtensions
 
             IEnumerable<ChargingConnector>? chargingConnectors = default;
             if (connectors.TryGetValue(result.Id, out var value)) chargingConnectors = value;
-            
+
             yield return new ChargingPark(
                 result.PointOfInterest.Name,
                 result.Address.FreeformAddress,
@@ -108,7 +113,8 @@ internal static class ResponseExtensions
     }
 
     private static async Task<IReadOnlyDictionary<string, IReadOnlyCollection<ChargingConnector>>> FromJson(
-        Stream stream, CancellationToken cancellationToken = default)
+        Stream stream,
+        CancellationToken cancellationToken = default)
     {
         var results = new Dictionary<string, IReadOnlyCollection<ChargingConnector>>();
 
@@ -164,7 +170,11 @@ internal static class ResponseExtensions
 
 public sealed class ChargingPark
 {
-    internal ChargingPark(string name, string address, GeoPosition position, IEnumerable<ChargingConnector> connectors,
+    internal ChargingPark(
+        string name,
+        string address,
+        GeoPosition position,
+        IEnumerable<ChargingConnector> connectors,
         double? distanceInKilometers)
     {
         Name = name;
@@ -177,7 +187,7 @@ public sealed class ChargingPark
     public string Name { get; }
 
     public string Address { get; }
-    
+
     public GeoPosition Position { get; }
 
     public IReadOnlyCollection<ChargingConnector> Connectors { get; }

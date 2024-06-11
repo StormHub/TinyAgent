@@ -17,7 +17,8 @@ internal sealed class AssistantAgent : IAssistantAgent
         _chat = new AgentGroupChat();
     }
 
-    public async IAsyncEnumerable<ChatMessageContent> Invoke(string input,
+    public async IAsyncEnumerable<ChatMessageContent> Invoke(
+        string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         _chat.AddChatMessage(new ChatMessageContent(AuthorRole.User, input));

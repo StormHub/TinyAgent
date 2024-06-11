@@ -9,7 +9,8 @@ namespace TinyAgents.SemanticKernel;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAssistanceAgent(this IServiceCollection services,
+    public static IServiceCollection AddAssistanceAgent(
+        this IServiceCollection services,
         IConfiguration configuration,
         IHostEnvironment environment)
     {

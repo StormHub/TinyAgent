@@ -37,7 +37,8 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async IAsyncEnumerable<MessageContent> Streaming(string input,
+    public async IAsyncEnumerable<MessageContent> Streaming(
+        string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var connectionId = Context.ConnectionId;

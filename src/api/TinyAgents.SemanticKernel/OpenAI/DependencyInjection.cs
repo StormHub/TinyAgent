@@ -20,7 +20,7 @@ internal static class DependencyInjection
 
         // services.AddTransient<TraceHttpHandler>();
         services.AddHttpClient(nameof(OpenAIClient));
-            // .AddHttpMessageHandler<TraceHttpHandler>();
+           // .AddHttpMessageHandler<TraceHttpHandler>();
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();

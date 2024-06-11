@@ -4,7 +4,8 @@ namespace TinyAgents.Maps.Azure.Routing;
 
 internal sealed class RouteApi(MapsRoutingClient mapsRoutingClient) : IRouteApi
 {
-    public async Task<GetRouteDirectionsResponse> GetRouteDirections(GetRouteDirectionsRequest request,
+    public async Task<GetRouteDirectionsResponse> GetRouteDirections(
+        GetRouteDirectionsRequest request,
         CancellationToken cancellationToken = default)
     {
         var options = request.GetOptions();

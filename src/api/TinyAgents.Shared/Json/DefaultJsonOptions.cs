@@ -5,13 +5,13 @@ namespace TinyAgents.Shared.Json;
 
 public static class DefaultJsonOptions
 {
-    public static JsonSerializerOptions DefaultSerializerOptions { get; }
-
     static DefaultJsonOptions()
     {
         DefaultSerializerOptions = new JsonSerializerOptions();
         DefaultSerializerOptions.Setup();
     }
+
+    public static JsonSerializerOptions DefaultSerializerOptions { get; }
 
     public static void Setup(this JsonSerializerOptions jsonSerializerOptions)
     {

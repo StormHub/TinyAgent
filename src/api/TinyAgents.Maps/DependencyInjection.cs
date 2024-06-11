@@ -18,6 +18,8 @@ public static class DependencyInjection
             .ValidateDataAnnotations();
 
         services.AddHttpClient(nameof(MapApi));
+            //.AddHttpMessageHandler<TraceHttpHandler>();
+
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();

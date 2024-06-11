@@ -51,7 +51,8 @@ internal sealed class AgentConnection : IAsyncDisposable
             }
     }
 
-    private async IAsyncEnumerable<MessageContent> GetMessages(string input,
+    private async IAsyncEnumerable<MessageContent> GetMessages(
+        string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var message in

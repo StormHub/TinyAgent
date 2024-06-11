@@ -12,8 +12,8 @@ namespace TinyAgents.SemanticKernel.Assistants;
 internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
 {
     private readonly IKernelBuilder _kernelBuilder;
-    private readonly AssistantOptions? _options;
     private readonly ILogger _logger;
+    private readonly AssistantOptions? _options;
 
     public AssistantAgentBuilder(
         IKernelBuilder kernelBuilder,
@@ -27,7 +27,8 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
         _logger = logger;
     }
 
-    public async Task<IAssistantAgent> Build(AssistantAgentType agentType,
+    public async Task<IAssistantAgent> Build(
+        AssistantAgentType agentType,
         CancellationToken cancellationToken = default)
     {
         var kernel = _kernelBuilder.Build();
