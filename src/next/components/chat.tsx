@@ -27,7 +27,7 @@ export const Chat = () => {
   React.useEffect(() => {
     alerts.map((x, index) => {
       toast.error(`${x.message}`, {
-        onAutoClose: () => dispatch(removeAlert(index))
+        onAutoClose: () => dispatch(removeAlert(index)),
       });
     });
   }, [alerts]);
@@ -46,6 +46,8 @@ export const Chat = () => {
         setInput={setInput}
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
+        messages={messages}
+        status={status}
       />
     </div>
   );

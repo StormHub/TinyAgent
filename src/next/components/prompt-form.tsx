@@ -6,13 +6,18 @@ import Textarea from "react-textarea-autosize";
 import { useChat } from "@/lib/hooks/use-chat";
 import { IconNew } from "./ui/icons";
 import { Button } from "./ui/button";
+import { Message } from "@/lib/types";
 
 export const PromptForm = ({
   input,
   setInput,
+  messages,
+  status,
 }: {
   input: string;
   setInput: (value: string) => void;
+  messages: Message[];
+  status?: string;
 }) => {
   const { sendMessage, restartChat } = useChat();
 
@@ -44,8 +49,9 @@ export const PromptForm = ({
     >
       <div className="relative flex max-h-60 w-full grow flex-col bg-transparent px-1 sm:rounded-md sm:border sm:px-4 border-none">
         <Button
-          className="outline rounded-full inline-flex items-center justify-center absolute ms-[-64px] z-10 left-0 top-[12px] size-8 rounded-full bg-gray-100 text-gray-400 p-0 sm:left-4"
+          className="outline rounded-full transition-all inline-flex items-center justify-center absolute ms-[-64px] z-10 left-0 top-[12px] size-8 text-gray-400 disabled:pointer-events-none hover:text-gray-900 p-0 sm:left-4"
           onClick={() => restartChat()}
+          disabled={!messages.length || !!status}
         >
           <IconNew />
           <span className="sr-only">New Chat</span>

@@ -1,7 +1,6 @@
 import { Message } from "@/lib/types";
 import * as React from "react";
 import { ChatMessage, WaitingIndicator } from "./chat-message";
-import { random } from "nanoid";
 import { nanoid } from "@/lib/utils";
 
 const Divider = () => {
