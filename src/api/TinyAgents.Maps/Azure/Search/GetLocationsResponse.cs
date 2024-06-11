@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Azure;
+using Azure.Core.GeoJson;
 using Azure.Maps.Search.Models;
 
 namespace TinyAgents.Maps.Azure.Search;
@@ -96,10 +97,11 @@ internal static class ResponseExtensions
 
             IEnumerable<ChargingConnector>? chargingConnectors = default;
             if (connectors.TryGetValue(result.Id, out var value)) chargingConnectors = value;
-
+            
             yield return new ChargingPark(
                 result.PointOfInterest.Name,
                 result.Address.FreeformAddress,
+                result.Position,
                 chargingConnectors ?? [],
                 distance);
         }
@@ -162,11 +164,12 @@ internal static class ResponseExtensions
 
 public sealed class ChargingPark
 {
-    internal ChargingPark(string name, string address, IEnumerable<ChargingConnector> connectors,
+    internal ChargingPark(string name, string address, GeoPosition position, IEnumerable<ChargingConnector> connectors,
         double? distanceInKilometers)
     {
         Name = name;
         Address = address;
+        Position = position;
         Connectors = connectors.ToArray();
         DistanceInKilometers = distanceInKilometers;
     }
@@ -174,6 +177,8 @@ public sealed class ChargingPark
     public string Name { get; }
 
     public string Address { get; }
+    
+    public GeoPosition Position { get; }
 
     public IReadOnlyCollection<ChargingConnector> Connectors { get; }
 
