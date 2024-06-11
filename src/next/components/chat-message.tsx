@@ -30,7 +30,7 @@ export const ChatMessage = ({ message }: { message: Message }) => {
     <div className={cn("group relative flex items-start md:-ml-12")}>
       <div
         className={cn(
-          "flex size-6 shrink-0 select-none items-center justify-center rounded-md border shadow",
+          "flex size-6 shrink-0 select-none items-center justify-center rounded-full border shadow",
           message.role === "user"
             ? "bg-gray-500 text-gray-100"
             : "bg-gray-100 text-current"
@@ -67,12 +67,12 @@ export const ChatMessage = ({ message }: { message: Message }) => {
   );
 };
 
-export const SpinnerMessage = ({ status }: { status: string }) => {
+export const WaitingIndicator = ({ status }: { status: string }) => {
   return (
     <div className={cn("group relative flex items-start md:-ml-12")}>
       <div
         className={cn(
-          "flex size-6 shrink-0 select-none items-center justify-center rounded-md border shadow bg-gray-100 text-current"
+          "flex size-6 shrink-0 select-none items-center justify-center rounded-full border shadow bg-gray-100 text-current"
         )}
       >
         <IconOpenAI />

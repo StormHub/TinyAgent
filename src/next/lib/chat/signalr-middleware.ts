@@ -1,6 +1,6 @@
 import { Action, Dispatch, Middleware } from "@reduxjs/toolkit";
 import { type Message } from "../types";
-import { RootState, StoreMiddlewareAPI } from "../redux/store";
+import { RootState, StoreMiddlewareAPI, resetState } from "../redux/store";
 import { getHubConnection } from "./signalr-connection";
 import { addAlert } from "./app-slice";
 
@@ -22,45 +22,62 @@ export const signalRMiddleware: Middleware<
     const hubConnection = getHubConnection(store);
 
     switch (signalRAction.type) {
-      case "app/addMessage": {
-        const message = signalRAction.payload.message;
-        if (!message?.content) {
-          return;
+      case "app/addMessage":
+        {
+          const message = signalRAction.payload.message;
+          if (!message?.content) {
+            return;
+          }
+
+          try {
+            store.dispatch({
+              type: "app/setStatus",
+              payload: { status: "Thinking" },
+            });
+
+            const result = hubConnection.stream<Message>(
+              "Streaming",
+              message.content
+            );
+
+            const messages: Message[] = [];
+            const subscription = result.subscribe({
+              next: (value) => {
+                messages.push(value);
+              },
+              error: (err) => {
+                store.dispatch(
+                  addAlert({ message: String(err), type: "Error" })
+                );
+              },
+              complete: () => {
+                subscription.dispose();
+                store.dispatch({
+                  type: "app/addMessages",
+                  payload: { messages, status: undefined },
+                });
+              },
+            });
+          } catch (err) {
+            store.dispatch(addAlert({ message: String(err), type: "Error" }));
+            store.dispatch({
+              type: "app/addMessages",
+              payload: { messages: [], status: undefined },
+            });
+          }
         }
+        break;
 
+      case "app/restart": {
         try {
-          store.dispatch({
-            type: "app/setStatus",
-            payload: { status: "Thinking" },
-          });
-
-          const result = hubConnection.stream<Message>(
-            "Streaming",
-            message.content
-          );
-
-          const messages: Message[] = [];
-          const subscription = result.subscribe({
-            next: (value) => {
-              messages.push(value);
-            },
-            error: (err) => {
+          hubConnection
+            .invoke("Restart")
+            .then(() => resetState())
+            .catch((err) => {
               store.dispatch(addAlert({ message: String(err), type: "Error" }));
-            },
-            complete: () => {
-              subscription.dispose();
-              store.dispatch({
-                type: "app/addMessages",
-                payload: { messages, status: undefined },
-              });
-            },
-          });
+            });
         } catch (err) {
           store.dispatch(addAlert({ message: String(err), type: "Error" }));
-          store.dispatch({
-            type: "app/addMessages",
-            payload: { messages: [], status: undefined },
-          });
         }
       }
     }

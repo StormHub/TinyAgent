@@ -1,6 +1,6 @@
 import { Message } from "@/lib/types";
 import * as React from "react";
-import { ChatMessage, SpinnerMessage } from "./chat-message";
+import { ChatMessage, WaitingIndicator } from "./chat-message";
 import { random } from "nanoid";
 import { nanoid } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ export const ChatList = ({
       {status && (
         <div key={nanoid()}>
           <Divider />
-          <SpinnerMessage status={status} />
+          <WaitingIndicator status={status} />
         </div>
       )}
     </div>

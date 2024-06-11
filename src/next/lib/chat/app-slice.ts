@@ -36,10 +36,19 @@ export const appSlice = createSlice({
     ) => {
       state.status = action.payload.status;
     },
+    restart: (state: AppState, action: PayloadAction<{ status?: string }>) => {
+      state.status = action.payload.status;
+    },
   },
 });
 
-export const { addAlert, removeAlert, addMessage, addMessages, setStatus } =
-  appSlice.actions;
+export const {
+  addAlert,
+  removeAlert,
+  addMessage,
+  addMessages,
+  setStatus,
+  restart,
+} = appSlice.actions;
 
 export default appSlice.reducer;
