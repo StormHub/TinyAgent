@@ -15,14 +15,24 @@ export const Chat = () => {
   const { messages, status, alerts } = useAppSelector(
     (state: RootState) => state.app
   );
-  const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
-    useScrollAnchor();
+  const {
+    messagesRef,
+    scrollRef,
+    visibilityRef,
+    isAtBottom,
+    isVisible,
+    scrollToBottom,
+  } = useScrollAnchor();
 
   React.useEffect(() => {
-    if (status && !isAtBottom) {
-      scrollToBottom();
+    if (messagesRef.current) {
+      if (typeof status !== "undefined" && !isVisible) {
+        messagesRef.current.scrollIntoView({
+          block: "end",
+        });
+      }
     }
-  }, [status, isAtBottom, scrollToBottom]);
+  }, [status, isAtBottom, isVisible, messagesRef]);
 
   React.useEffect(() => {
     alerts.map((x, index) => {
@@ -37,10 +47,10 @@ export const Chat = () => {
       className="group w-full overflow-auto pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]"
       ref={scrollRef}
     >
-      <div className="pb-[48px] pt-4 md:pt-10" ref={messagesRef}>
+      <div className="pb-[80px] pt-4 md:pt-10" ref={messagesRef}>
         <ChatList messages={messages} status={status} />
+        <div className="w-full h-px" ref={visibilityRef} />
       </div>
-      <div className="w-full h-px" ref={visibilityRef} />
       <ChatPanel
         input={input}
         setInput={setInput}

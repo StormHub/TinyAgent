@@ -18,21 +18,11 @@ export const useScrollAnchor = () => {
   }, [messagesRef]);
 
   React.useEffect(() => {
-    if (messagesRef.current) {
-      if (isAtBottom && !isVisible) {
-        messagesRef.current.scrollIntoView({
-          block: "end",
-        });
-      }
-    }
-  }, [isAtBottom, isVisible, messagesRef]);
-
-  React.useEffect(() => {
     const { current } = scrollRef;
     if (current) {
       const handleScroll = (event: Event) => {
         const target = event.target as HTMLDivElement;
-        const offset = 72;
+        const offset = 32;
         const isAtBottom =
           target.scrollTop + target.clientHeight >=
           target.scrollHeight - offset;
@@ -62,7 +52,7 @@ export const useScrollAnchor = () => {
           });
         },
         {
-          rootMargin: "0px 0px -96px 0px",
+          rootMargin: "0px 0px -120px 0px",
         }
       );
 

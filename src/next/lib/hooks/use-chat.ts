@@ -10,11 +10,11 @@ export const useChat = () => {
   };
 
   const restartChat = () => {
-    dispatch(restart({ status: "restarting" }));
+    dispatch(restart({ status: "Starting new chat" }));
   };
 
   return {
     sendMessage,
-    restartChat
+    restartChat,
   };
 };
