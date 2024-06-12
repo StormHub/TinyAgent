@@ -49,6 +49,10 @@ export const signalRMiddleware: Middleware<
                 store.dispatch(
                   addAlert({ message: String(err), type: "Error" })
                 );
+                store.dispatch({
+                  type: "app/abortMessage",
+                  payload: { message },
+                });
               },
               complete: () => {
                 subscription.dispose();
@@ -61,8 +65,8 @@ export const signalRMiddleware: Middleware<
           } catch (err) {
             store.dispatch(addAlert({ message: String(err), type: "Error" }));
             store.dispatch({
-              type: "app/addMessages",
-              payload: { messages: [], status: undefined },
+              type: "app/abortMessage",
+              payload: { message },
             });
           }
         }

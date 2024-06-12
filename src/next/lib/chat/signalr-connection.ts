@@ -3,7 +3,10 @@ import { StoreMiddlewareAPI } from "../redux/store";
 import { addAlert } from "./app-slice";
 
 const connectionToHub = () => {
-  const url = new URL("http://localhost:5000/agent");
+  const url = new URL(
+    process.env.AGENT_HUB_URL || "http://localhost:5000/agent"
+  );
+  
   const options = {
     skipNegotiation: true,
     transport: signalR.HttpTransportType.WebSockets,

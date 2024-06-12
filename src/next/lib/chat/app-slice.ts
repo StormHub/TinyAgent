@@ -22,6 +22,18 @@ export const appSlice = createSlice({
       const message = action.payload.message;
       state.messages.push({ ...message });
     },
+    abortMessage: (
+      state: AppState,
+      action: PayloadAction<{ message: Message }>
+    ) => {
+      const lastMessage = state.messages.length
+        ? state.messages[state.messages.length - 1]
+        : undefined;
+      if (lastMessage?.id === action.payload.message.id) {
+        state.messages.splice(-1);
+        state.status = undefined;
+      }
+    },
     addMessages: (
       state: AppState,
       action: PayloadAction<{ messages: Message[]; status?: string }>
@@ -46,6 +58,7 @@ export const {
   addAlert,
   removeAlert,
   addMessage,
+  abortMessage,
   addMessages,
   setStatus,
   restart,
