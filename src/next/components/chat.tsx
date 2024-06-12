@@ -26,7 +26,7 @@ export const Chat = () => {
 
   React.useEffect(() => {
     if (messagesRef.current) {
-      if (typeof status !== "undefined" && !isVisible) {
+      if (!!status && !isVisible) {
         messagesRef.current.scrollIntoView({
           block: "end",
         });

@@ -36,7 +36,7 @@ export const PromptForm = ({
         e.preventDefault();
 
         // Blur focus on mobile
-        if (window.innerWidth < 600) {
+        if (window?.innerWidth < 600) {
           e.target["message"]?.blur();
         }
 

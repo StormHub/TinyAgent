@@ -3,10 +3,6 @@ import * as React from "react";
 import { ChatMessage, WaitingIndicator } from "./chat-message";
 import { nanoid } from "@/lib/utils";
 
-const Divider = () => {
-  return <div className="shrink-0 bg-gray-200 h-[1px] w-full my-4" />;
-};
-
 export const ChatList = ({
   messages,
   status,
@@ -15,16 +11,14 @@ export const ChatList = ({
   status?: string;
 }) => {
   return (
-    <div className="relative mx-auto max-w-2xl px-4 pb-8">
-      {messages.map((message, index) => (
-        <div key={message.id}>
+    <div className="relative mx-auto max-w-2xl px-4 pb-8 divide-y">
+      {messages.map((message) => (
+        <div className="py-2.5" key={message.id}>
           <ChatMessage message={message} />
-          {index < messages.length - 1 && <Divider />}
         </div>
       ))}
       {status && (
-        <div key={nanoid()}>
-          <Divider />
+        <div className="py-2.5" key={nanoid()}>
           <WaitingIndicator status={status} />
         </div>
       )}
