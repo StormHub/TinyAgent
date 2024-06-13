@@ -15,7 +15,7 @@ public static class DependencyInjection
         IHostEnvironment environment)
     {
         services.AddMaps();
-        services.AddOpenAI(environment);
+        services.AddOpenAI();
         services.AddAssistant(configuration);
 
         return services;

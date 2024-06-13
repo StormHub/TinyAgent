@@ -15,18 +15,23 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public override async Task OnConnectedAsync()
     {
-        var id = Context.ConnectionId;
-        if (!Agents.TryGetValue(id, out var agent))
+        var agentId = GetAgentId();
+        if (string.IsNullOrEmpty(agentId))
         {
-            agent = await Build();
-            Agents.AddOrUpdate(id, _ => agent, (_, _) => agent);
+            Context.Abort();
+            return;
+        }
 
-            _logger.LogInformation("Connected {Id}", id);
+        if (!Agents.TryGetValue(agentId, out var agent))
+        {
+            agent = await Build(agentId);
+            Agents.AddOrUpdate(agentId, _ => agent, (_, _) => agent);
+
+            _logger.LogInformation("Connected {ConnectionId} {AgentId}", Context.ConnectionId, agentId);
         }
 
         await base.OnConnectedAsync();
     }
-    
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
@@ -39,21 +44,23 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public async Task Restart()
     {
-        var id = Context.ConnectionId;
-        if (Agents.TryRemove(id, out var agent))
+        var agentId = GetAgentId();
+
+        if (!string.IsNullOrEmpty(agentId)
+            && Agents.TryRemove(agentId, out var agent))
         {
             await agent.DisposeAsync();
-            
+
             // Recreate so that no more history
-            agent = await Build();
-            Agents.AddOrUpdate(id, _ => agent, (_, _) => agent);
+            agent = await Build(agentId);
+            Agents.AddOrUpdate(agentId, _ => agent, (_, _) => agent);
         }
     }
 
-    private async Task<IAssistantAgent> Build()
+    private async Task<IAssistantAgent> Build(string agentId)
     {
-        // agent = await builder.Build(AssistantAgentType.RouteDirections, Context.ConnectionAborted);
-        var agent = await builder.Build(AssistantAgentType.ChargingLocations, Context.ConnectionAborted);
+        var agent = await builder.Build(agentId, AssistantAgentType.RouteDirections, Context.ConnectionAborted);
+        // var agent = await builder.Build(AssistantAgentType.ChargingLocations, Context.ConnectionAborted);
         return agent;
     }
 
@@ -61,23 +68,30 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
         string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var connectionId = Context.ConnectionId;
-        if (!Agents.TryGetValue(connectionId, out var agent)) yield break;
+        var agentId = GetAgentId();
+        if (string.IsNullOrEmpty(agentId)
+            || !Agents.TryGetValue(agentId, out var agent))
+            yield break;
 
         await foreach (var message in agent.Invoke(input, cancellationToken))
         {
             var textContent = message.Items.OfType<TextContent>().FirstOrDefault();
-            if (textContent is not null
-                && !string.IsNullOrEmpty(textContent.Text))
-            {
-                string? id = default;
-                if (message.Metadata is not null
-                    && message.Metadata.TryGetValue(nameof(MessageContent.Id), out var value))
-                    id = value?.ToString();
+            if (string.IsNullOrEmpty(textContent?.Text)) continue;
 
-                id ??= Guid.NewGuid().ToString();
-                yield return new MessageContent(id, message.Role.Label, textContent.Text);
-            }
+            string? id = default;
+            if (message.Metadata?.TryGetValue(nameof(MessageContent.Id), out var value) ?? false)
+                id = value?.ToString();
+
+            id ??= Guid.NewGuid().ToString();
+            yield return new MessageContent(id, message.Role.Label, textContent.Text);
         }
+    }
+
+    private string? GetAgentId()
+    {
+        var httpContent = Context.GetHttpContext();
+        if (httpContent?.Request.Query.TryGetValue("run", out var value) ?? false) return value.ToString();
+
+        return default;
     }
 }

@@ -1,12 +1,15 @@
 import * as signalR from "@microsoft/signalr";
 import { StoreMiddlewareAPI } from "../redux/store";
 import { addAlert } from "./app-slice";
+import { nanoid } from "../utils";
 
 const connectionToHub = () => {
   const url = new URL(
-    process.env.AGENT_HUB_URL || "http://localhost:5000/agent"
+    `${
+      process.env.AGENT_HUB_URL || "http://localhost:5000/agent"
+    }?run=${nanoid()}`
   );
-  
+
   const options = {
     skipNegotiation: true,
     transport: signalR.HttpTransportType.WebSockets,
@@ -58,8 +61,7 @@ const registerConnectionEvents = (
 
   hubConnection.onreconnected((connectionId = "") => {
     if (hubConnection.state === signalR.HubConnectionState.Connected) {
-      const message =
-        "Connection reestablished. Please refresh the page to ensure you have the latest data.";
+      const message = "Connection reestablished.";
       store.dispatch(addAlert({ message, type: "success" }));
       console.log(`${message} Connected with connectionId ${connectionId}`);
     }

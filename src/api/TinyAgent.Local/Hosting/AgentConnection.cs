@@ -16,8 +16,15 @@ internal sealed class AgentConnection : IAsyncDisposable
 
     public AgentConnection(IOptions<AgentOptions> options, ILogger<AgentConnection> logger)
     {
-        var options1 = options.Value;
-        var uri = new Uri(options1.Uri, options1.ChannelName);
+        var agentOptions = options.Value;
+
+        var id = Guid.NewGuid();
+        var builder = new UriBuilder(agentOptions.Uri)
+        {
+            Path = agentOptions.ChannelName,
+            Query = $"run={id.ToString()}"
+        };
+        var uri = builder.ToString();
         _connection = new HubConnectionBuilder()
             .AddJsonProtocol(jsonOptions => { jsonOptions.PayloadSerializerOptions.Setup(); })
             .WithUrl(uri)

@@ -28,6 +28,7 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
     }
 
     public async Task<IAssistantAgent> Build(
+        string id,
         AssistantAgentType agentType,
         CancellationToken cancellationToken = default)
     {
@@ -47,18 +48,29 @@ internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
                 HttpClient = httpClient
             };
 
-            var definition = new OpenAIAssistantDefinition
-            {
-                Name = agentSetup.Name,
-                Instructions = agentSetup.Instructions,
-                ModelId = _options.ModelId
-            };
+            await foreach (var result in OpenAIAssistantAgent
+                               .ListDefinitionsAsync(configuration, cancellationToken: cancellationToken))
+                if (result.Id == id)
+                {
+                    agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, configuration, id, cancellationToken);
+                    break;
+                }
 
-            agent = await OpenAIAssistantAgent.CreateAsync(
-                kernel,
-                configuration,
-                definition,
-                cancellationToken);
+            if (agent is null)
+            {
+                var definition = new OpenAIAssistantDefinition
+                {
+                    Name = agentSetup.Name,
+                    Instructions = agentSetup.Instructions,
+                    ModelId = _options.ModelId
+                };
+
+                agent = await OpenAIAssistantAgent.CreateAsync(
+                    kernel,
+                    configuration,
+                    definition,
+                    cancellationToken);
+            }
         }
 
         agent ??= new ChatCompletionAgent
