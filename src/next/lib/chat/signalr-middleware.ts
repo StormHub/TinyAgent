@@ -76,10 +76,10 @@ export const signalRMiddleware: Middleware<
         try {
           hubConnection
             .invoke("Restart")
-            .then(() => resetState())
             .catch((err) => {
               store.dispatch(addAlert({ message: String(err), type: "Error" }));
-            });
+            })
+            .finally(() => resetState());
         } catch (err) {
           store.dispatch(addAlert({ message: String(err), type: "Error" }));
         }
