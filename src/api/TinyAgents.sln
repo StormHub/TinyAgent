@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34601.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyAgents.HubHost", "TinyAgents.HubHost\TinyAgents.HubHost.csproj", "{822A5901-381B-4B2C-A3FD-D0CA0625EC07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.SemanticKernel", "TinyAgents.SemanticKernel\TinyAgents.SemanticKernel.csproj", "{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{CF199974-D4A9-40D1-89E6-C48ADC59EE84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Maps", "TinyAgents.Maps\TinyAgents.Maps.csproj", "{4A246F3D-8828-4AE9-9714-528CA6F9FCB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Shared", "TinyAgents.Shared\TinyAgents.Shared.csproj", "{56854D79-CD52-49A0-8717-C85AED1FACFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Local", "TinyAgents.Local\TinyAgents.Local.csproj", "{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{822A5901-381B-4B2C-A3FD-D0CA0625EC07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{822A5901-381B-4B2C-A3FD-D0CA0625EC07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{822A5901-381B-4B2C-A3FD-D0CA0625EC07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{822A5901-381B-4B2C-A3FD-D0CA0625EC07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A246F3D-8828-4AE9-9714-528CA6F9FCB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A246F3D-8828-4AE9-9714-528CA6F9FCB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A246F3D-8828-4AE9-9714-528CA6F9FCB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A246F3D-8828-4AE9-9714-528CA6F9FCB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56854D79-CD52-49A0-8717-C85AED1FACFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56854D79-CD52-49A0-8717-C85AED1FACFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56854D79-CD52-49A0-8717-C85AED1FACFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56854D79-CD52-49A0-8717-C85AED1FACFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87DB9F22-CA1B-4A2B-8886-764B7F523156}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
+		{4A246F3D-8828-4AE9-9714-528CA6F9FCB4} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
+		{56854D79-CD52-49A0-8717-C85AED1FACFB} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
+	EndGlobalSection
+EndGlobal
