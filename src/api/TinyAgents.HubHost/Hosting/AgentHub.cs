@@ -35,9 +35,11 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var id = Context.ConnectionId;
-        if (Agents.TryRemove(id, out var agent)) await agent.DisposeAsync();
-        _logger.LogInformation("Disconnected {Id}", id);
+        var agentId = GetAgentId();
+        if (!string.IsNullOrEmpty(agentId)
+            && Agents.TryRemove(agentId, out var agent))
+            await agent.DisposeAsync();
+        _logger.LogInformation("Disconnected {ConnectionId} {AgentId}", Context.ConnectionId, agentId);
 
         await base.OnDisconnectedAsync(exception);
     }
