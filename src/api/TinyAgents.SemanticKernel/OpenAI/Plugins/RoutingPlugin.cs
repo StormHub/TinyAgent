@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Azure.Core.GeoJson;
+using Azure.Maps.Routing.Models;
 using Microsoft.SemanticKernel;
 using TinyAgents.Maps.Azure.Routing;
 
@@ -8,8 +9,8 @@ namespace TinyAgents.SemanticKernel.OpenAI.Plugins;
 internal sealed class RoutingPlugin(IRouteApi routeApi)
 {
     [KernelFunction(nameof(GetDirections))]
-    [Description("Get routing directions between a specified origin and destination in Australia")]
-    public async Task<string> GetDirections(
+    [Description("Get route directions in GPS coordinats between a specified origin and destination in Australia")]
+    public async Task<RouteData?> GetDirections(
         [Description("Origin GPS latitude")] double originLatitude,
         [Description("Origin GPS longitude")] double originLongitude,
         [Description("Destination GPS latitude")]
@@ -22,20 +23,9 @@ internal sealed class RoutingPlugin(IRouteApi routeApi)
         var destination = new GeoPosition(destinationLongitude, destinationLatitude);
 
         var response = await routeApi.GetRouteDirections(
-            new GetRouteDirectionsRequest([origin, destination]), cancellationToken);
+            new GetRouteDirectionsRequest([origin, destination], useTextInstructions: false), cancellationToken);
 
-        var buffer = new StringBuilder();
-        foreach (var route in response.Directions.Routes)
-        {
-            buffer.AppendLine(
-                $" Total length: {route.Summary.LengthInMeters} meters, travel time: {route.Summary.TravelTimeDuration} seconds");
-
-            buffer.AppendLine(" Route path:");
-            if (route.Guidance is not null)
-                foreach (var instruction in route.Guidance.Instructions)
-                    buffer.AppendLine(instruction.Message);
-        }
-
-        return buffer.ToString();
+        var routes = response.Directions.Routes;
+        return routes.Count > 0 ? routes[0] : default;
     }
 }
