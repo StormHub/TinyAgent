@@ -9,6 +9,8 @@ internal sealed class RouteDirectionsSetup(IServiceProvider provider) : IAgentSe
 {
     public string Name => "RouteDirectionsAssistant";
 
+    public string Version => "2024-06-17";
+
     public string Instructions =>
         """
         You are an assistant helping users to find driving route directions from origin to destination address in Australia.

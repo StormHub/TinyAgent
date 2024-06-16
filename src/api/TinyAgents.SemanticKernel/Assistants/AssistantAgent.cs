@@ -8,10 +8,10 @@ namespace TinyAgents.SemanticKernel.Assistants;
 
 internal sealed class AssistantAgent : IAssistantAgent
 {
-    private readonly KernelAgent _agent;
+    private readonly OpenAIAssistantAgent _agent;
     private readonly AgentGroupChat _chat;
 
-    internal AssistantAgent(KernelAgent agent)
+    internal AssistantAgent(OpenAIAssistantAgent agent)
     {
         _agent = agent;
         _chat = new AgentGroupChat();
@@ -25,9 +25,14 @@ internal sealed class AssistantAgent : IAssistantAgent
         await foreach (var content in _chat.InvokeAsync(_agent, cancellationToken)) yield return content;
     }
 
-    public async ValueTask DisposeAsync()
+    public Task Restart(CancellationToken? cancellationToken = default)
     {
-        if (_agent is OpenAIAssistantAgent openAIAssistantAgent) await openAIAssistantAgent.DeleteAsync();
+        return Task.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync()
+    {
         _chat.IsComplete = true;
+        return ValueTask.CompletedTask;
     }
 }

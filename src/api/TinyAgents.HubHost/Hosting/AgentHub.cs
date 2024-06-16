@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Assistants;
@@ -10,70 +9,58 @@ internal record MessageContent(string Id, string Role, string Content);
 
 internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub> logger) : Hub
 {
-    private static readonly ConcurrentDictionary<string, IAssistantAgent> Agents = new();
+    private readonly AssistantAgentType _agentType = AssistantAgentType.ChargingLocations;
     private readonly ILogger _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
-        var agentId = GetAgentId();
-        if (string.IsNullOrEmpty(agentId))
+        IAssistantAgent? agent = default; 
+        if (Context.Items.TryGetValue(_agentType, out var value))
         {
-            Context.Abort();
-            return;
+            agent = value as IAssistantAgent;
         }
 
-        if (!Agents.TryGetValue(agentId, out var agent))
+        if (agent is null)
         {
-            agent = await Build(agentId);
-            Agents.AddOrUpdate(agentId, _ => agent, (_, _) => agent);
-
-            _logger.LogInformation("Connected {ConnectionId} {AgentId}", Context.ConnectionId, agentId);
+            agent = await builder.Build(_agentType, Context.ConnectionAborted);
+            Context.Items.Add(_agentType, agent);
         }
+
+        _logger.LogInformation("Connected {ConnectionId} {AgentName}", Context.ConnectionId, agent.GetType().Name);
 
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var agentId = GetAgentId();
-        if (!string.IsNullOrEmpty(agentId)
-            && Agents.TryRemove(agentId, out var agent))
+        if (Context.Items.TryGetValue(_agentType, out var item) 
+            && item is IAssistantAgent agent)
+        {
+            _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId, agent.GetType().Name);
             await agent.DisposeAsync();
-        _logger.LogInformation("Disconnected {ConnectionId} {AgentId}", Context.ConnectionId, agentId);
+        }
 
         await base.OnDisconnectedAsync(exception);
     }
 
     public async Task Restart()
     {
-        var agentId = GetAgentId();
-
-        if (!string.IsNullOrEmpty(agentId)
-            && Agents.TryRemove(agentId, out var agent))
+        if (Context.Items.TryGetValue(_agentType, out var item)
+            && item is IAssistantAgent agent)
         {
-            await agent.DisposeAsync();
-
-            // Recreate so that no more history
-            agent = await Build(agentId);
-            Agents.AddOrUpdate(agentId, _ => agent, (_, _) => agent);
+            await agent.Restart();
         }
-    }
-
-    private async Task<IAssistantAgent> Build(string agentId)
-    {
-        var agent = await builder.Build(agentId, AssistantAgentType.RouteDirections, Context.ConnectionAborted);
-        // var agent = await builder.Build(AssistantAgentType.ChargingLocations, Context.ConnectionAborted);
-        return agent;
     }
 
     public async IAsyncEnumerable<MessageContent> Streaming(
         string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var agentId = GetAgentId();
-        if (string.IsNullOrEmpty(agentId)
-            || !Agents.TryGetValue(agentId, out var agent))
+        if (!Context.Items.TryGetValue(_agentType, out var item)
+            || item is not IAssistantAgent agent)
+        {
             yield break;
+        }
 
         await foreach (var message in agent.Invoke(input, cancellationToken))
         {
@@ -87,13 +74,5 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
             id ??= Guid.NewGuid().ToString();
             yield return new MessageContent(id, message.Role.Label, textContent.Text);
         }
-    }
-
-    private string? GetAgentId()
-    {
-        var httpContent = Context.GetHttpContext();
-        if (httpContent?.Request.Query.TryGetValue("run", out var value) ?? false) return value.ToString();
-
-        return default;
     }
 }

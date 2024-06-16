@@ -1,91 +1,75 @@
 using Azure.AI.OpenAI;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
+using TinyAgents.SemanticKernel.OpenAI;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
-internal sealed class AssistantAgentBuilder : IAssistantAgentBuilder
+internal sealed class AssistantAgentBuilder(
+    IKernelBuilder kernelBuilder,
+    IOptions<OpenAIOptions> options,
+    ILogger<AssistantAgentBuilder> logger)
+    : IAssistantAgentBuilder
 {
-    private readonly IKernelBuilder _kernelBuilder;
-    private readonly ILogger _logger;
-    private readonly AssistantOptions? _options;
-
-    public AssistantAgentBuilder(
-        IKernelBuilder kernelBuilder,
-        IConfiguration configuration,
-        ILogger<AssistantAgentBuilder> logger)
-    {
-        var section = configuration.GetSection(nameof(AssistantOptions));
-        _options = section.Exists() ? section.Get<AssistantOptions>() : default;
-
-        _kernelBuilder = kernelBuilder;
-        _logger = logger;
-    }
+    private readonly ILogger _logger = logger;
+    private readonly OpenAIOptions _options = options.Value;
 
     public async Task<IAssistantAgent> Build(
-        string id,
         AssistantAgentType agentType,
         CancellationToken cancellationToken = default)
     {
-        var kernel = _kernelBuilder.Build();
+        var kernel = kernelBuilder.Build();
         var agentSetup = kernel.Services.GetRequiredKeyedService<IAgentSetup>(agentType);
         agentSetup.Configure(kernel);
 
-        KernelAgent? agent = default;
-        if (_options is not null)
+        var httpClient = kernel.Services.GetRequiredKeyedService<HttpClient>(nameof(OpenAIClient));
+
+        var configuration = new OpenAIAssistantConfiguration(
+            _options.ApiKey,
+            _options.Uri.ToString())
         {
-            var httpClient = kernel.Services.GetRequiredKeyedService<HttpClient>(nameof(OpenAIClient));
+            HttpClient = httpClient
+        };
 
-            var configuration = new OpenAIAssistantConfiguration(
-                _options.ApiKey,
-                _options.Uri.ToString())
+        OpenAIAssistantAgent? agent = default;
+        await foreach (var result in OpenAIAssistantAgent
+                           .ListDefinitionsAsync(configuration, cancellationToken: cancellationToken))
+            if (string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrEmpty(result.Id))
             {
-                HttpClient = httpClient
-            };
-
-            await foreach (var result in OpenAIAssistantAgent
-                               .ListDefinitionsAsync(configuration, cancellationToken: cancellationToken))
-                if (result.Id == id)
+                agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, configuration, result.Id, cancellationToken);
+                if (agent.Metadata.TryGetValue(nameof(IAgentSetup.Version), out var version)
+                    && string.Equals(version, agentSetup.Version, StringComparison.OrdinalIgnoreCase))
                 {
-                    agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, configuration, id, cancellationToken);
+                    agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, configuration, result.Id,
+                        cancellationToken);
+                    _logger.LogInformation("Retrieve {AgentType} {Id}", result.Name, result.Id);
                     break;
                 }
 
-            if (agent is null)
-            {
-                var definition = new OpenAIAssistantDefinition
-                {
-                    Name = agentSetup.Name,
-                    Instructions = agentSetup.Instructions,
-                    ModelId = _options.ModelId
-                };
-
-                agent = await OpenAIAssistantAgent.CreateAsync(
-                    kernel,
-                    configuration,
-                    definition,
-                    cancellationToken);
+                await agent.DeleteAsync(cancellationToken);
             }
-        }
 
-        agent ??= new ChatCompletionAgent
+        if (agent is null)
         {
-            Kernel = kernel,
-            Name = agentSetup.Name,
-            Instructions = agentSetup.Instructions,
-            ExecutionSettings = new OpenAIPromptExecutionSettings
+            var definition = new OpenAIAssistantDefinition
             {
-                Temperature = 0,
-                ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-            }
-        };
+                Name = agentSetup.Name,
+                Instructions = agentSetup.Instructions,
+                ModelId = _options.TextGenerationModelId
+            };
 
-        _logger.LogInformation("Build {AgentType}", agent.GetType().Name);
+            agent = await OpenAIAssistantAgent.CreateAsync(
+                kernel,
+                configuration,
+                definition,
+                cancellationToken);
+
+            _logger.LogInformation("Creating {AgentType}", agent.GetType().Name);
+        }
 
         return new AssistantAgent(agent);
     }

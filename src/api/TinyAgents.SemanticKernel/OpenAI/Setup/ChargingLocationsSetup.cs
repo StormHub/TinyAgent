@@ -9,6 +9,8 @@ internal sealed class ChargingLocationsSetup(IServiceProvider provider) : IAgent
 {
     public string Name => "ChargingLocationsAssistant";
 
+    public string Version => "2024-06-17";
+
     public string Instructions =>
         """
         You are an assistant helping users to find electric vehicle charging locations offer compatible charging connectors from Postal address, postcode, suburbs in Australia.
