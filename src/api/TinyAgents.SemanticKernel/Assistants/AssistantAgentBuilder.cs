@@ -59,7 +59,13 @@ internal sealed class AssistantAgentBuilder(
             {
                 Name = agentSetup.Name,
                 Instructions = agentSetup.Instructions,
-                ModelId = _options.TextGenerationModelId
+                ModelId = _options.TextGenerationModelId,
+                Metadata = new Dictionary<string, string>
+                {
+                    {
+                        nameof(IAgentSetup.Version), agentSetup.Version
+                    }
+                }
             };
 
             agent = await OpenAIAssistantAgent.CreateAsync(
@@ -67,6 +73,7 @@ internal sealed class AssistantAgentBuilder(
                 configuration,
                 definition,
                 cancellationToken);
+
 
             _logger.LogInformation("Creating {AgentType}", agent.GetType().Name);
         }
