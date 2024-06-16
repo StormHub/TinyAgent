@@ -25,11 +25,6 @@ internal sealed class AssistantAgent : IAssistantAgent
         await foreach (var content in _chat.InvokeAsync(_agent, cancellationToken)) yield return content;
     }
 
-    public Task Restart(CancellationToken? cancellationToken = default)
-    {
-        return Task.CompletedTask;
-    }
-
     public ValueTask DisposeAsync()
     {
         _chat.IsComplete = true;

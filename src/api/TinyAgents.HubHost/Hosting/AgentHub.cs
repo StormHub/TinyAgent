@@ -45,10 +45,13 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public async Task Restart()
     {
-        if (Context.Items.TryGetValue(_agentType, out var item)
+        if (Context.Items.Remove(_agentType, out var item)
             && item is IAssistantAgent agent)
         {
-            await agent.Restart();
+            await agent.DisposeAsync();
+            
+            agent = await builder.Build(_agentType, Context.ConnectionAborted);
+            Context.Items.Add(_agentType, agent);
         }
     }
 
