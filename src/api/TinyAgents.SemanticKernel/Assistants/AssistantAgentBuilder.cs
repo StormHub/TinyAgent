@@ -74,7 +74,6 @@ internal sealed class AssistantAgentBuilder(
                 definition,
                 cancellationToken);
 
-
             _logger.LogInformation("Creating {AgentType}", agent.GetType().Name);
         }
 
