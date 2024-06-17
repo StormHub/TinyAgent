@@ -1,0 +1,36 @@
+
+- Electric vehicle connector types
+  name: CCS2 Type 2, often called 'Mennekes' connectors
+  description: designed to power electric and hybrid vehicles that comply with standard IEC 62196-3. The maximum rated current for AC is 32A at the maximum voltage of 480V.
+  
+  name: CHAdeMO 
+  description:  Fast charging up to 400 kW by 1 kV, 400 A DC,
+
+
+- Tesla electric vehicle models available in Australia with charger connector types:
+
+    model name: Tesla Model 3
+    charger connector:  CCS2 Type 2, additional DC pins
+    
+    model name: Tesla Model S
+    charger connector:  CCS2 Type 2
+    additional adaptor: CHAdeMO
+    
+    model name: Tesla Model X
+    charger connector:  CCS2 Type 2
+    additional adaptor: CHAdeMO
+    
+    model name: Tesla Model Y
+    charger connector:  CCS2 Type 2, additional DC pins 
+    
+- BYD electric vehicle models available in Australia with charger connector types:
+
+    model name: BYD Atto 3
+    charger connector:  CCS2 Type 2, additional DC pins
+    
+    model name: BYD Dolphin
+    charger connector:  CCS2 Type 2, additional DC pins
+     
+    model name: BYD Seal
+    charger connector:  CCS2 Type 2, additional DC pins
+    additional adaptor: CHAdeMO
