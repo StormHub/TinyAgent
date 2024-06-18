@@ -22,10 +22,10 @@ internal sealed class RoutingPlugin(IRouteApi routeApi)
         var origin = new GeoPosition(originLongitude, originLatitude);
         var destination = new GeoPosition(destinationLongitude, destinationLatitude);
 
-        var response = await routeApi.GetRouteDirections(
-            new GetRouteDirectionsRequest([origin, destination], useTextInstructions: false), cancellationToken);
-
+        var request = new GetRouteDirectionsRequest([origin, destination], useTextInstructions: false);
+        var response = await routeApi.GetRouteDirections(request, cancellationToken);
         var routes = response.Directions.Routes;
+        
         return routes.Count > 0 ? routes[0] : default;
     }
 }

@@ -65,7 +65,10 @@ internal sealed class AssistantAgentBuilder(
                     {
                         nameof(IAgentSetup.Version), agentSetup.Version
                     }
-                }
+                },
+                // Assistant 2024-02-15-preview does not support file tool
+                // keep it disabled until 2024-05-01-preview is in use
+                // EnableRetrieval = true,  
             };
 
             agent = await OpenAIAssistantAgent.CreateAsync(

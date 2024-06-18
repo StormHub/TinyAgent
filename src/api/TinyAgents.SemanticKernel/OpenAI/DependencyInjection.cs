@@ -25,9 +25,11 @@ internal static class DependencyInjection
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
         services.AddTransient<RoutingPlugin>();
+        services.AddTransient<PlannerPlugin>();
 
         services.AddSingleton<ChargingLocationsSetup>();
         services.AddSingleton<RouteDirectionsSetup>();
+        services.AddSingleton<PlannerSetup>();
 
         services.AddTransient(provider =>
         {
@@ -60,6 +62,10 @@ internal static class DependencyInjection
             kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
                 AssistantAgentType.RouteDirections,
                 provider.GetRequiredService<RouteDirectionsSetup>());
+            
+            kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
+                AssistantAgentType.PlanRoutes,
+                provider.GetRequiredService<PlannerSetup>());
 
             kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());

@@ -9,21 +9,21 @@ internal record MessageContent(string Id, string Role, string Content);
 
 internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub> logger) : Hub
 {
-    private readonly AssistantAgentType _agentType = AssistantAgentType.ChargingLocations;
+    private const AssistantAgentType AgentType = AssistantAgentType.ChargingLocations; // AssistantAgentType.PlanRoutes;
     private readonly ILogger _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
         IAssistantAgent? agent = default; 
-        if (Context.Items.TryGetValue(_agentType, out var value))
+        if (Context.Items.TryGetValue(AgentType, out var value))
         {
             agent = value as IAssistantAgent;
         }
 
         if (agent is null)
         {
-            agent = await builder.Build(_agentType, Context.ConnectionAborted);
-            Context.Items.Add(_agentType, agent);
+            agent = await builder.Build(AgentType, Context.ConnectionAborted);
+            Context.Items.Add(AgentType, agent);
         }
 
         _logger.LogInformation("Connected {ConnectionId} {AgentName}", Context.ConnectionId, agent.GetType().Name);
@@ -33,7 +33,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (Context.Items.TryGetValue(_agentType, out var item) 
+        if (Context.Items.TryGetValue(AgentType, out var item) 
             && item is IAssistantAgent agent)
         {
             _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId, agent.GetType().Name);
@@ -45,13 +45,13 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public async Task Restart()
     {
-        if (Context.Items.Remove(_agentType, out var item)
+        if (Context.Items.Remove(AgentType, out var item)
             && item is IAssistantAgent agent)
         {
             await agent.DisposeAsync();
             
-            agent = await builder.Build(_agentType, Context.ConnectionAborted);
-            Context.Items.Add(_agentType, agent);
+            agent = await builder.Build(AgentType, Context.ConnectionAborted);
+            Context.Items.Add(AgentType, agent);
         }
     }
 
@@ -59,7 +59,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
         string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        if (!Context.Items.TryGetValue(_agentType, out var item)
+        if (!Context.Items.TryGetValue(AgentType, out var item)
             || item is not IAssistantAgent agent)
         {
             yield break;
