@@ -16,7 +16,7 @@ public static class DependencyInjection
     {
         services.AddMaps();
         services.AddOpenAI();
-        services.AddAssistant(configuration);
+        services.AddAssistant();
 
         return services;
     }

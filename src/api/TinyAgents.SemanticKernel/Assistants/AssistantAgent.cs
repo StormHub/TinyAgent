@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
@@ -11,10 +12,13 @@ internal sealed class AssistantAgent : IAssistantAgent
     private readonly OpenAIAssistantAgent _agent;
     private readonly AgentGroupChat _chat;
 
-    internal AssistantAgent(OpenAIAssistantAgent agent)
+    internal AssistantAgent(OpenAIAssistantAgent agent, ILoggerFactory loggerFactory)
     {
         _agent = agent;
-        _chat = new AgentGroupChat();
+        _chat = new AgentGroupChat
+        {
+            LoggerFactory = loggerFactory
+        };
     }
 
     public async IAsyncEnumerable<ChatMessageContent> Invoke(

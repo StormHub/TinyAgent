@@ -80,6 +80,7 @@ internal sealed class AssistantAgentBuilder(
             _logger.LogInformation("Creating {AgentType}", agent.GetType().Name);
         }
 
-        return new AssistantAgent(agent);
+        var loggerFactory = kernel.Services.GetRequiredService<ILoggerFactory>();
+        return new AssistantAgent(agent, loggerFactory);
     }
 }

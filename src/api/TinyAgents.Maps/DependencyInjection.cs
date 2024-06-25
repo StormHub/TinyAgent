@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TinyAgents.Maps.Azure.Routing;
 using TinyAgents.Maps.Azure.Search;
-using TinyAgents.Shared.Http;
 
 namespace TinyAgents.Maps;
 
@@ -18,13 +17,7 @@ public static class DependencyInjection
             .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
-#if DEBUG        
-        services.AddTransient<TraceHttpHandler>();
-        services.AddHttpClient(nameof(MapApi))
-            .AddHttpMessageHandler<TraceHttpHandler>();
-#else
         services.AddHttpClient(nameof(MapApi));
-#endif
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
@@ -41,12 +34,7 @@ public static class DependencyInjection
         });
         services.AddTransient<IMapApi, MapApi>();
 
-#if DEBUG
-        services.AddHttpClient(nameof(RouteApi))
-            .AddHttpMessageHandler<TraceHttpHandler>();
-#else
         services.AddHttpClient(nameof(RouteApi));
-#endif
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
