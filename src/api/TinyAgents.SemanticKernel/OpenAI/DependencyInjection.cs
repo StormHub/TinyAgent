@@ -18,9 +18,13 @@ internal static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
+#if DEBUG
         services.AddTransient<TraceHttpHandler>();
         services.AddHttpClient(nameof(OpenAIClient))
             .AddHttpMessageHandler<TraceHttpHandler>();
+#else
+        services.AddHttpClient(nameof(OpenAIClient));
+#endif
 
         services.AddTransient<MapPlugin>();
         services.AddTransient<SearchPlugin>();
