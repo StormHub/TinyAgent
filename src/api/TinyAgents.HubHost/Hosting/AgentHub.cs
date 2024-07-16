@@ -18,15 +18,16 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
         if (Context.Items.TryGetValue(AgentType, out var value))
         {
             agent = value as IAssistantAgent;
+            _logger.LogInformation("Connected {ConnectionId} context {AgentType}", Context.ConnectionId, AgentType);
         }
 
         if (agent is null)
         {
+            _logger.LogInformation("Connected {ConnectionId} build {AgentType}", Context.ConnectionId, AgentType);
             agent = await builder.Build(AgentType, Context.ConnectionAborted);
             Context.Items.Add(AgentType, agent);
         }
 
-        _logger.LogInformation("Connected {ConnectionId} {AgentName}", Context.ConnectionId, agent.GetType().Name);
 
         await base.OnConnectedAsync();
     }
