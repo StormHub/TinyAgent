@@ -1,4 +1,5 @@
-using Azure.AI.OpenAI;
+using System.ClientModel;
+using OpenAI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,24 +28,23 @@ internal sealed class AssistantAgentBuilder(
 
         var httpClient = kernel.Services.GetRequiredKeyedService<HttpClient>(nameof(OpenAIClient));
 
-        var configuration = new OpenAIAssistantConfiguration(
-            _options.ApiKey,
-            _options.Uri.ToString())
-        {
-            HttpClient = httpClient
-        };
+        var credential = new ApiKeyCredential(_options.ApiKey);
+        var provider = OpenAIClientProvider.ForAzureOpenAI(credential, _options.Uri, httpClient);
 
         OpenAIAssistantAgent? agent = default;
         await foreach (var result in OpenAIAssistantAgent
-                           .ListDefinitionsAsync(configuration, cancellationToken: cancellationToken))
+                           .ListDefinitionsAsync(provider, cancellationToken: cancellationToken))
             if (string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)
                 && !string.IsNullOrEmpty(result.Id))
             {
-                agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, configuration, result.Id, cancellationToken);
-                if (agent.Metadata.TryGetValue(nameof(IAgentSetup.Version), out var version)
+                agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
+                
+                
+                if (agent.Definition.Metadata is not null 
+                    && agent.Definition.Metadata.TryGetValue(nameof(IAgentSetup.Version), out var version)
                     && string.Equals(version, agentSetup.Version, StringComparison.OrdinalIgnoreCase))
                 {
-                    agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, configuration, result.Id,
+                    agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id,
                         cancellationToken);
                     _logger.LogInformation("Retrieve {AgentType} {Id}", result.Name, result.Id);
                     break;
@@ -55,11 +55,10 @@ internal sealed class AssistantAgentBuilder(
 
         if (agent is null)
         {
-            var definition = new OpenAIAssistantDefinition
+            var definition = new OpenAIAssistantDefinition(_options.TextGenerationModelId)
             {
                 Name = agentSetup.Name,
                 Instructions = agentSetup.Instructions,
-                ModelId = _options.TextGenerationModelId,
                 Metadata = new Dictionary<string, string>
                 {
                     {
@@ -73,7 +72,7 @@ internal sealed class AssistantAgentBuilder(
 
             agent = await OpenAIAssistantAgent.CreateAsync(
                 kernel,
-                configuration,
+                provider,
                 definition,
                 cancellationToken);
 
