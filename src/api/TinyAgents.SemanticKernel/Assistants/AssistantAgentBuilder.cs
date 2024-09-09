@@ -1,10 +1,10 @@
 using System.ClientModel;
-using OpenAI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
+using OpenAI;
 using TinyAgents.SemanticKernel.OpenAI;
 
 namespace TinyAgents.SemanticKernel.Assistants;
@@ -33,14 +33,14 @@ internal sealed class AssistantAgentBuilder(
 
         OpenAIAssistantAgent? agent = default;
         await foreach (var result in OpenAIAssistantAgent
-                           .ListDefinitionsAsync(provider, cancellationToken: cancellationToken))
+                           .ListDefinitionsAsync(provider, cancellationToken))
             if (string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)
                 && !string.IsNullOrEmpty(result.Id))
             {
                 agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
-                
-                
-                if (agent.Definition.Metadata is not null 
+
+
+                if (agent.Definition.Metadata is not null
                     && agent.Definition.Metadata.TryGetValue(nameof(IAgentSetup.Version), out var version)
                     && string.Equals(version, agentSetup.Version, StringComparison.OrdinalIgnoreCase))
                 {
@@ -64,7 +64,7 @@ internal sealed class AssistantAgentBuilder(
                     {
                         nameof(IAgentSetup.Version), agentSetup.Version
                     }
-                },
+                }
                 // Assistant 2024-02-15-preview does not support file tool
                 // keep it disabled until 2024-05-01-preview is in use
                 // EnableRetrieval = true,  

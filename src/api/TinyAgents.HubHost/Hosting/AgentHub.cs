@@ -9,12 +9,12 @@ internal record MessageContent(string Id, string Role, string Content);
 
 internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub> logger) : Hub
 {
-    private const AssistantAgentType AgentType = AssistantAgentType.ChargingLocations; // AssistantAgentType.PlanRoutes;
+    private const AssistantAgentType AgentType = AssistantAgentType.Locations; // AssistantAgentType.PlanRoutes;
     private readonly ILogger _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
-        IAssistantAgent? agent = default; 
+        IAssistantAgent? agent = default;
         if (Context.Items.TryGetValue(AgentType, out var value))
         {
             agent = value as IAssistantAgent;
@@ -34,10 +34,11 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (Context.Items.TryGetValue(AgentType, out var item) 
+        if (Context.Items.TryGetValue(AgentType, out var item)
             && item is IAssistantAgent agent)
         {
-            _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId, agent.GetType().Name);
+            _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId,
+                agent.GetType().Name);
             await agent.DisposeAsync();
         }
 
@@ -50,7 +51,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
             && item is IAssistantAgent agent)
         {
             await agent.DisposeAsync();
-            
+
             agent = await builder.Build(AgentType, Context.ConnectionAborted);
             Context.Items.Add(AgentType, agent);
         }
@@ -62,9 +63,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
     {
         if (!Context.Items.TryGetValue(AgentType, out var item)
             || item is not IAssistantAgent agent)
-        {
             yield break;
-        }
 
         await foreach (var message in agent.Invoke(input, cancellationToken))
         {

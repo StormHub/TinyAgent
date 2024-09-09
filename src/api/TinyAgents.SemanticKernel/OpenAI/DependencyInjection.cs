@@ -1,10 +1,10 @@
-using OpenAI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using OpenAI;
+using TinyAgents.Plugins.Maps;
 using TinyAgents.SemanticKernel.Assistants;
-using TinyAgents.SemanticKernel.OpenAI.Plugins;
 using TinyAgents.SemanticKernel.OpenAI.Setup;
 using TinyAgents.Shared.Http;
 
@@ -22,13 +22,8 @@ internal static class DependencyInjection
         services.AddHttpClient(nameof(OpenAIClient)).AddHttpMessageHandler<TraceHttpHandler>();
 
         services.AddTransient<MapPlugin>();
-        services.AddTransient<SearchPlugin>();
-        services.AddTransient<RoutingPlugin>();
-        services.AddTransient<PlannerPlugin>();
 
-        services.AddSingleton<ChargingLocationsSetup>();
-        services.AddSingleton<RouteDirectionsSetup>();
-        services.AddSingleton<PlannerSetup>();
+        services.AddSingleton<LocationSetup>();
 
         services.AddTransient(provider =>
         {
@@ -55,16 +50,8 @@ internal static class DependencyInjection
                     httpClient: httpClient);
 
             kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
-                AssistantAgentType.ChargingLocations,
-                provider.GetRequiredService<ChargingLocationsSetup>());
-
-            kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
-                AssistantAgentType.RouteDirections,
-                provider.GetRequiredService<RouteDirectionsSetup>());
-            
-            kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
-                AssistantAgentType.PlanRoutes,
-                provider.GetRequiredService<PlannerSetup>());
+                AssistantAgentType.Locations,
+                provider.GetRequiredService<LocationSetup>());
 
             kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());

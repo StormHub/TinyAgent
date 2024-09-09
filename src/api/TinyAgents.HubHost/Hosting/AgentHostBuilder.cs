@@ -24,7 +24,7 @@ internal static class AgentHostBuilder
         );
         builder.Services.AddSignalR()
             .AddJsonProtocol(options => { options.PayloadSerializerOptions.Setup(); });
-        builder.Services.AddAssistanceAgent(builder.Configuration, builder.Environment);
+        builder.Services.AddAssistanceAgent();
 
         var app = builder.Build();
         app.UseCors("AllowCors");

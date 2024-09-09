@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
+using TinyAgents.Plugins.Maps;
 using TinyAgents.SemanticKernel.Assistants;
-using TinyAgents.SemanticKernel.OpenAI.Plugins;
 
 namespace TinyAgents.SemanticKernel.OpenAI.Setup;
 
-internal sealed class RouteDirectionsSetup(IServiceProvider provider) : IAgentSetup
+internal sealed class LocationSetup(IServiceProvider provider) : IAgentSetup
 {
     public string Name => "RouteDirectionsAssistant";
 
@@ -13,8 +13,7 @@ internal sealed class RouteDirectionsSetup(IServiceProvider provider) : IAgentSe
 
     public string Instructions =>
         """
-        You are an assistant helping users to find driving route directions from origin to destination address in Australia.
-        The goal is to find the closest routes for users.
+        You are an assistant helping users to find GPS locations from postal address in Australia.
         You're laser focused on the goal at hand.
         Answer questions only from given facts.
         """;
@@ -22,7 +21,6 @@ internal sealed class RouteDirectionsSetup(IServiceProvider provider) : IAgentSe
     public Kernel Configure(Kernel kernel)
     {
         kernel.Plugins.AddFromObject(provider.GetRequiredService<MapPlugin>());
-        kernel.Plugins.AddFromObject(provider.GetRequiredService<RoutingPlugin>());
 
         return kernel;
     }
