@@ -7,7 +7,7 @@ namespace TinyAgents.SemanticKernel.OpenAI.Setup;
 
 internal sealed class LocationSetup(IServiceProvider provider) : IAgentSetup
 {
-    public string Name => "RouteDirectionsAssistant";
+    public string Name => "LocationAssistant";
 
     public string Version => "2024-06-17";
 

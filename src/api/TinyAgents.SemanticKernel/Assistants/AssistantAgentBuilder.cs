@@ -39,7 +39,6 @@ internal sealed class AssistantAgentBuilder(
             {
                 agent = await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
 
-
                 if (agent.Definition.Metadata is not null
                     && agent.Definition.Metadata.TryGetValue(nameof(IAgentSetup.Version), out var version)
                     && string.Equals(version, agentSetup.Version, StringComparison.OrdinalIgnoreCase))
@@ -80,6 +79,10 @@ internal sealed class AssistantAgentBuilder(
         }
 
         var loggerFactory = kernel.Services.GetRequiredService<ILoggerFactory>();
+        
+        agent.PollingOptions.RunPollingInterval = TimeSpan.FromSeconds(1);
+        agent.PollingOptions.RunPollingBackoffThreshold = 1;
+        
         return new AssistantAgent(agent, loggerFactory);
     }
 }

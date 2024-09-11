@@ -16,7 +16,7 @@ public sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Delegat
             await using var requestStream = await GetContentStream(request.Content);
             var requestStreamContent = new StreamContent(requestStream);
             var requestContent = await requestStreamContent.ReadAsStringAsync(cancellationToken);
-            _logger.LogInformation("{RequestUri} {RequestContent}", request.RequestUri, requestContent);
+            _logger.LogInformation("{Method} {RequestUri} {RequestContent}", request.Method, request.RequestUri, requestContent);
         }
 #endif
 
@@ -26,7 +26,7 @@ public sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Delegat
         var responseStream = await GetContentStream(response.Content);
         var responseStreamContent = new StreamContent(responseStream);
         var responseContent = await responseStreamContent.ReadAsStringAsync(cancellationToken);
-        _logger.LogInformation("{ResponseContent}", responseContent);
+        _logger.LogInformation("{Status} {ResponseContent}", response.StatusCode, responseContent);
 
         // Rewind the stream position for downstream reads
         responseStream.Position = 0;

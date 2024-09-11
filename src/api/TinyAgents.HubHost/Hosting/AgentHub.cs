@@ -28,7 +28,6 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
             Context.Items.Add(AgentType, agent);
         }
 
-
         await base.OnConnectedAsync();
     }
 

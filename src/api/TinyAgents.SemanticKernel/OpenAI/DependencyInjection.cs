@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using OpenAI;
-using TinyAgents.Plugins.Maps;
 using TinyAgents.SemanticKernel.Assistants;
 using TinyAgents.SemanticKernel.OpenAI.Setup;
 using TinyAgents.Shared.Http;
@@ -18,11 +17,7 @@ internal static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
-        services.AddTransient<TraceHttpHandler>();
-        services.AddHttpClient(nameof(OpenAIClient)).AddHttpMessageHandler<TraceHttpHandler>();
-
-        services.AddTransient<MapPlugin>();
-
+        services.AddRateLimitedHttpClient(nameof(OpenAIClient));
         services.AddSingleton<LocationSetup>();
 
         services.AddTransient(provider =>
@@ -34,6 +29,7 @@ internal static class DependencyInjection
 
             var kernelBuilder = Kernel.CreateBuilder();
             if (openAIOptions.Uri.Host.EndsWith("openai.azure.com"))
+            {
                 kernelBuilder.AddAzureOpenAIChatCompletion(
                     openAIOptions.TextGenerationModelId,
                     openAIOptions.Uri.ToString(),
@@ -41,13 +37,16 @@ internal static class DependencyInjection
                     openAIOptions.TextGenerationModelId,
                     openAIOptions.TextGenerationModelId,
                     httpClient);
+            }
             else
+            {
                 kernelBuilder.AddOpenAIChatCompletion(
                     openAIOptions.TextGenerationModelId,
                     apiKey: openAIOptions.ApiKey,
                     endpoint: openAIOptions.Uri,
                     orgId: openAIOptions.OrganizationId,
                     httpClient: httpClient);
+            }
 
             kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
                 AssistantAgentType.Locations,

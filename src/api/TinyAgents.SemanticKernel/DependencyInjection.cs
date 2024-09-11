@@ -7,11 +7,9 @@ namespace TinyAgents.SemanticKernel;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAssistanceAgent(this IServiceCollection services)
-    {
-        services.AddOpenAI();
-        services.AddAssistant();
-        services.AddMapPlugin();
-        return services;
-    }
+    public static IServiceCollection AddAssistanceAgent(this IServiceCollection services) => 
+        services
+            .AddOpenAI()
+            .AddAssistant()
+            .AddMapPlugin();
 }
