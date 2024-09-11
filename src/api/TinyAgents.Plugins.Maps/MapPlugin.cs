@@ -13,7 +13,7 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
 
     [KernelFunction(nameof(GetPosition))]
     [Description("Get GPS latitude and longitude for a given postal address, postcode, suburbs in Australia")]
-    public async Task<GeoJsonPoint?> GetPosition(
+    public async Task<GeoPosition?> GetPosition(
         [Description("Postal address, postcode, suburbs in Australia to search for")]
         string location,
         CancellationToken cancellationToken = default)
@@ -26,9 +26,19 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
             },
             cancellationToken);
 
-        return response.Value.Features.Count > 0
-            ? response.Value.Features[0].Geometry
-            : default;
+        GeoJsonPoint? geometry = default;
+        if (response.Value.Features.Count > 0)
+        {
+            geometry = response.Value.Features[0].Geometry;
+        }
+
+        GeoPosition? position = default;
+        if (geometry is not null && geometry.Coordinates.Count > 1)
+        {
+            position = new GeoPosition(longitude: geometry.Coordinates[0], latitude: geometry.Coordinates[1]);
+        }
+
+        return position;
     }
 
     [KernelFunction(nameof(GetAddress))]
