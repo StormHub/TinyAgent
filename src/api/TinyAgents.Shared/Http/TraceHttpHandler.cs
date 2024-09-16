@@ -23,6 +23,12 @@ public sealed class TraceHttpHandler(ILogger<TraceHttpHandler> logger) : Delegat
         var response = await base.SendAsync(request, cancellationToken);
 
 #if DEBUG
+        foreach (var header in response.Headers)
+        {
+            _logger.LogInformation("{Key}={Value}", header.Key, string.Join(";", header.Value));
+        }
+        
+        
         var responseStream = await GetContentStream(response.Content);
         var responseStreamContent = new StreamContent(responseStream);
         var responseContent = await responseStreamContent.ReadAsStringAsync(cancellationToken);

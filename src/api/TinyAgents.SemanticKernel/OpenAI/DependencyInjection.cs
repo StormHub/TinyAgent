@@ -1,3 +1,7 @@
+using System.ClientModel.Primitives;
+using Azure;
+using Azure.AI.OpenAI;
+using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,26 +21,45 @@ internal static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
-        services.AddRateLimitedHttpClient(nameof(OpenAIClient));
+        var builder = services.AddHttpClient(nameof(OpenAIClient));
+        
+#if DEBUG
+        services.AddTransient<TraceHttpHandler>();
+        builder.AddHttpMessageHandler<TraceHttpHandler>();
+#endif        
+        
         services.AddSingleton<LocationSetup>();
 
         services.AddTransient(provider =>
         {
+            var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+            
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(OpenAIClient));
-
-            var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
 
             var kernelBuilder = Kernel.CreateBuilder();
             if (openAIOptions.Uri.Host.EndsWith("openai.azure.com"))
             {
+                var clientOptions = new AzureOpenAIClientOptions
+                {
+                    Transport = new HttpClientPipelineTransport(httpClient),
+                };
+
+                var azureOpenAIClient = !string.IsNullOrEmpty(openAIOptions.ApiKey) 
+                    ? new AzureOpenAIClient(
+                        openAIOptions.Uri,
+                        new AzureKeyCredential(openAIOptions.ApiKey),
+                        clientOptions) 
+                    : new AzureOpenAIClient(
+                        openAIOptions.Uri, 
+                        new DefaultAzureCredential(), 
+                        clientOptions);
+
                 kernelBuilder.AddAzureOpenAIChatCompletion(
-                    openAIOptions.TextGenerationModelId,
-                    openAIOptions.Uri.ToString(),
-                    openAIOptions.ApiKey,
-                    openAIOptions.TextGenerationModelId,
-                    openAIOptions.TextGenerationModelId,
-                    httpClient);
+                    deploymentName: openAIOptions.TextGenerationModelId,
+                    azureOpenAIClient: azureOpenAIClient,
+                    serviceId: openAIOptions.TextGenerationModelId,
+                    modelId: openAIOptions.TextGenerationModelId);
             }
             else
             {
@@ -52,7 +75,7 @@ internal static class DependencyInjection
                 AssistantAgentType.Locations,
                 provider.GetRequiredService<LocationSetup>());
 
-            kernelBuilder.Services.AddKeyedSingleton(nameof(OpenAIClient), httpClient);
+            kernelBuilder.Services.AddKeyedSingleton(openAIOptions.Uri, httpClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 
             return kernelBuilder;
