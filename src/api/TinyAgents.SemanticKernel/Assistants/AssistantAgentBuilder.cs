@@ -44,6 +44,7 @@ internal sealed class AssistantAgentBuilder(
         {
             Name = agentSetup.Name,
             Instructions = agentSetup.Instructions,
+            Temperature = 0,
             Metadata = new Dictionary<string, string>
             {
                 {
