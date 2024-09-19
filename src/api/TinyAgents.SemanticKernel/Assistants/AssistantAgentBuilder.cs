@@ -1,3 +1,4 @@
+using System.ClientModel;
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,17 +29,26 @@ internal sealed class AssistantAgentBuilder(
         var httpClient = kernel.Services.GetRequiredKeyedService<HttpClient>(_options.Uri);
 
         var provider = ! string.IsNullOrEmpty(_options.ApiKey) 
-            ? OpenAIClientProvider.ForAzureOpenAI(_options.ApiKey, _options.Uri, httpClient) 
+            ? OpenAIClientProvider.ForAzureOpenAI(new ApiKeyCredential(_options.ApiKey), _options.Uri, httpClient) 
             : OpenAIClientProvider.ForAzureOpenAI(new DefaultAzureCredential(), _options.Uri, httpClient);
 
         await foreach (var result in OpenAIAssistantAgent
                            .ListDefinitionsAsync(provider, cancellationToken))
-            if (string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)
-                && !string.IsNullOrEmpty(result.Id))
+        {
+            if (!string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)) continue;
+            
+            var assistantAgent =
+                await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
+            var deleted = await assistantAgent.DeleteAsync(cancellationToken);
+            if (deleted)
             {
-                var assistantAgent = await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
-                await assistantAgent.DeleteAsync(cancellationToken);
+                _logger.LogInformation("Removed OpenAI assistant {Id}", assistantAgent.Id);
             }
+            else
+            {
+                _logger.LogWarning("Unable to remove OpenAI assistant {Id}", assistantAgent.Id);
+            }
+        }
 
         var definition = new OpenAIAssistantDefinition(_options.TextGenerationModelId)
         {
@@ -62,7 +72,7 @@ internal sealed class AssistantAgentBuilder(
             definition,
             cancellationToken);
 
-        _logger.LogInformation("Creating {AgentType}", agent.GetType().Name);
+        _logger.LogInformation("{AgentType} created {Id}", agent.GetType().Name, agent.Id);
 
         var loggerFactory = kernel.Services.GetRequiredService<ILoggerFactory>();
 
