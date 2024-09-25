@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Azure.Core.GeoJson;
 using Azure.Maps.Search;
 using Azure.Maps.Search.Models;
-using Azure.Maps.Search.Models.Queries;
 using Microsoft.SemanticKernel;
 
 namespace TinyAgents.Plugins.Maps;
@@ -26,19 +25,9 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
             },
             cancellationToken);
 
-        GeoJsonPoint? geometry = default;
-        if (response.Value.Features.Count > 0)
-        {
-            geometry = response.Value.Features[0].Geometry;
-        }
-
-        GeoPosition? position = default;
-        if (geometry is not null && geometry.Coordinates.Count > 1)
-        {
-            position = new GeoPosition(longitude: geometry.Coordinates[0], latitude: geometry.Coordinates[1]);
-        }
-
-        return position;
+        return response.Value.Features.Count > 0
+            ? response.Value.Features[0].Geometry.Coordinates 
+            : default;
     }
 
     [KernelFunction(nameof(GetAddress))]

@@ -1,5 +1,4 @@
-using System.ClientModel;
-using Azure.Identity;
+using Azure.AI.OpenAI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,11 +25,8 @@ internal sealed class AssistantAgentBuilder(
         var agentSetup = kernel.Services.GetRequiredKeyedService<IAgentSetup>(agentType);
         agentSetup.Configure(kernel);
 
-        var httpClient = kernel.Services.GetRequiredKeyedService<HttpClient>(_options.Uri);
-
-        var provider = ! string.IsNullOrEmpty(_options.ApiKey) 
-            ? OpenAIClientProvider.ForAzureOpenAI(new ApiKeyCredential(_options.ApiKey), _options.Uri, httpClient) 
-            : OpenAIClientProvider.ForAzureOpenAI(new DefaultAzureCredential(), _options.Uri, httpClient);
+        var openAIClient = kernel.Services.GetRequiredService<AzureOpenAIClient>();
+        var provider = OpenAIClientProvider.FromClient(openAIClient);
 
         await foreach (var result in OpenAIAssistantAgent
                            .ListDefinitionsAsync(provider, cancellationToken))
@@ -50,7 +46,7 @@ internal sealed class AssistantAgentBuilder(
             }
         }
 
-        var definition = new OpenAIAssistantDefinition(_options.TextGenerationModelId)
+        var definition = new OpenAIAssistantDefinition(_options.ModelId)
         {
             Name = agentSetup.Name,
             Instructions = agentSetup.Instructions,
