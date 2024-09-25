@@ -32,18 +32,14 @@ internal sealed class AssistantAgentBuilder(
                            .ListDefinitionsAsync(provider, cancellationToken))
         {
             if (!string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)) continue;
-            
+
             var assistantAgent =
                 await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
             var deleted = await assistantAgent.DeleteAsync(cancellationToken);
             if (deleted)
-            {
                 _logger.LogInformation("Removed OpenAI assistant {Id}", assistantAgent.Id);
-            }
             else
-            {
                 _logger.LogWarning("Unable to remove OpenAI assistant {Id}", assistantAgent.Id);
-            }
         }
 
         var definition = new OpenAIAssistantDefinition(_options.ModelId)
@@ -75,7 +71,7 @@ internal sealed class AssistantAgentBuilder(
         agent.PollingOptions.RunPollingInterval = _options.RunPollingInterval;
         agent.PollingOptions.RunPollingBackoff = _options.RunPollingBackoff;
         agent.PollingOptions.RunPollingBackoffThreshold = _options.DefaultPollingBackoffThreshold;
-        
+
         return new AssistantAgent(agent, loggerFactory);
     }
 }

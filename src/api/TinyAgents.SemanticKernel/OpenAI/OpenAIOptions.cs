@@ -9,7 +9,7 @@ public sealed class OpenAIOptions
     [Required(AllowEmptyStrings = false)] public required string ModelId { get; init; }
 
     public string? ApiKey { get; init; }
-    
+
     public TimeSpan RunPollingInterval { get; init; } = TimeSpan.FromSeconds(1);
 
     public TimeSpan RunPollingBackoff { get; init; } = TimeSpan.FromSeconds(1);

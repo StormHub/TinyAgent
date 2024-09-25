@@ -25,8 +25,8 @@ internal static class DependencyInjection
 #if DEBUG
         services.AddTransient<TraceHttpHandler>();
         builder.AddHttpMessageHandler<TraceHttpHandler>();
-#endif        
-        
+#endif
+
         services.AddSingleton<LocationSetup>();
 
         services.AddTransient<AzureOpenAIClient>(provider =>
@@ -39,7 +39,6 @@ internal static class DependencyInjection
             {
                 Transport = new HttpClientPipelineTransport(httpClient)
             };
-            clientOptions.AddPolicy(new OpenAIPipelinePolicy(), PipelinePosition.PerCall);
 
             var azureOpenAIClient = !string.IsNullOrEmpty(openAIOptions.ApiKey)
                 ? new AzureOpenAIClient(
@@ -61,10 +60,10 @@ internal static class DependencyInjection
             var azureOpenAIClient = provider.GetRequiredService<AzureOpenAIClient>();
 
             kernelBuilder.AddAzureOpenAIChatCompletion(
-                deploymentName: openAIOptions.ModelId,
-                azureOpenAIClient: azureOpenAIClient,
-                serviceId: openAIOptions.ModelId,
-                modelId: openAIOptions.ModelId);
+                openAIOptions.ModelId,
+                azureOpenAIClient,
+                openAIOptions.ModelId,
+                openAIOptions.ModelId);
 
             kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
                 AssistantAgentType.Locations,

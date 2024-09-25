@@ -26,7 +26,7 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
             cancellationToken);
 
         return response.Value.Features.Count > 0
-            ? response.Value.Features[0].Geometry.Coordinates 
+            ? response.Value.Features[0].Geometry.Coordinates
             : default;
     }
 

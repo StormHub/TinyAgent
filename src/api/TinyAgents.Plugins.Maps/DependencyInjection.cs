@@ -20,8 +20,8 @@ public static class DependencyInjection
 #if DEBUG
         services.AddTransient<TraceHttpHandler>();
         builder.AddHttpMessageHandler<TraceHttpHandler>();
-#endif        
-        
+#endif
+
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
