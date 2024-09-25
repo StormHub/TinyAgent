@@ -39,6 +39,7 @@ internal static class DependencyInjection
             {
                 Transport = new HttpClientPipelineTransport(httpClient)
             };
+            clientOptions.AddPolicy(new OpenAIPipelinePolicy(), PipelinePosition.PerCall);
 
             var azureOpenAIClient = !string.IsNullOrEmpty(openAIOptions.ApiKey)
                 ? new AzureOpenAIClient(
@@ -56,16 +57,7 @@ internal static class DependencyInjection
         {
             var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
 
-            var factory = provider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = factory.CreateClient(nameof(OpenAIClient));
-
             var kernelBuilder = Kernel.CreateBuilder();
-            var clientOptions = new AzureOpenAIClientOptions
-            {
-                Transport = new HttpClientPipelineTransport(httpClient)
-            };
-            clientOptions.AddPolicy(new OpenAIPipelinePolicy(), PipelinePosition.PerCall);
-
             var azureOpenAIClient = provider.GetRequiredService<AzureOpenAIClient>();
 
             kernelBuilder.AddAzureOpenAIChatCompletion(
