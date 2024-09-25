@@ -1,8 +1,10 @@
+using System.Runtime.CompilerServices;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using TinyAgents.SemanticKernel.OpenAI;
 
@@ -17,61 +19,68 @@ internal sealed class AssistantAgentBuilder(
     private readonly ILogger _logger = logger;
     private readonly OpenAIOptions _options = options.Value;
 
-    public async Task<IAssistantAgent> Build(
-        AssistantAgentType agentType,
-        CancellationToken cancellationToken = default)
+    public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
         var kernel = kernelBuilder.Build();
-        var agentSetup = kernel.Services.GetRequiredKeyedService<IAgentSetup>(agentType);
-        agentSetup.Configure(kernel);
+        Agent[] agents = await BuildAgents(kernel, cancellationToken)
+            .ToArrayAsync(cancellationToken);
+        
+        var loggerFactory = kernel.Services.GetRequiredService<ILoggerFactory>();
+        return new AssistantAgent(agents, loggerFactory);
+    }
 
+    private async IAsyncEnumerable<OpenAIAssistantAgent> BuildAgents(Kernel kernel, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
         var openAIClient = kernel.Services.GetRequiredService<AzureOpenAIClient>();
         var provider = OpenAIClientProvider.FromClient(openAIClient);
 
-        await foreach (var result in OpenAIAssistantAgent
-                           .ListDefinitionsAsync(provider, cancellationToken))
+        foreach (var agentSetup in kernel.Services.GetServices<IAgentSetup>())
         {
-            if (!string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)) continue;
-
-            var assistantAgent =
-                await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
-            var deleted = await assistantAgent.DeleteAsync(cancellationToken);
-            if (deleted)
-                _logger.LogInformation("Removed OpenAI assistant {Id}", assistantAgent.Id);
-            else
-                _logger.LogWarning("Unable to remove OpenAI assistant {Id}", assistantAgent.Id);
-        }
-
-        var definition = new OpenAIAssistantDefinition(_options.ModelId)
-        {
-            Name = agentSetup.Name,
-            Instructions = agentSetup.Instructions,
-            Temperature = 0,
-            Metadata = new Dictionary<string, string>
+            agentSetup.Configure(kernel);
+            
+            await foreach (var result in OpenAIAssistantAgent
+                               .ListDefinitionsAsync(provider, cancellationToken))
             {
-                {
-                    nameof(IAgentSetup.Version), agentSetup.Version
-                }
+                if (!string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)) continue;
+                
+                var assistantAgent =
+                    await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
+                var deleted = await assistantAgent.DeleteAsync(cancellationToken);
+                if (deleted)
+                    _logger.LogInformation("Removed OpenAI assistant {Id}", assistantAgent.Id);
+                else
+                    _logger.LogWarning("Unable to remove OpenAI assistant {Id}", assistantAgent.Id);
             }
-            // Assistant 2024-02-15-preview does not support file tool
-            // keep it disabled until 2024-05-01-preview is in use
-            // EnableRetrieval = true,  
-        };
 
-        var agent = await OpenAIAssistantAgent.CreateAsync(
-            kernel,
-            provider,
-            definition,
-            cancellationToken);
+            var definition = new OpenAIAssistantDefinition(_options.ModelId)
+            {
+                Name = agentSetup.Name,
+                Instructions = agentSetup.Instructions,
+                Temperature = 0,
+                Metadata = new Dictionary<string, string>
+                {
+                    {
+                        nameof(IAgentSetup.Version), agentSetup.Version
+                    }
+                }
+                // Assistant 2024-02-15-preview does not support file tool
+                // keep it disabled until 2024-05-01-preview is in use
+                // EnableRetrieval = true,  
+            };
 
-        _logger.LogInformation("{AgentType} created {Id}", agent.GetType().Name, agent.Id);
+            var agent = await OpenAIAssistantAgent.CreateAsync(
+                kernel,
+                provider,
+                definition,
+                cancellationToken);
 
-        var loggerFactory = kernel.Services.GetRequiredService<ILoggerFactory>();
+            _logger.LogInformation("{AgentType} created {Id}", agent.GetType().Name, agent.Id);
 
-        agent.PollingOptions.RunPollingInterval = _options.RunPollingInterval;
-        agent.PollingOptions.RunPollingBackoff = _options.RunPollingBackoff;
-        agent.PollingOptions.RunPollingBackoffThreshold = _options.DefaultPollingBackoffThreshold;
+            agent.PollingOptions.RunPollingInterval = _options.RunPollingInterval;
+            agent.PollingOptions.RunPollingBackoff = _options.RunPollingBackoff;
+            agent.PollingOptions.RunPollingBackoffThreshold = _options.DefaultPollingBackoffThreshold;
 
-        return new AssistantAgent(agent, loggerFactory);
+            yield return agent;
+        }
     }
 }

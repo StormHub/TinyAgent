@@ -27,7 +27,7 @@ internal static class DependencyInjection
         builder.AddHttpMessageHandler<TraceHttpHandler>();
 #endif
 
-        services.AddSingleton<LocationSetup>();
+        services.AddSingleton<IAgentSetup, LocationSetup>();
 
         services.AddTransient<AzureOpenAIClient>(provider =>
         {
@@ -65,9 +65,11 @@ internal static class DependencyInjection
                 openAIOptions.ModelId,
                 openAIOptions.ModelId);
 
-            kernelBuilder.Services.AddKeyedSingleton<IAgentSetup>(
-                AssistantAgentType.Locations,
-                provider.GetRequiredService<LocationSetup>());
+            foreach (var agentSetup in provider.GetServices<IAgentSetup>())
+            {
+                kernelBuilder.Services.AddSingleton(agentSetup);
+            }
+
             kernelBuilder.Services.AddSingleton(azureOpenAIClient);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 

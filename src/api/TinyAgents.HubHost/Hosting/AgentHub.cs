@@ -9,22 +9,24 @@ internal record MessageContent(string Id, string Role, string Content);
 
 internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub> logger) : Hub
 {
-    private const AssistantAgentType AgentType = AssistantAgentType.Locations; // AssistantAgentType.PlanRoutes;
+    private const string AgentType = nameof(AgentType);
+    
     private readonly ILogger _logger = logger;
 
     public override async Task OnConnectedAsync()
     {
         IAssistantAgent? agent = default;
-        if (Context.Items.TryGetValue(AgentType, out var value))
+        if (Context.Items.TryGetValue(Context.ConnectionId, out var value)
+            && value is IAssistantAgent assistantAgent)
         {
-            agent = value as IAssistantAgent;
-            _logger.LogInformation("Connected {ConnectionId} context {AgentType}", Context.ConnectionId, AgentType);
+            agent = assistantAgent;
+            _logger.LogInformation("Connected {ConnectionId} {Assistant}.", Context.ConnectionId, agent.GetType().Name);
         }
 
         if (agent is null)
         {
-            _logger.LogInformation("Connected {ConnectionId} build {AgentType}", Context.ConnectionId, AgentType);
-            agent = await builder.Build(AgentType, Context.ConnectionAborted);
+            _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
+            agent = await builder.Build(Context.ConnectionAborted);
             Context.Items.Add(AgentType, agent);
         }
 
@@ -51,7 +53,7 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
         {
             await agent.DisposeAsync();
 
-            agent = await builder.Build(AgentType, Context.ConnectionAborted);
+            agent = await builder.Build(Context.ConnectionAborted);
             Context.Items.Add(AgentType, agent);
         }
     }

@@ -2,5 +2,5 @@ namespace TinyAgents.SemanticKernel.Assistants;
 
 public interface IAssistantAgentBuilder
 {
-    Task<IAssistantAgent> Build(AssistantAgentType agentType, CancellationToken cancellationToken = default);
+    Task<IAssistantAgent> Build(CancellationToken cancellationToken = default);
 }
