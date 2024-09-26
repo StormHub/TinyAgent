@@ -10,9 +10,9 @@ public sealed class OpenAIOptions
 
     public string? ApiKey { get; init; }
 
-    public TimeSpan RunPollingInterval { get; init; } = TimeSpan.FromSeconds(2);
+    public TimeSpan RunPollingInterval { get; init; } = TimeSpan.FromSeconds(1);
 
-    public TimeSpan RunPollingBackoff { get; init; } = TimeSpan.FromSeconds(3);
+    public TimeSpan RunPollingBackoff { get; init; } = TimeSpan.FromSeconds(2);
 
     public int DefaultPollingBackoffThreshold { get; init; } = 1;
 }
