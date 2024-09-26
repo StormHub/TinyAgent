@@ -44,7 +44,7 @@ internal sealed class AssistantAgentBuilder(
                 if (!string.Equals(agentSetup.Name, result.Name, StringComparison.OrdinalIgnoreCase)) continue;
                 
                 var assistantAgent =
-                    await OpenAIAssistantAgent.RetrieveAsync(kernel, provider, result.Id, cancellationToken);
+                    await OpenAIAssistantAgent.RetrieveAsync(provider, result.Id, kernel, default, default, cancellationToken);
                 var deleted = await assistantAgent.DeleteAsync(cancellationToken);
                 if (deleted)
                     _logger.LogInformation("Removed OpenAI assistant {Id}", assistantAgent.Id);
@@ -57,6 +57,7 @@ internal sealed class AssistantAgentBuilder(
                 Name = agentSetup.Name,
                 Instructions = agentSetup.Instructions,
                 Temperature = 0,
+                TopP = 0,
                 Metadata = new Dictionary<string, string>
                 {
                     {
@@ -69,9 +70,10 @@ internal sealed class AssistantAgentBuilder(
             };
 
             var agent = await OpenAIAssistantAgent.CreateAsync(
-                kernel,
                 provider,
                 definition,
+                kernel,
+                default,
                 cancellationToken);
 
             _logger.LogInformation("{AgentType} created {Id}", agent.GetType().Name, agent.Id);
