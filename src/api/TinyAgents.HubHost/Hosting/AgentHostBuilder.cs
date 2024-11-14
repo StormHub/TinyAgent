@@ -11,23 +11,33 @@ internal static class AgentHostBuilder
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Host.UseLogging();
-        builder.Services.AddCors(
-            options => options.AddPolicy("AllowCors",
-                policyBuilder =>
-                {
-                    policyBuilder
-                        .WithOrigins("http://localhost:3000")
-                        .AllowCredentials()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                })
-        );
+        
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddCors(
+                options => options.AddPolicy("AllowCors",
+                    policyBuilder =>
+                    {
+                        policyBuilder
+                            .WithOrigins("http://localhost:3000")
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    })
+            );
+        }
+
         builder.Services.AddSignalR()
             .AddJsonProtocol(options => { options.PayloadSerializerOptions.Setup(); });
         builder.Services.AddAssistanceAgent();
 
         var app = builder.Build();
-        app.UseCors("AllowCors");
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseCors("AllowCors");
+        }
+        
         app.MapHub<AgentHub>("/agent");
 
         return app;
