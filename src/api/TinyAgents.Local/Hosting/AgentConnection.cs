@@ -18,11 +18,9 @@ internal sealed class AgentConnection : IAsyncDisposable
     {
         var agentOptions = options.Value;
 
-        var id = Guid.NewGuid();
         var builder = new UriBuilder(agentOptions.Uri)
         {
             Path = agentOptions.ChannelName,
-            Query = $"run={id.ToString()}"
         };
         var uri = builder.ToString();
         _connection = new HubConnectionBuilder()
