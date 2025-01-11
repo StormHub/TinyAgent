@@ -42,7 +42,7 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
             coordinates,
             new ReverseGeocodingQuery
             {
-                ResultTypes = new[] { ReverseGeocodingResultTypeEnum.Address }
+                ResultTypes = [ReverseGeocodingResultTypeEnum.Address]
             },
             cancellationToken);
 

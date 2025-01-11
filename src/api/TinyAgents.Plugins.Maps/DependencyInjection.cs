@@ -16,16 +16,18 @@ public static class DependencyInjection
             .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
-        var builder = services.AddHttpClient(nameof(MapPlugin));
+        var builder = services.AddHttpClient(nameof(MapsSearchClient));
+        
 #if DEBUG
         services.AddTransient<TraceHttpHandler>();
         builder.AddHttpMessageHandler<TraceHttpHandler>();
 #endif
+        builder.AddStandardResilienceHandler();
 
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = factory.CreateClient(nameof(MapPlugin));
+            var httpClient = factory.CreateClient(nameof(MapsSearchClient));
 
             var mapOptions = provider.GetRequiredService<IOptions<MapOptions>>().Value;
             if (!string.IsNullOrEmpty(mapOptions.ApiKey))
