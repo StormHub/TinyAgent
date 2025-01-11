@@ -17,7 +17,6 @@ public static class DependencyInjection
             .ValidateDataAnnotations();
 
         var builder = services.AddHttpClient(nameof(MapsSearchClient));
-        
 #if DEBUG
         services.AddTransient<TraceHttpHandler>();
         builder.AddHttpMessageHandler<TraceHttpHandler>();

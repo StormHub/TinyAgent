@@ -1,23 +1,18 @@
 using System.Runtime.CompilerServices;
-using Azure.AI.OpenAI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
-using TinyAgents.SemanticKernel.OpenAI;
 
 namespace TinyAgents.SemanticKernel.Assistants;
 
 internal sealed class AssistantAgentBuilder(
     IKernelBuilder kernelBuilder,
-    IOptions<OpenAIOptions> options,
     ILogger<AssistantAgentBuilder> logger)
     : IAssistantAgentBuilder
 {
     private readonly ILogger _logger = logger;
-    private readonly OpenAIOptions _options = options.Value;
 
     public async Task<IAssistantAgent> Build(CancellationToken cancellationToken = default)
     {
@@ -31,8 +26,7 @@ internal sealed class AssistantAgentBuilder(
 
     private async IAsyncEnumerable<OpenAIAssistantAgent> BuildAgents(Kernel kernel, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var openAIClient = kernel.Services.GetRequiredService<AzureOpenAIClient>();
-        var provider = OpenAIClientProvider.FromClient(openAIClient);
+        var provider = kernel.Services.GetRequiredService<OpenAIClientProvider>();
 
         foreach (var agentSetup in kernel.Services.GetServices<IAgentSetup>())
         {
@@ -52,7 +46,7 @@ internal sealed class AssistantAgentBuilder(
                     _logger.LogWarning("Unable to remove OpenAI assistant {Id}", assistantAgent.Id);
             }
 
-            var definition = new OpenAIAssistantDefinition(_options.ModelId)
+            var definition = new OpenAIAssistantDefinition("gpt-4o")
             {
                 Name = agentSetup.Name,
                 Instructions = agentSetup.Instructions,
@@ -77,10 +71,6 @@ internal sealed class AssistantAgentBuilder(
                 cancellationToken);
 
             _logger.LogInformation("{AgentType} created {Id}", agent.GetType().Name, agent.Id);
-
-            agent.PollingOptions.RunPollingInterval = _options.RunPollingInterval;
-            agent.PollingOptions.RunPollingBackoff = _options.RunPollingBackoff;
-            agent.PollingOptions.RunPollingBackoffThreshold = _options.DefaultPollingBackoffThreshold;
 
             yield return agent;
         }
