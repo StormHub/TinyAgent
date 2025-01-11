@@ -9,9 +9,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAssistanceAgent(this IServiceCollection services)
     {
-        return services
-            .AddOpenAI()
-            .AddAssistant()
-            .AddMapPlugin();
+        services.AddOpenAI();
+        services.AddTransient<IAssistantAgentBuilder, AssistantAgentBuilder>();
+        services.AddMapPlugin();
+
+        return services;
     }
 }
