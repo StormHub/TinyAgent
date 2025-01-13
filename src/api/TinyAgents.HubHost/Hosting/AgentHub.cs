@@ -1,13 +1,13 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.SemanticKernel;
-using TinyAgents.SemanticKernel.Assistants;
+using TinyAgents.SemanticKernel.Agents;
 
 namespace TinyAgents.HubHost.Hosting;
 
 internal record MessageContent(string Id, string Role, string Content);
 
-internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub> logger) : Hub
+internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> logger) : Hub
 {
     private const string AgentType = nameof(AgentType);
     
@@ -15,18 +15,18 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
 
     public override async Task OnConnectedAsync()
     {
-        IAssistantAgent? agent = default;
+        LocationAgent? agent = default;
         if (Context.Items.TryGetValue(Context.ConnectionId, out var value)
-            && value is IAssistantAgent assistantAgent)
+            && value is LocationAgent locationAgent)
         {
-            agent = assistantAgent;
+            agent = locationAgent;
             _logger.LogInformation("Connected {ConnectionId} {Assistant}.", Context.ConnectionId, agent.GetType().Name);
         }
 
         if (agent is null)
         {
             _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
-            agent = await builder.Build(Context.ConnectionAborted);
+            agent = await factory.CreateAgent(Context.ConnectionAborted);
             Context.Items.Add(AgentType, agent);
         }
 
@@ -36,34 +36,33 @@ internal sealed class AgentHub(IAssistantAgentBuilder builder, ILogger<AgentHub>
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         if (Context.Items.TryGetValue(AgentType, out var item)
-            && item is IAssistantAgent agent)
+            && item is AssistantAgent agent)
         {
             _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId,
                 agent.GetType().Name);
-            await agent.DisposeAsync();
         }
 
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task Restart()
+    // ReSharper disable once UnusedMember.Global
+    public Task Restart()
     {
-        if (Context.Items.Remove(AgentType, out var item)
-            && item is IAssistantAgent agent)
+        if (Context.Items.TryGetValue(AgentType, out var item)
+            && item is LocationAgent agent)
         {
-            await agent.DisposeAsync();
-
-            agent = await builder.Build(Context.ConnectionAborted);
-            Context.Items.Add(AgentType, agent);
+            agent.ClearHistory();
         }
+        return Task.CompletedTask;
     }
 
+    // ReSharper disable once UnusedMember.Global
     public async IAsyncEnumerable<MessageContent> Streaming(
         string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!Context.Items.TryGetValue(AgentType, out var item)
-            || item is not IAssistantAgent agent)
+            || item is not LocationAgent agent)
             yield break;
 
         await foreach (var message in agent.Invoke(input, cancellationToken))

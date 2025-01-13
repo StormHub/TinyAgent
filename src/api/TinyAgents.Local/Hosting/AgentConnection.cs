@@ -68,8 +68,6 @@ internal sealed class AgentConnection : IAsyncDisposable
 
     private static IEnumerable<string> ConsoleInput(CancellationToken cancellationToken)
     {
-        yield return "hello"; // Ping first
-
         while (!cancellationToken.IsCancellationRequested)
         {
             Console.Write("User > ");

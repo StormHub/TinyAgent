@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TinyAgents.SemanticKernel.OpenAI;
+namespace TinyAgents.SemanticKernel;
 
 public sealed class OpenAIOptions
 {
-    [Required] public required string Uri { get; init; }
+    [Required] 
+    public required string Endpoint { get; init; }
+    
+    [Required(AllowEmptyStrings = false)] 
+    public required string DeploymentName { get; init; }
 
     [Required(AllowEmptyStrings = false)] 
     public required string ModelId { get; init; }
