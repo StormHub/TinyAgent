@@ -1,5 +1,5 @@
 import { Action, Dispatch, Middleware } from "@reduxjs/toolkit";
-import { type Message } from "../types";
+import { ChatMessageContent, type Message } from "../types";
 import { RootState, StoreMiddlewareAPI, resetState } from "../redux/store";
 import { getHubConnection } from "./signalr-connection";
 import { addAlert } from "./app-slice";
@@ -35,7 +35,7 @@ export const signalRMiddleware: Middleware<
               payload: { status: "Thinking" },
             });
 
-            const result = hubConnection.stream<Message>(
+            const result = hubConnection.stream<ChatMessageContent>(
               "Streaming",
               message.content
             );
@@ -43,7 +43,14 @@ export const signalRMiddleware: Middleware<
             const messages: Message[] = [];
             const subscription = result.subscribe({
               next: (value) => {
-                messages.push(value);
+                const text = value.items.length ? value.items[0]?.text : undefined;
+                if (text) {
+                  messages.push({
+                    id: value.metadata.Id,
+                    role: value.role.label,
+                    content: text
+                  });
+                }
               },
               error: (err) => {
                 store.dispatch(

@@ -6,7 +6,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
-public sealed class AssistantAgent
+public sealed class AssistantAgent : IAsyncDisposable
 {
     private readonly OpenAIAssistantAgent _agent;
     private readonly ILogger _logger;
@@ -42,6 +42,15 @@ public sealed class AssistantAgent
         {
             _logger.LogInformation("{Thread} {Content}", _threadId, content.Content);
             yield return content;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!string.IsNullOrEmpty(_threadId))
+        {
+            await _agent.DeleteThreadAsync(_threadId);
+            _threadId = default;
         }
     }
 }

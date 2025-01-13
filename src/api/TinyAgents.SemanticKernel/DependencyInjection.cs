@@ -21,7 +21,6 @@ public static class DependencyInjection
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
 
-        // services.AddSingleton<IAgentSetup, LocationSetup>();
         services.AddMapPlugin();
 
         services.AddTransient<TraceHttpHandler>();

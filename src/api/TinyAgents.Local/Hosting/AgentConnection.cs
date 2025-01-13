@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.SemanticKernel;
 using TinyAgents.Shared.Json;
 
 namespace TinyAgents.Local.Hosting;
-
-internal record MessageContent(string Role, string Content);
 
 internal sealed class AgentConnection : IAsyncDisposable
 {
@@ -24,7 +23,10 @@ internal sealed class AgentConnection : IAsyncDisposable
         };
         var uri = builder.ToString();
         _connection = new HubConnectionBuilder()
-            .AddJsonProtocol(jsonOptions => { jsonOptions.PayloadSerializerOptions.Setup(); })
+            .AddJsonProtocol(jsonOptions =>
+            {
+                jsonOptions.PayloadSerializerOptions.Setup();
+            })
             .WithUrl(uri)
             .Build();
         _logger = logger;
@@ -56,12 +58,12 @@ internal sealed class AgentConnection : IAsyncDisposable
             }
     }
 
-    private async IAsyncEnumerable<MessageContent> GetMessages(
+    private async IAsyncEnumerable<ChatMessageContent> GetMessages(
         string input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var message in
-                       _connection.StreamAsync<MessageContent>("Streaming", input, cancellationToken))
+                       _connection.StreamAsync<ChatMessageContent>("Streaming", input, cancellationToken))
             if (!string.IsNullOrEmpty(message.Content))
                 yield return message;
     }

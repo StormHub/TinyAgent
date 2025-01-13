@@ -20,7 +20,10 @@ internal static class ConsoleHostBuilder
 
                 builder.AddEnvironmentVariables();
             })
-            .ConfigureServices((builderContext, services) => { services.AddApplication(); })
+            .ConfigureServices((_, services) =>
+            {
+                services.AddApplication();
+            })
             .UseLogging()
             .UseConsoleLifetime()
             .Build();
