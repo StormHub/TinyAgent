@@ -33,7 +33,7 @@ public sealed class LocationAgentFactory
         Answer questions only from given facts.
         """;
 
-    public Task<ChatHistoryAgent> CreateAgent(CancellationToken cancellationToken = default)
+    public Task<ChatHistoryAgent> CreateLocationAgent(CancellationToken cancellationToken = default)
     {
         var kernel = _kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
@@ -56,7 +56,7 @@ public sealed class LocationAgentFactory
         return Task.FromResult(agent);
     }
 
-    public async Task<AssistantAgent> CreateAssistant(CancellationToken cancellationToken = default)
+    public async Task<AssistantAgent> CreateLocationAssistant(CancellationToken cancellationToken = default)
     {
         var kernel = _kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
