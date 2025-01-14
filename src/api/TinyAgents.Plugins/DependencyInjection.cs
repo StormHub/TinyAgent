@@ -75,8 +75,8 @@ public static class DependencyInjection
 
             var searchOptions = provider.GetRequiredService<IOptions<SearchOptions>>().Value;
             var bingConnector = new BingConnector(
-                searchOptions.APIKey, 
-                httpClient, 
+                apiKey: searchOptions.ApiKey, 
+                httpClient: httpClient, 
                 loggerFactory: provider.GetRequiredService<ILoggerFactory>());
             
             return new WebSearchEnginePlugin(bingConnector);

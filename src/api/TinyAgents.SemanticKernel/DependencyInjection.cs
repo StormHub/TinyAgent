@@ -69,6 +69,7 @@ public static class DependencyInjection
                 modelId: openAIOptions.ModelId);
 
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));
+            
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<MapPlugin>());
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<WebSearchEnginePlugin>());
             
