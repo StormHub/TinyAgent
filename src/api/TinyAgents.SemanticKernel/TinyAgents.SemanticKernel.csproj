@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TinyAgents.Plugins.Maps\TinyAgents.Plugins.Maps.csproj"/>
+      <ProjectReference Include="..\TinyAgents.Plugins\TinyAgents.Plugins.csproj" />
     </ItemGroup>
 
 </Project>

@@ -35,7 +35,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TinyAgents.Plugins.Maps\TinyAgents.Plugins.Maps.csproj"/>
         <ProjectReference Include="..\TinyAgents.SemanticKernel\TinyAgents.SemanticKernel.csproj"/>
     </ItemGroup>
 

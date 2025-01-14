@@ -6,17 +6,17 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
-public sealed class LocationAgent
+public sealed class ChatHistoryAgent
 {
     private readonly ChatCompletionAgent _agent;
     private readonly ChatHistory _history;
     private readonly ILogger _logger;
 
-    internal LocationAgent(ChatCompletionAgent agent, ILoggerFactory loggerFactory)
+    internal ChatHistoryAgent(ChatCompletionAgent agent, ILoggerFactory loggerFactory)
     {
         _agent = agent;
         _history = [];
-        _logger = loggerFactory.CreateLogger<LocationAgent>();
+        _logger = loggerFactory.CreateLogger<ChatHistoryAgent>();
     }
 
     public void ClearHistory() => _history.Clear();

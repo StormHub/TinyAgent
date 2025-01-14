@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Shared", "TinyAg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Local", "TinyAgents.Local\TinyAgents.Local.csproj", "{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Plugins.Maps", "TinyAgents.Plugins.Maps\TinyAgents.Plugins.Maps.csproj", "{7F3BBD80-CB2F-4346-9BD4-C52797627A10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Plugins", "TinyAgents.Plugins\TinyAgents.Plugins.csproj", "{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +37,10 @@ Global
 		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A7A2B0F-B034-4B56-B9E7-09ABBCF11DF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7F3BBD80-CB2F-4346-9BD4-C52797627A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F3BBD80-CB2F-4346-9BD4-C52797627A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7F3BBD80-CB2F-4346-9BD4-C52797627A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7F3BBD80-CB2F-4346-9BD4-C52797627A10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +51,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{840DE5A9-FDEE-467A-B5FF-2BCD667AB1BE} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
 		{56854D79-CD52-49A0-8717-C85AED1FACFB} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
-		{7F3BBD80-CB2F-4346-9BD4-C52797627A10} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
+		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C} = {CF199974-D4A9-40D1-89E6-C48ADC59EE84}
 	EndGlobalSection
 EndGlobal

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
+using TinyAgents.Plugins;
 using TinyAgents.Plugins.Maps;
 using TinyAgents.SemanticKernel.Agents;
 using TinyAgents.Shared.Http;

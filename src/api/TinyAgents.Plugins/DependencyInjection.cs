@@ -4,8 +4,9 @@ using Azure.Identity;
 using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using TinyAgents.Plugins.Maps;
 
-namespace TinyAgents.Plugins.Maps;
+namespace TinyAgents.Plugins;
 
 public static class DependencyInjection
 {

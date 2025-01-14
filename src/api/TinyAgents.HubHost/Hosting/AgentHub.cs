@@ -13,9 +13,9 @@ internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> l
 
     public override async Task OnConnectedAsync()
     {
-        LocationAgent? agent = default;
+        ChatHistoryAgent? agent = default;
         if (Context.Items.TryGetValue(Context.ConnectionId, out var value)
-            && value is LocationAgent locationAgent)
+            && value is ChatHistoryAgent locationAgent)
         {
             agent = locationAgent;
             _logger.LogInformation("Connected {ConnectionId} {Assistant}.", Context.ConnectionId, agent.GetType().Name);
@@ -34,7 +34,7 @@ internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> l
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         if (Context.Items.TryGetValue(AgentKey, out var item)
-            && item is LocationAgent agent)
+            && item is ChatHistoryAgent agent)
         {
             _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId,
                 agent.GetType().Name);
@@ -47,7 +47,7 @@ internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> l
     public Task Restart()
     {
         if (Context.Items.TryGetValue(AgentKey, out var item)
-            && item is LocationAgent agent)
+            && item is ChatHistoryAgent agent)
         {
             agent.ClearHistory();
         }
@@ -60,7 +60,7 @@ internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> l
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!Context.Items.TryGetValue(AgentKey, out var item)
-            || item is not LocationAgent agent)
+            || item is not ChatHistoryAgent agent)
             yield break;
 
         await foreach (var message in agent.Invoke(input, cancellationToken))
