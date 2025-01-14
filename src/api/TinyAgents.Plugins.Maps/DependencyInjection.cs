@@ -4,7 +4,6 @@ using Azure.Identity;
 using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TinyAgents.Shared.Http;
 
 namespace TinyAgents.Plugins.Maps;
 
@@ -17,10 +16,6 @@ public static class DependencyInjection
             .ValidateDataAnnotations();
 
         var builder = services.AddHttpClient(nameof(MapsSearchClient));
-#if DEBUG
-        services.AddTransient<TraceHttpHandler>();
-        builder.AddHttpMessageHandler<TraceHttpHandler>();
-#endif
         builder.AddStandardResilienceHandler();
 
         services.AddTransient(provider =>
