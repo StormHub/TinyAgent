@@ -5,7 +5,10 @@ using TinyAgents.SemanticKernel.Agents;
 
 namespace TinyAgents.HubHost.Hosting;
 
-internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> logger) : Hub
+internal sealed class AgentHub(
+    LocationAgentFactory locationAgentFactory,
+    SearchAgentFactory searchAgentFactory,
+    ILogger<AgentHub> logger) : Hub
 {
     private const string AgentKey = nameof(AgentKey);
     
@@ -24,7 +27,9 @@ internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> l
         if (agent is null)
         {
             _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
-            agent = await factory.CreateAgent(Context.ConnectionAborted);
+            
+            agent = await searchAgentFactory.CreateAgent(Context.ConnectionAborted);
+            // agent = await locationAgentFactory.CreateAgent(Context.ConnectionAborted);
             Context.Items.Add(AgentKey, agent);
         }
 
