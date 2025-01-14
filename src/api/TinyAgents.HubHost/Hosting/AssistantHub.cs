@@ -24,7 +24,7 @@ internal  sealed class AssistantHub(LocationAgentFactory factory, ILogger<AgentH
         if (agent is null)
         {
             _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
-            agent = await factory.CreateLocationAssistant(Context.ConnectionAborted);
+            agent = await factory.CreateAssistant(Context.ConnectionAborted);
             await agent.NewThread(Context.ConnectionAborted);
             Context.Items.Add(AssistantKey, agent);
         }

@@ -5,10 +5,10 @@ using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel.Plugins.Web;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using TinyAgents.Plugins.Maps;
 using TinyAgents.Plugins.Search;
+using TinyAgents.Shared.Http;
 
 namespace TinyAgents.Plugins;
 
@@ -65,8 +65,10 @@ public static class DependencyInjection
             .BindConfiguration(nameof(SearchOptions))
             .ValidateDataAnnotations();
 
+        services.AddTransient<TraceHttpHandler>();
         var builder = services.AddHttpClient(nameof(BingConnector));
-        builder.AddStandardResilienceHandler();
+        builder.AddHttpMessageHandler<TraceHttpHandler>();
+        // builder.AddStandardResilienceHandler();
         
         services.AddTransient(provider =>
         {
@@ -79,7 +81,7 @@ public static class DependencyInjection
                 httpClient: httpClient, 
                 loggerFactory: provider.GetRequiredService<ILoggerFactory>());
             
-            return new WebSearchEnginePlugin(bingConnector);
+            return new SearchPlugin(bingConnector, provider.GetRequiredService<ILoggerFactory>());
         });
 
         return services;

@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
-using Microsoft.SemanticKernel.Plugins.Web;
 using TinyAgents.Plugins;
 using TinyAgents.Plugins.Maps;
+using TinyAgents.Plugins.Search;
 using TinyAgents.SemanticKernel.Agents;
 using TinyAgents.Shared.Http;
 
@@ -71,7 +71,7 @@ public static class DependencyInjection
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));
             
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<MapPlugin>());
-            kernelBuilder.Services.AddSingleton(provider.GetRequiredService<WebSearchEnginePlugin>());
+            kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
             
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 
@@ -79,6 +79,7 @@ public static class DependencyInjection
         });
         
         services.AddTransient<LocationAgentFactory>();
+        services.AddTransient<SearchAgentFactory>();
 
         return services;
     }

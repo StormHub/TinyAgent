@@ -24,7 +24,7 @@ internal sealed class AgentHub(LocationAgentFactory factory, ILogger<AgentHub> l
         if (agent is null)
         {
             _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
-            agent = await factory.CreateLocationAgent(Context.ConnectionAborted);
+            agent = await factory.CreateAgent(Context.ConnectionAborted);
             Context.Items.Add(AgentKey, agent);
         }
 
