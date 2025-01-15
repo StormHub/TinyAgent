@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
+using Microsoft.SemanticKernel.ChatCompletion;
 using TinyAgents.Plugins.Search;
 
 namespace TinyAgents.SemanticKernel.Agents;
@@ -26,10 +27,10 @@ public sealed class SearchAgentFactory
         You are an assistant helping users to find charger types for electric vehicles.
         """;
     
-    public async Task<ChatHistoryAgent> CreateAgent()
+    public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
     {
         var chatCompletionAgent = await CreateChatCompletionAgent(_kernelBuilder, _openAIOptions);
-        return new ChatHistoryAgent(chatCompletionAgent);
+        return new ChatHistoryAgent(chatCompletionAgent, history);
     }
     
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(IKernelBuilder kernelBuilder, OpenAIOptions options)

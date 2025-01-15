@@ -12,10 +12,10 @@ public sealed class AssistantAgent : IAsyncDisposable
     private readonly ILogger _logger;
     private string? _threadId;
 
-    internal AssistantAgent(OpenAIAssistantAgent agent, ILoggerFactory loggerFactory)
+    internal AssistantAgent(OpenAIAssistantAgent agent)
     {
         _agent = agent;
-        _logger = loggerFactory.CreateLogger<AssistantAgent>();
+        _logger = agent.LoggerFactory.CreateLogger<AssistantAgent>();
         _threadId = default;
     }
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.OpenAI;
+using Microsoft.SemanticKernel.ChatCompletion;
 using TinyAgents.Plugins.Maps;
 
 namespace TinyAgents.SemanticKernel.Agents;
@@ -31,10 +32,10 @@ public sealed class LocationAgentFactory
         You are an assistant helping users to find GPS locations from postal address in Australia.
         """;
 
-    public async Task<ChatHistoryAgent> CreateAgent()
+    public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
     {
         var chatCompletionAgent = await CreateChatCompletionAgent(_kernelBuilder, _openAIOptions);
-        return new ChatHistoryAgent(chatCompletionAgent);
+        return new ChatHistoryAgent(chatCompletionAgent, history);
     }
     
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(IKernelBuilder kernelBuilder, OpenAIOptions options)
@@ -79,7 +80,7 @@ public sealed class LocationAgentFactory
                     default,
                     default,
                     cancellationToken);
-                return new AssistantAgent(openAIAssistantAgent, kernel.LoggerFactory);
+                return new AssistantAgent(openAIAssistantAgent);
             }
         }
 
@@ -100,6 +101,6 @@ public sealed class LocationAgentFactory
         
         _logger.LogInformation("OpenAIAssistantAgent {Name} {Id} created", agent.Name, agent.Id);
 
-        return new AssistantAgent(agent, kernel.LoggerFactory);
+        return new AssistantAgent(agent);
     }
 }
