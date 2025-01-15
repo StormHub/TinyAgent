@@ -26,15 +26,15 @@ public sealed class SearchAgentFactory
         You are an assistant helping users to find charger types for electric vehicles.
         """;
     
-    public async Task<ChatHistoryAgent> CreateAgent(CancellationToken cancellationToken = default)
+    public async Task<ChatHistoryAgent> CreateAgent()
     {
-        var chatCompletionAgent = await CreateChatCompletionAgent(cancellationToken);
+        var chatCompletionAgent = await CreateChatCompletionAgent(_kernelBuilder, _openAIOptions);
         return new ChatHistoryAgent(chatCompletionAgent);
     }
     
-    public Task<ChatCompletionAgent> CreateChatCompletionAgent(CancellationToken cancellationToken = default)
+    internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(IKernelBuilder kernelBuilder, OpenAIOptions options)
     {
-        var kernel = _kernelBuilder.Build();
+        var kernel = kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<SearchPlugin>());
 
         var chatCompletionAgent = new ChatCompletionAgent
@@ -45,7 +45,7 @@ public sealed class SearchAgentFactory
             Arguments = new KernelArguments(
                 new PromptExecutionSettings
                 {
-                    ModelId = _openAIOptions.ModelId,
+                    ModelId = options.ModelId,
                     FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
                 }),
             LoggerFactory = kernel.LoggerFactory
