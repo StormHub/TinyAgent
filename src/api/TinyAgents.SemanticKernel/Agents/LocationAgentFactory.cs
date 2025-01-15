@@ -31,7 +31,13 @@ public sealed class LocationAgentFactory
         You are an assistant helping users to find GPS locations from postal address in Australia.
         """;
 
-    public Task<ChatHistoryAgent> CreateAgent(CancellationToken cancellationToken = default)
+    public async Task<ChatHistoryAgent> CreateAgent(CancellationToken cancellationToken = default)
+    {
+        var chatCompletionAgent = await CreateChatCompletionAgent(cancellationToken);
+        return new ChatHistoryAgent(chatCompletionAgent);
+    }
+    
+    public Task<ChatCompletionAgent> CreateChatCompletionAgent(CancellationToken cancellationToken = default)
     {
         var kernel = _kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
@@ -50,8 +56,7 @@ public sealed class LocationAgentFactory
             LoggerFactory = kernel.LoggerFactory
         };
 
-        var agent = new ChatHistoryAgent(chatCompletionAgent, kernel.LoggerFactory);
-        return Task.FromResult(agent);
+        return Task.FromResult(chatCompletionAgent);
     }
 
     public async Task<AssistantAgent> CreateAssistant(CancellationToken cancellationToken = default)

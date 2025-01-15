@@ -23,10 +23,16 @@ public sealed class SearchAgentFactory
     
     private const string Instructions =
         """
-        You are an assistant helping users to search for electric vehicle charger types.
+        You are an assistant helping users to find charger types for electric vehicles.
         """;
     
-    public Task<ChatHistoryAgent> CreateAgent(CancellationToken cancellationToken = default)
+    public async Task<ChatHistoryAgent> CreateAgent(CancellationToken cancellationToken = default)
+    {
+        var chatCompletionAgent = await CreateChatCompletionAgent(cancellationToken);
+        return new ChatHistoryAgent(chatCompletionAgent);
+    }
+    
+    public Task<ChatCompletionAgent> CreateChatCompletionAgent(CancellationToken cancellationToken = default)
     {
         var kernel = _kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<SearchPlugin>());
@@ -45,7 +51,6 @@ public sealed class SearchAgentFactory
             LoggerFactory = kernel.LoggerFactory
         };
 
-        var agent = new ChatHistoryAgent(chatCompletionAgent, kernel.LoggerFactory);
-        return Task.FromResult(agent);
+        return Task.FromResult(chatCompletionAgent);
     }
 }

@@ -12,11 +12,11 @@ public sealed class ChatHistoryAgent
     private readonly ChatHistory _history;
     private readonly ILogger _logger;
 
-    internal ChatHistoryAgent(ChatCompletionAgent agent, ILoggerFactory loggerFactory)
+    internal ChatHistoryAgent(ChatCompletionAgent agent, ChatHistory? history = default)
     {
         _agent = agent;
-        _history = [];
-        _logger = loggerFactory.CreateLogger<ChatHistoryAgent>();
+        _history = history ?? [];
+        _logger = agent.LoggerFactory.CreateLogger<ChatHistoryAgent>();
     }
 
     public void ClearHistory() => _history.Clear();

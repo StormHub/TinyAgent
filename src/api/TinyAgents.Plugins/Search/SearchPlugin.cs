@@ -17,7 +17,7 @@ public sealed class SearchPlugin
     }
     
     [KernelFunction]
-    [Description("Perform a web search.")]
+    [Description("Search the web for the latest information.")]
     public async Task<IReadOnlyCollection<WebPage>> Search(
         [Description("Text to search for")] string query,
         [Description("Number of results")] int count = 5,
