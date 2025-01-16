@@ -24,18 +24,24 @@ public sealed class SearchAgentFactory
     
     private const string Instructions =
         """
-        You are an assistant helping users to find charger types for electric vehicles.
+        You are an assistant helping users search the web for the latest information.
         """;
     
     public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
     {
-        var chatCompletionAgent = await CreateChatCompletionAgent(_kernelBuilder, _openAIOptions);
+        var kernel = _kernelBuilder.Build();
+        var arguments = new KernelArguments(
+            new PromptExecutionSettings
+            {
+                ModelId = _openAIOptions.ModelId,
+                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+            });
+        var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
         return new ChatHistoryAgent(chatCompletionAgent, history);
     }
     
-    internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(IKernelBuilder kernelBuilder, OpenAIOptions options)
+    internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
     {
-        var kernel = kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<SearchPlugin>());
 
         var chatCompletionAgent = new ChatCompletionAgent
@@ -43,12 +49,7 @@ public sealed class SearchAgentFactory
             Name = Name,
             Instructions = Instructions,
             Kernel = kernel,
-            Arguments = new KernelArguments(
-                new PromptExecutionSettings
-                {
-                    ModelId = options.ModelId,
-                    FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-                }),
+            Arguments = arguments,
             LoggerFactory = kernel.LoggerFactory
         };
 

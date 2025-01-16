@@ -34,13 +34,19 @@ public sealed class LocationAgentFactory
 
     public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
     {
-        var chatCompletionAgent = await CreateChatCompletionAgent(_kernelBuilder, _openAIOptions);
+        var kernel = _kernelBuilder.Build();
+        var arguments = new KernelArguments(
+            new PromptExecutionSettings
+            {
+                ModelId = _openAIOptions.ModelId,
+                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+            });
+        var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
         return new ChatHistoryAgent(chatCompletionAgent, history);
     }
     
-    internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(IKernelBuilder kernelBuilder, OpenAIOptions options)
+    internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
     {
-        var kernel = kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
 
         var chatCompletionAgent = new ChatCompletionAgent
@@ -48,12 +54,7 @@ public sealed class LocationAgentFactory
             Name = Name,
             Instructions = Instructions,
             Kernel = kernel,
-            Arguments = new KernelArguments(
-                new PromptExecutionSettings
-                {
-                    ModelId = options.ModelId,
-                    FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-                }),
+            Arguments = arguments,
             LoggerFactory = kernel.LoggerFactory
         };
 
