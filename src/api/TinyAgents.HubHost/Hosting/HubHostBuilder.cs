@@ -5,7 +5,7 @@ using TinyAgents.Shared.Json;
 
 namespace TinyAgents.HubHost.Hosting;
 
-internal static class AgentHostBuilder
+internal static class HubHostBuilder
 {
     public static IHost Build(string[] args)
     {

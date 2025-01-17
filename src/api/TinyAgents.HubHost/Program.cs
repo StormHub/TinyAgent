@@ -3,7 +3,7 @@
 IHost? host = default;
 try
 {
-    host = AgentHostBuilder.Build(args);
+    host = HubHostBuilder.Build(args);
     await host.RunAsync();
 }
 catch (Exception ex)
