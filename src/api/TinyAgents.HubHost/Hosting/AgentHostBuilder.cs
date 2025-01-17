@@ -29,7 +29,7 @@ internal static class AgentHostBuilder
 
         builder.Services.AddSignalR()
             .AddJsonProtocol(options => { options.PayloadSerializerOptions.Setup(); });
-        builder.Services.AddAssistanceAgent();
+        builder.Services.AddAgents(builder.Environment);
 
         var app = builder.Build();
 

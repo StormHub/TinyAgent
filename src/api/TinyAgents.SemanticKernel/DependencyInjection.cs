@@ -3,6 +3,7 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
@@ -17,7 +18,7 @@ namespace TinyAgents.SemanticKernel;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAssistanceAgent(this IServiceCollection services)
+    public static IServiceCollection AddAgents(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<OpenAIOptions>()
             .BindConfiguration(nameof(OpenAIOptions))
@@ -26,10 +27,20 @@ public static class DependencyInjection
         services.AddMapPlugin();
         services.AddSearchPlugin();
 
-        services.AddTransient<TraceHttpHandler>();
-        services.AddHttpClient(nameof(AzureOpenAIClient))
-            .AddHttpMessageHandler<TraceHttpHandler>();
-            // .AddStandardResilienceHandler();
+        if (environment.IsDevelopment())
+        {
+            services.AddTransient<TraceHttpHandler>();
+        }
+        
+        var builder = services.AddHttpClient(nameof(AzureOpenAIClient));
+        if (environment.IsProduction())
+        {
+            builder.AddStandardResilienceHandler();
+        }
+        if (environment.IsDevelopment())
+        {
+            builder.AddHttpMessageHandler<TraceHttpHandler>();
+        }
         
         services.AddTransient<AzureOpenAIClient>(provider =>
         {

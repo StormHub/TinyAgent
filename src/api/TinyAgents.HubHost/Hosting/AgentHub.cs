@@ -6,7 +6,6 @@ using TinyAgents.SemanticKernel.Agents;
 namespace TinyAgents.HubHost.Hosting;
 
 internal sealed class AgentHub(
-    LocationAgentFactory locationAgentFactory,
     SearchAgentFactory searchAgentFactory,
     ILogger<AgentHub> logger) : Hub
 {

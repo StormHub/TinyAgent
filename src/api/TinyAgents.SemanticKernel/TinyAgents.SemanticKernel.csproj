@@ -26,6 +26,8 @@
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
         <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.33.0-alpha" />
         <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.33.0-alpha" />
+        <PackageReference Include="AutoGen" Version="0.2.1" />
+        <PackageReference Include="AutoGen.SemanticKernel" Version="0.2.1" />
     </ItemGroup>
 
     <ItemGroup>
