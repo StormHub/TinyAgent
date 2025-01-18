@@ -28,7 +28,6 @@ internal sealed class AgentHub(
             _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
             
             agent = await searchAgentFactory.CreateAgent();
-            // agent = await locationAgentFactory.CreateAgent(Context.ConnectionAborted);
             Context.Items.Add(AgentKey, agent);
         }
 

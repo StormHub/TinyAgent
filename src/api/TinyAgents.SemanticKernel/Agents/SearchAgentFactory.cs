@@ -7,18 +7,11 @@ using TinyAgents.Plugins.Search;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
-public sealed class SearchAgentFactory
+public sealed class SearchAgentFactory(
+    IKernelBuilder kernelBuilder,
+    IOptions<OpenAIOptions> options)
 {
-    private readonly IKernelBuilder _kernelBuilder;
-    private readonly OpenAIOptions _openAIOptions;
-
-    public SearchAgentFactory(
-        IKernelBuilder kernelBuilder,
-        IOptions<OpenAIOptions> options)
-    {
-        _kernelBuilder = kernelBuilder;
-        _openAIOptions = options.Value;
-    }
+    private readonly OpenAIOptions _openAIOptions = options.Value;
 
     private const string Name = "SearchAgent";
     
@@ -29,11 +22,11 @@ public sealed class SearchAgentFactory
     
     public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
     {
-        var kernel = _kernelBuilder.Build();
+        var kernel = kernelBuilder.Build();
         var arguments = new KernelArguments(
             new PromptExecutionSettings
             {
-                ModelId = _openAIOptions.ModelId,
+                ModelId = _openAIOptions.Agents.ModelId,
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);

@@ -69,15 +69,21 @@ public static class DependencyInjection
         services.AddTransient(provider =>
         {
             var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
-            
             var azureOpenAIClient = provider.GetRequiredService<AzureOpenAIClient>();
 
             var kernelBuilder = Kernel.CreateBuilder();
+            
             kernelBuilder.AddAzureOpenAIChatCompletion(
-                deploymentName: openAIOptions.DeploymentName,
+                deploymentName: openAIOptions.Agents.DeploymentName,
                 azureOpenAIClient: azureOpenAIClient,
-                serviceId: "azure",
-                modelId: openAIOptions.ModelId);
+                serviceId: nameof(openAIOptions.Agents),
+                modelId: openAIOptions.Agents.ModelId);
+            
+            kernelBuilder.AddAzureOpenAIChatCompletion(
+                deploymentName: openAIOptions.Assistants.DeploymentName,
+                azureOpenAIClient: azureOpenAIClient,
+                serviceId: nameof(openAIOptions.Assistants),
+                modelId: openAIOptions.Assistants.ModelId);
 
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));
             

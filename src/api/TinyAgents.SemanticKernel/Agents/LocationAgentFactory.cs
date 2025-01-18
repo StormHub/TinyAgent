@@ -9,36 +9,28 @@ using TinyAgents.Plugins.Maps;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
-public sealed class LocationAgentFactory
+public sealed class LocationAgentFactory(
+    IKernelBuilder kernelBuilder,
+    IOptions<OpenAIOptions> options,
+    ILogger<LocationAgentFactory> logger)
 {
-    private readonly IKernelBuilder _kernelBuilder;
-    private readonly OpenAIOptions _openAIOptions;
-    private readonly ILogger _logger;
-
-    public LocationAgentFactory(
-        IKernelBuilder kernelBuilder,
-        IOptions<OpenAIOptions> options,
-        ILogger<LocationAgentFactory> logger)
-    {
-        _kernelBuilder = kernelBuilder;
-        _openAIOptions = options.Value;
-        _logger = logger;
-    }
+    private readonly OpenAIOptions _openAIOptions = options.Value;
+    private readonly ILogger _logger = logger;
 
     private const string Name = "LocationAgent";
     
     private const string Instructions =
         """
-        You are an assistant helping users to find GPS locations from postal address in Australia.
+        You are an assistant helping users to find GPS locations from postal address.
         """;
 
     public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
     {
-        var kernel = _kernelBuilder.Build();
+        var kernel = kernelBuilder.Build();
         var arguments = new KernelArguments(
             new PromptExecutionSettings
             {
-                ModelId = _openAIOptions.ModelId,
+                ModelId = _openAIOptions.Agents.ModelId,
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
@@ -63,7 +55,7 @@ public sealed class LocationAgentFactory
 
     public async Task<AssistantAgent> CreateAssistant(CancellationToken cancellationToken = default)
     {
-        var kernel = _kernelBuilder.Build();
+        var kernel = kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
         
         var provider = kernel.Services.GetRequiredService<OpenAIClientProvider>();
@@ -71,7 +63,7 @@ public sealed class LocationAgentFactory
         await foreach (var definition in OpenAIAssistantAgent.ListDefinitionsAsync(provider, cancellationToken))
         {
             if (string.Equals(definition.Name, Name, StringComparison.OrdinalIgnoreCase)
-                && string.Equals(definition.ModelId, _openAIOptions.ModelId))
+                && string.Equals(definition.ModelId, _openAIOptions.Agents.ModelId))
             {
                 _logger.LogInformation("OpenAIAssistantAgent {Name} {Id} exists", definition.Name, definition.Id);
                 var openAIAssistantAgent = await OpenAIAssistantAgent.RetrieveAsync(
@@ -85,7 +77,7 @@ public sealed class LocationAgentFactory
             }
         }
 
-        var assistantDefinition = new OpenAIAssistantDefinition(_openAIOptions.ModelId)
+        var assistantDefinition = new OpenAIAssistantDefinition(_openAIOptions.Agents.ModelId)
         {
             Name = Name,
             Instructions = Instructions,
