@@ -76,13 +76,13 @@ public static class DependencyInjection
             kernelBuilder.AddAzureOpenAIChatCompletion(
                 deploymentName: openAIOptions.Agents.DeploymentName,
                 azureOpenAIClient: azureOpenAIClient,
-                serviceId: nameof(openAIOptions.Agents),
+                serviceId: nameof(openAIOptions.Agents).ToLowerInvariant(),
                 modelId: openAIOptions.Agents.ModelId);
             
             kernelBuilder.AddAzureOpenAIChatCompletion(
                 deploymentName: openAIOptions.Assistants.DeploymentName,
                 azureOpenAIClient: azureOpenAIClient,
-                serviceId: nameof(openAIOptions.Assistants),
+                serviceId: nameof(openAIOptions.Assistants).ToLowerInvariant(),
                 modelId: openAIOptions.Assistants.ModelId);
 
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));

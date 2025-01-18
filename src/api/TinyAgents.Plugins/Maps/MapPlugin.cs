@@ -11,9 +11,9 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
     private const int DefaultResultSize = 5;
 
     [KernelFunction(nameof(GetPosition))]
-    [Description("Get GPS latitude and longitude for a given postal address, postcode, suburbs in Australia")]
+    [Description("Get GPS latitude and longitude for a given postal address, postcode, suburbs.")]
     public async Task<GeoPosition?> GetPosition(
-        [Description("Postal address, postcode, suburbs in Australia to search for")]
+        [Description("Postal address, postcode, suburbs to search for")]
         string location,
         CancellationToken cancellationToken = default)
     {
@@ -31,7 +31,7 @@ public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
     }
 
     [KernelFunction(nameof(GetAddress))]
-    [Description("Get the address for a given GPS latitude and longitude in Australia")]
+    [Description("Get the address for a given GPS latitude and longitude.")]
     public async Task<string?> GetAddress(
         [Description("GPS latitude")] double latitude,
         [Description("GPS longitude")] double longitude,

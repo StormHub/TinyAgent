@@ -1,19 +1,29 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <NoWarn>SKEXP0001,SKEXP0010,SKEXP0020,SKEXP0040,SKEXP0050,SKEXP0060,SKEXP0070,SKEXP0101,SKEXP0110</NoWarn>
-        <UserSecretsId>308D85F6-3713-4F90-B4B2-DA828CFE788B</UserSecretsId>
+        <UserSecretsId>2A6CB7DD-D6D9-4C94-84F3-80C03B8D1922</UserSecretsId>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="appsettings.Development.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
     <ItemGroup>
         <Using Include="System"/>
         <Using Include="System.Collections"/>
         <Using Include="System.Collections.Generic"/>
+        <Using Include="System.Collections.Generic"/>
         <Using Include="System.Linq"/>
+        <Using Include="System.Text"/>
         <Using Include="System.Text"/>
         <Using Include="System.Threading"/>
         <Using Include="System.Threading.Tasks"/>
@@ -25,16 +35,10 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
-        <PackageReference Include="Serilog" Version="4.2.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TinyAgents.SemanticKernel\TinyAgents.SemanticKernel.csproj"/>
+      <ProjectReference Include="..\TinyAgents.SemanticKernel\TinyAgents.SemanticKernel.csproj" />
     </ItemGroup>
 
 </Project>

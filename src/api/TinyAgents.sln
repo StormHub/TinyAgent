@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Local", "TinyAge
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Plugins", "TinyAgents.Plugins\TinyAgents.Plugins.csproj", "{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyAgents.Hosting", "TinyAgents.Hosting\TinyAgents.Hosting.csproj", "{29EF505F-44BE-4F5F-BD37-565B9ADF8353}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEECA3E2-F3D0-4179-815E-87B9B4501E8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29EF505F-44BE-4F5F-BD37-565B9ADF8353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29EF505F-44BE-4F5F-BD37-565B9ADF8353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29EF505F-44BE-4F5F-BD37-565B9ADF8353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29EF505F-44BE-4F5F-BD37-565B9ADF8353}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
