@@ -28,7 +28,11 @@ internal static class HubHostBuilder
         }
 
         builder.Services.AddSignalR()
-            .AddJsonProtocol(options => { options.PayloadSerializerOptions.Setup(); });
+            .AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Setup();
+            });
+        
         builder.Services.AddAgents(builder.Environment);
 
         var app = builder.Build();

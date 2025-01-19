@@ -20,12 +20,37 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAgents(this IServiceCollection services, IHostEnvironment environment)
     {
+        services.AddMapPlugin(environment);
+        services.AddSearchPlugin(environment);
+        
+        services.AddTransient<LocationAgentFactory>();
+        services.AddTransient<SearchAgentFactory>();
+
+        return services.AddKernelBuilder(environment,
+            (kernelBuilder, provider) =>
+            {
+                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<MapPlugin>());
+                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
+            });
+    }
+
+    public static IServiceCollection AddFlows(this IServiceCollection services, IHostEnvironment environment)
+    {
+        services.AddSearchPlugin(environment);
+        
+        return services.AddKernelBuilder(environment,
+            (kernelBuilder, provider) =>
+            {
+                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
+            });
+    }    
+
+    private static IServiceCollection AddKernelBuilder(this IServiceCollection services,
+        IHostEnvironment environment, Action<IKernelBuilder, IServiceProvider> configureKernelBuilder)
+    {
         services.AddOptions<OpenAIOptions>()
             .BindConfiguration(nameof(OpenAIOptions))
             .ValidateDataAnnotations();
-
-        services.AddMapPlugin();
-        services.AddSearchPlugin();
 
         if (environment.IsDevelopment())
         {
@@ -86,17 +111,11 @@ public static class DependencyInjection
                 modelId: openAIOptions.Assistants.ModelId);
 
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));
-            
-            kernelBuilder.Services.AddSingleton(provider.GetRequiredService<MapPlugin>());
-            kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
-            
+            configureKernelBuilder(kernelBuilder, provider);
             kernelBuilder.Services.AddSingleton(provider.GetRequiredService<ILoggerFactory>());
 
             return kernelBuilder;
         });
-        
-        services.AddTransient<LocationAgentFactory>();
-        services.AddTransient<SearchAgentFactory>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using Azure.Core.Pipeline;
 using Azure.Identity;
 using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
@@ -14,14 +15,26 @@ namespace TinyAgents.Plugins;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddMapPlugin(this IServiceCollection services)
+    public static IServiceCollection AddMapPlugin(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<MapOptions>()
             .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
+        if (environment.IsDevelopment())
+        {
+            services.AddTransient<TraceHttpHandler>();
+        }
+        
         var builder = services.AddHttpClient(nameof(MapsSearchClient));
-        builder.AddStandardResilienceHandler();
+        if (environment.IsProduction())
+        {
+            builder.AddStandardResilienceHandler();
+        }
+        if (environment.IsDevelopment())
+        {
+            builder.AddHttpMessageHandler<TraceHttpHandler>();
+        }
 
         services.AddTransient(provider =>
         {
@@ -51,7 +64,6 @@ public static class DependencyInjection
                 {
                     Transport = new HttpClientTransport(httpClient)
                 });
-
         });
 
         services.AddTransient<MapPlugin>();
@@ -59,16 +71,27 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddSearchPlugin(this IServiceCollection services)
+    public static IServiceCollection AddSearchPlugin(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<SearchOptions>()
             .BindConfiguration(nameof(SearchOptions))
             .ValidateDataAnnotations();
 
-        services.AddTransient<TraceHttpHandler>();
+        
+        if (environment.IsDevelopment())
+        {
+            services.AddTransient<TraceHttpHandler>();
+        }
+        
         var builder = services.AddHttpClient(nameof(BingConnector));
-        builder.AddHttpMessageHandler<TraceHttpHandler>();
-        // builder.AddStandardResilienceHandler();
+        if (environment.IsProduction())
+        {
+            builder.AddStandardResilienceHandler();
+        }
+        if (environment.IsDevelopment())
+        {
+            builder.AddHttpMessageHandler<TraceHttpHandler>();
+        }
         
         services.AddTransient(provider =>
         {

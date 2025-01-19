@@ -26,6 +26,8 @@
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
         <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.33.0-alpha" />
         <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.33.0-alpha" />
+        <PackageReference Include="Microsoft.SemanticKernel.Experimental.Orchestration.Flow" Version="1.33.0-alpha" />
+        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.33.0-alpha" />
     </ItemGroup>
 
     <ItemGroup>
