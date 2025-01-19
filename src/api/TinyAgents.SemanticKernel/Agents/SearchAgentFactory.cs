@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using TinyAgents.Plugins.Search;
 
 namespace TinyAgents.SemanticKernel.Agents;
@@ -24,10 +25,11 @@ public sealed class SearchAgentFactory(
     {
         var kernel = kernelBuilder.Build();
         var arguments = new KernelArguments(
-            new PromptExecutionSettings
+            new AzureOpenAIPromptExecutionSettings
             {
                 ModelId = _openAIOptions.Agents.ModelId,
-                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
+                Temperature = 0
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
         return new ChatHistoryAgent(chatCompletionAgent, history);
