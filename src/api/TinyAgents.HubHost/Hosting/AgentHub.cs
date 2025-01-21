@@ -15,9 +15,9 @@ internal sealed class AgentHub(
 
     public override async Task OnConnectedAsync()
     {
-        ChatHistoryAgent? agent = default;
+        AgentProxy? agent = default;
         if (Context.Items.TryGetValue(Context.ConnectionId, out var value)
-            && value is ChatHistoryAgent locationAgent)
+            && value is AgentProxy locationAgent)
         {
             agent = locationAgent;
             _logger.LogInformation("Connected {ConnectionId} {Assistant}.", Context.ConnectionId, agent.GetType().Name);
@@ -37,7 +37,7 @@ internal sealed class AgentHub(
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         if (Context.Items.TryGetValue(AgentKey, out var item)
-            && item is ChatHistoryAgent agent)
+            && item is AgentProxy agent)
         {
             _logger.LogInformation("Disconnected {ConnectionId} {AgentName}", Context.ConnectionId,
                 agent.GetType().Name);
@@ -50,7 +50,7 @@ internal sealed class AgentHub(
     public Task Restart()
     {
         if (Context.Items.TryGetValue(AgentKey, out var item)
-            && item is ChatHistoryAgent agent)
+            && item is AgentProxy agent)
         {
             agent.ClearHistory();
         }
@@ -63,10 +63,10 @@ internal sealed class AgentHub(
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!Context.Items.TryGetValue(AgentKey, out var item)
-            || item is not ChatHistoryAgent agent)
+            || item is not AgentProxy agent)
             yield break;
 
-        await foreach (var message in agent.Invoke(input, cancellationToken))
+        await foreach (var message in agent.Invoke(input, cancellationToken: cancellationToken))
         {
             yield return message;
         }

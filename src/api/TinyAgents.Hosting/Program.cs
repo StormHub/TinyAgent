@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using TinyAgents.SemanticKernel;
+using TinyAgents.SemanticKernel.Agents;
 
 IHost? host = default;
 
@@ -29,23 +29,15 @@ try
     var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
     await using (var scope = host.Services.CreateAsyncScope())
     {
-        var builder = scope.ServiceProvider.GetRequiredService<IKernelBuilder>();
-        var kernel = builder.Build();
-
         var history = new ChatHistory();
-        history.AddUserMessage("Whats the charger type of tesla model 3?");
-        var executionSettings = new PromptExecutionSettings
+        var factory = scope.ServiceProvider.GetRequiredService<SearchAgentFactory>();
+        var agentProxy = await factory.CreateAgent(history);
+        var response = agentProxy.Invoke(
+            input: "Whats the charger type of tesla model 3?", cancellationToken: lifetime.ApplicationStopping);
+        await foreach (var message in response)
         {
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-        };
-        
-        var chatCompletion = kernel.Services.GetRequiredKeyedService<IChatCompletionService>("assistants");
-        var response = await chatCompletion.GetChatMessageContentAsync(
-            history,
-            executionSettings: executionSettings,
-            kernel: kernel,
-            cancellationToken: lifetime.ApplicationStopping);
-        Console.WriteLine(response.Content);
+            Console.WriteLine(message.Content);
+        }
     }
 
     lifetime.StopApplication();

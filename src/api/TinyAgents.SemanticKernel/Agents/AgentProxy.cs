@@ -6,25 +6,28 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
-public sealed class ChatHistoryAgent
+public sealed class AgentProxy
 {
     private readonly ChatCompletionAgent _agent;
     private readonly ChatHistory _history;
     private readonly ILogger _logger;
 
-    internal ChatHistoryAgent(ChatCompletionAgent agent, ChatHistory? history = default)
+    internal AgentProxy(ChatCompletionAgent agent, ChatHistory? history = default)
     {
         _agent = agent;
         _history = history ?? [];
-        _logger = agent.LoggerFactory.CreateLogger<ChatHistoryAgent>();
+        _logger = agent.LoggerFactory.CreateLogger<AgentProxy>();
     }
 
     public void ClearHistory() => _history.Clear();
     
-    public async IAsyncEnumerable<ChatMessageContent> Invoke(string input, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ChatMessageContent> Invoke(
+        string input, 
+        KernelArguments? arguments = null, 
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         _history.Add(new ChatMessageContent(AuthorRole.User, input));
-        await foreach (var content in _agent.InvokeAsync(_history, cancellationToken: cancellationToken))
+        await foreach (var content in _agent.InvokeAsync(_history, arguments, cancellationToken: cancellationToken))
         {
             _logger.LogInformation("{Name} {Content}", _agent.Name, content.Content);
             yield return content;

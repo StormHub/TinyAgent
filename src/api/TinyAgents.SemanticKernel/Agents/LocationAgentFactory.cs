@@ -25,7 +25,7 @@ public sealed class LocationAgentFactory(
         You are an assistant helping users to find GPS locations from postal address.
         """;
 
-    public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default)
+    public async Task<AgentProxy> CreateAgent(ChatHistory? history = default)
     {
         var kernel = kernelBuilder.Build();
         var arguments = new KernelArguments(
@@ -36,7 +36,7 @@ public sealed class LocationAgentFactory(
                 Temperature = 0
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
-        return new ChatHistoryAgent(chatCompletionAgent, history);
+        return new AgentProxy(chatCompletionAgent, history);
     }
     
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
