@@ -19,7 +19,7 @@ public sealed class SearchPlugin
     [KernelFunction]
     [Description("Search the web for the latest information.")]
     public async Task<IReadOnlyCollection<WebPage>> Search(
-        [Description("Text to search for")] string query,
+        [Description("Search query")] string query,
         [Description("Number of results")] int count = 5,
         [Description("Number of results to skip")] int offset = 0,
         CancellationToken cancellationToken = default)

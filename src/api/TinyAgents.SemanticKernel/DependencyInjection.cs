@@ -34,17 +34,6 @@ public static class DependencyInjection
             });
     }
 
-    public static IServiceCollection AddFlows(this IServiceCollection services, IHostEnvironment environment)
-    {
-        services.AddSearchPlugin(environment);
-        
-        return services.AddKernelBuilder(environment,
-            (kernelBuilder, provider) =>
-            {
-                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
-            });
-    }    
-
     private static IServiceCollection AddKernelBuilder(this IServiceCollection services,
         IHostEnvironment environment, Action<IKernelBuilder, IServiceProvider> configureKernelBuilder)
     {

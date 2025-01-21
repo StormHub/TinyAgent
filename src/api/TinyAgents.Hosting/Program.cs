@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using TinyAgents.SemanticKernel;
 
 IHost? host = default;
@@ -22,7 +21,6 @@ try
         .ConfigureServices((builderContext, services) =>
         {
             services.AddAgents(builderContext.HostingEnvironment);
-
         }).Build();
 
     await host.StartAsync();
@@ -30,11 +28,15 @@ try
     var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
     await using (var scope = host.Services.CreateAsyncScope())
     {
-        var kernelBuilder = scope.ServiceProvider.GetRequiredService<IKernelBuilder>();
-        var kernel = kernelBuilder.Build();
-        var service = kernel.Services.GetRequiredKeyedService<IChatCompletionService>("assistants");
-        var response = await service.GetChatMessageContentAsync("Who are you?");
-        Console.WriteLine(response);
+        var builder = scope.ServiceProvider.GetRequiredService<IKernelBuilder>();
+        var kernel = builder.Build();
+
+        var response = await kernel.InvokePromptAsync("Who are you?",
+            new KernelArguments(new PromptExecutionSettings
+            {
+                ServiceId = "agents"
+            }));
+        Console.WriteLine(response.GetValue<string>());
     }
 
     lifetime.StopApplication();

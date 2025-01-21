@@ -77,7 +77,6 @@ public static class DependencyInjection
             .BindConfiguration(nameof(SearchOptions))
             .ValidateDataAnnotations();
 
-        
         if (environment.IsDevelopment())
         {
             services.AddTransient<TraceHttpHandler>();
@@ -103,7 +102,6 @@ public static class DependencyInjection
                 apiKey: searchOptions.ApiKey, 
                 httpClient: httpClient, 
                 loggerFactory: provider.GetRequiredService<ILoggerFactory>());
-            
             return new SearchPlugin(bingConnector, provider.GetRequiredService<ILoggerFactory>());
         });
 
