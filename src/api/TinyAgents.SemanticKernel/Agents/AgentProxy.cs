@@ -26,7 +26,19 @@ public sealed class AgentProxy
         KernelArguments? arguments = null, 
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        _history.Add(new ChatMessageContent(AuthorRole.User, input));
+        var messageContent = new ChatMessageContent(AuthorRole.User, input);
+        await foreach (var content in Invoke(messageContent, arguments, cancellationToken))
+        {
+            yield return content;
+        }
+    }
+    
+    public async IAsyncEnumerable<ChatMessageContent> Invoke(
+        ChatMessageContent messageContent, 
+        KernelArguments? arguments = null, 
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        _history.Add(messageContent);
         await foreach (var content in _agent.InvokeAsync(_history, arguments, cancellationToken: cancellationToken))
         {
             _logger.LogInformation("{Name} {Content}", _agent.Name, content.Content);
