@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
 using TinyAgents.SemanticKernel;
 
 IHost? host = default;
@@ -31,12 +32,20 @@ try
         var builder = scope.ServiceProvider.GetRequiredService<IKernelBuilder>();
         var kernel = builder.Build();
 
-        var response = await kernel.InvokePromptAsync("Who are you?",
-            new KernelArguments(new PromptExecutionSettings
-            {
-                ServiceId = "agents"
-            }));
-        Console.WriteLine(response.GetValue<string>());
+        var history = new ChatHistory();
+        history.AddUserMessage("Whats the charger type of tesla model 3?");
+        var executionSettings = new PromptExecutionSettings
+        {
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+        };
+        
+        var chatCompletion = kernel.Services.GetRequiredKeyedService<IChatCompletionService>("assistants");
+        var response = await chatCompletion.GetChatMessageContentAsync(
+            history,
+            executionSettings: executionSettings,
+            kernel: kernel,
+            cancellationToken: lifetime.ApplicationStopping);
+        Console.WriteLine(response.Content);
     }
 
     lifetime.StopApplication();
