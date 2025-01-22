@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
+using TinyAgents.Hosting;
 using TinyAgents.SemanticKernel;
 using TinyAgents.SemanticKernel.Agents;
 
@@ -40,13 +40,24 @@ try
             {
                 ServiceId = "agents",
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
-                Temperature = 0,
-                ResponseFormat = ChatResponseFormat.Json
+                Temperature = 0
             });
         var agentProxy = await factory.CreateAgent(history, arguments);
-        
+        history.AddUserMessage(
+            $$$"""
+            Question: 
+            What are the charger types of tesla model 3?
+            
+            Respond in JSON format with the following JSON schema:
+            {{{JsonResponse.JsonSchema()}}}
+            """);
+
         var response = agentProxy.Invoke(
-            input: "Whats the charger type of tesla model 3?", 
+            new KernelArguments(
+                new AzureOpenAIPromptExecutionSettings
+                {
+                    ResponseFormat = JsonResponse.JsonSchema()
+                }),
             cancellationToken: lifetime.ApplicationStopping);
         await foreach (var message in response)
         {

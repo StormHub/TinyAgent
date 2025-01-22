@@ -6,12 +6,32 @@ namespace TinyAgents.SemanticKernel.Json;
 
 using ChatResponseFormat = OpenAI.Chat.ChatResponseFormat;
 
-internal static class ResponseFormat
+public static class ResponseFormat
 {
-    public static ChatResponseFormat Json<T>(string? description = default, JsonSerializerOptions? jsonSerializerOptions = default) 
+    public static ChatResponseFormat Json<T>(
+        string? description = default, 
+        AIJsonSchemaCreateOptions? inferenceOptions = default, 
+        JsonSerializerOptions? jsonSerializerOptions = default) 
         where T : class
     {
-        var inferenceOptions = new AIJsonSchemaCreateOptions
+        var text = JsonSchema<T>(description, inferenceOptions, jsonSerializerOptions);
+        
+        var kernelJsonSchema = KernelJsonSchema.Parse(text);
+        var jsonSchemaData = BinaryData.FromObjectAsJson(kernelJsonSchema, jsonSerializerOptions);
+
+        return ChatResponseFormat.CreateJsonSchemaFormat(
+            nameof(T).ToLowerInvariant(),
+            jsonSchemaData,
+            jsonSchemaIsStrict: true);
+    }    
+
+    public static string JsonSchema<T>(
+        string? description = default,
+        AIJsonSchemaCreateOptions? inferenceOptions = default, 
+        JsonSerializerOptions? jsonSerializerOptions = default) 
+        where T : class
+    {
+        inferenceOptions ??= new AIJsonSchemaCreateOptions
         {
             IncludeSchemaKeyword = false,
             DisallowAdditionalProperties = true,
@@ -22,15 +42,6 @@ internal static class ResponseFormat
             description: description,
             serializerOptions: jsonSerializerOptions,
             inferenceOptions: inferenceOptions);
-        var text = jsonElement.GetRawText();
-        
-        var kernelJsonSchema = KernelJsonSchema.Parse(text);
-        var jsonSchemaData = BinaryData.FromObjectAsJson(kernelJsonSchema, jsonSerializerOptions);
-
-        return ChatResponseFormat.CreateJsonSchemaFormat(
-            nameof(T).ToLowerInvariant(),
-            jsonSchemaData,
-            jsonSchemaIsStrict: true);
+        return jsonElement.GetRawText();
     }    
-    
 }

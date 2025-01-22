@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
+using TinyAgents.SemanticKernel.Json;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
@@ -20,7 +21,7 @@ public sealed class AgentProxy
     }
 
     public void ClearHistory() => _history.Clear();
-    
+
     public async IAsyncEnumerable<ChatMessageContent> Invoke(
         string input, 
         KernelArguments? arguments = null, 
@@ -39,6 +40,16 @@ public sealed class AgentProxy
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         _history.Add(messageContent);
+        await foreach (var content in Invoke(arguments, cancellationToken: cancellationToken))
+        {
+            yield return content;
+        }
+    }
+    
+    public async IAsyncEnumerable<ChatMessageContent> Invoke(
+        KernelArguments? arguments = null, 
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
         await foreach (var content in _agent.InvokeAsync(_history, arguments, cancellationToken: cancellationToken))
         {
             _history.Add(content);
