@@ -25,10 +25,10 @@ public sealed class LocationAgentFactory(
         You are an assistant helping users to find GPS locations from postal address.
         """;
 
-    public async Task<AgentProxy> CreateAgent(ChatHistory? history = default)
+    public async Task<AgentProxy> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
     {
         var kernel = kernelBuilder.Build();
-        var arguments = new KernelArguments(
+        arguments ??= new KernelArguments(
             new AzureOpenAIPromptExecutionSettings
             {
                 ModelId = _openAIOptions.Agents.ModelId,
@@ -38,7 +38,7 @@ public sealed class LocationAgentFactory(
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
         return new AgentProxy(chatCompletionAgent, history);
     }
-    
+
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
     {
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());

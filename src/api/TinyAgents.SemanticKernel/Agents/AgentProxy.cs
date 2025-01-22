@@ -41,6 +41,7 @@ public sealed class AgentProxy
         _history.Add(messageContent);
         await foreach (var content in _agent.InvokeAsync(_history, arguments, cancellationToken: cancellationToken))
         {
+            _history.Add(content);
             _logger.LogInformation("{Name} {Content}", _agent.Name, content.Content);
             yield return content;
         }

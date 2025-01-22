@@ -21,10 +21,10 @@ public sealed class SearchAgentFactory(
         You are an assistant helping users search the web for the latest information.
         """;
     
-    public async Task<AgentProxy> CreateAgent(ChatHistory? history = default)
+    public async Task<AgentProxy> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
     {
         var kernel = kernelBuilder.Build();
-        var arguments = new KernelArguments(
+        arguments ??= new KernelArguments(
             new AzureOpenAIPromptExecutionSettings
             {
                 ModelId = _openAIOptions.Agents.ModelId,
