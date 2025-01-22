@@ -6,5 +6,5 @@ public record Charger(string Type, string Description);
 
 public sealed class JsonResponse
 {
-    public static string JsonSchema() => ResponseFormat.JsonSchema<Charger[]>();
+    public static string JsonSchema() => ResponseFormat.JsonSchema<Charger[]>().GetRawText();
 }

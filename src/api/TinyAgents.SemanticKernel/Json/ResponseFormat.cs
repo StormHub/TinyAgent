@@ -14,9 +14,9 @@ public static class ResponseFormat
         JsonSerializerOptions? jsonSerializerOptions = default) 
         where T : class
     {
-        var text = JsonSchema<T>(description, inferenceOptions, jsonSerializerOptions);
+        var jsonSchema = JsonSchema<T>(description, inferenceOptions, jsonSerializerOptions);
         
-        var kernelJsonSchema = KernelJsonSchema.Parse(text);
+        var kernelJsonSchema = KernelJsonSchema.Parse(jsonSchema.GetRawText());
         var jsonSchemaData = BinaryData.FromObjectAsJson(kernelJsonSchema, jsonSerializerOptions);
 
         return ChatResponseFormat.CreateJsonSchemaFormat(
@@ -25,7 +25,7 @@ public static class ResponseFormat
             jsonSchemaIsStrict: true);
     }    
 
-    public static string JsonSchema<T>(
+    public static JsonElement JsonSchema<T>(
         string? description = default,
         AIJsonSchemaCreateOptions? inferenceOptions = default, 
         JsonSerializerOptions? jsonSerializerOptions = default) 
@@ -37,11 +37,10 @@ public static class ResponseFormat
             DisallowAdditionalProperties = true,
         };
 
-        var jsonElement = AIJsonUtilities.CreateJsonSchema(
+        return AIJsonUtilities.CreateJsonSchema(
             typeof(T),
             description: description,
             serializerOptions: jsonSerializerOptions,
             inferenceOptions: inferenceOptions);
-        return jsonElement.GetRawText();
     }    
 }
