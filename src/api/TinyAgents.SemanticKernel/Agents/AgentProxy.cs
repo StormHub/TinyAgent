@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
-using TinyAgents.SemanticKernel.Json;
 
 namespace TinyAgents.SemanticKernel.Agents;
 

@@ -6,7 +6,7 @@ using Microsoft.SemanticKernel;
 
 namespace TinyAgents.Plugins.Maps;
 
-public sealed class MapPlugin(MapsSearchClient mapsSearchClient)
+public sealed class LocationPlugin(MapsSearchClient mapsSearchClient)
 {
     private const int DefaultResultSize = 5;
 

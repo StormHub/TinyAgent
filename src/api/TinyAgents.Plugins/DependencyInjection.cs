@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Core.Pipeline;
 using Azure.Identity;
+using Azure.Maps.Routing;
 using Azure.Maps.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,8 +67,37 @@ public static class DependencyInjection
                 });
         });
 
-        services.AddTransient<MapPlugin>();
+        services.AddTransient<LocationPlugin>();
 
+        services.AddTransient(provider =>
+        {
+            var mapOptions = provider.GetRequiredService<IOptions<MapOptions>>().Value;
+            if (string.IsNullOrEmpty(mapOptions.ApiKey)
+                && string.IsNullOrEmpty(mapOptions.ClientId))
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(MapsSearchClient)} requires either api key or client id credential.");
+            }
+            
+            var factory = provider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = factory.CreateClient(nameof(MapsSearchClient));
+            var clientOptions = new MapsRoutingClientOptions
+            {
+                Transport = new HttpClientTransport(httpClient)
+            };
+
+            if (!string.IsNullOrEmpty(mapOptions.ApiKey))
+                return new MapsRoutingClient(
+                    new AzureKeyCredential(mapOptions.ApiKey),
+                    clientOptions);
+
+            return new MapsRoutingClient(
+                new DefaultAzureCredential(),
+                mapOptions.ClientId,
+                clientOptions);
+        });
+        services.AddTransient<RoutingPlugin>();
+        
         return services;
     }
 

@@ -41,7 +41,7 @@ public sealed class LocationAgentFactory(
 
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
     {
-        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
+        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<LocationPlugin>());
 
         var chatCompletionAgent = new ChatCompletionAgent
         {
@@ -58,7 +58,7 @@ public sealed class LocationAgentFactory(
     public async Task<AssistantAgent> CreateAssistant(CancellationToken cancellationToken = default)
     {
         var kernel = kernelBuilder.Build();
-        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<MapPlugin>());
+        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<LocationPlugin>());
         
         var provider = kernel.Services.GetRequiredService<OpenAIClientProvider>();
 

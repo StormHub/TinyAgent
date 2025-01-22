@@ -29,7 +29,7 @@ public static class DependencyInjection
         return services.AddKernelBuilder(environment,
             (kernelBuilder, provider) =>
             {
-                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<MapPlugin>());
+                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<LocationPlugin>());
                 kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
             });
     }
