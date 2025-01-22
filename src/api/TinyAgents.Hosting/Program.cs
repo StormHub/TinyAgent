@@ -44,21 +44,15 @@ try
             });
         var agentProxy = await factory.CreateAgent(history, arguments);
         history.AddUserMessage(
-            $$$"""
+            $"""
             Question: 
             What are the charger types of tesla model 3?
             
             Respond in JSON format with the following JSON schema:
-            {{{JsonResponse.JsonSchema()}}}
+            {JsonResponse.JsonSchema()}
             """);
 
-        var response = agentProxy.Invoke(
-            new KernelArguments(
-                new AzureOpenAIPromptExecutionSettings
-                {
-                    ResponseFormat = JsonResponse.JsonSchema()
-                }),
-            cancellationToken: lifetime.ApplicationStopping);
+        var response = agentProxy.Invoke(cancellationToken: lifetime.ApplicationStopping);
         await foreach (var message in response)
         {
             Console.WriteLine(message.Content);
