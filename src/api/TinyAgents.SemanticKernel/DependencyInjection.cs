@@ -31,6 +31,8 @@ public static class DependencyInjection
             {
                 kernelBuilder.Services.AddSingleton(provider.GetRequiredService<LocationPlugin>());
                 kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
+                kernelBuilder.Services.AddSingleton(provider.GetRequiredService<RoutingPlugin>());
+
             });
     }
 

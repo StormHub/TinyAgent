@@ -6,7 +6,7 @@ using TinyAgents.SemanticKernel.Agents;
 namespace TinyAgents.HubHost.Hosting;
 
 internal sealed class AgentHub(
-    SearchAgentFactory searchAgentFactory,
+    LocationAgentFactory agentFactory,
     ILogger<AgentHub> logger) : Hub
 {
     private const string AgentKey = nameof(AgentKey);
@@ -27,7 +27,7 @@ internal sealed class AgentHub(
         {
             _logger.LogInformation("Connected {ConnectionId} build agents", Context.ConnectionId);
             
-            agent = await searchAgentFactory.CreateAgent();
+            agent = await agentFactory.CreateAgent();
             Context.Items.Add(AgentKey, agent);
         }
 

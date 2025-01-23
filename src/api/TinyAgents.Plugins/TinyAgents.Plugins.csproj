@@ -18,16 +18,16 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="Azure.Maps.Routing" Version="1.0.0-beta.4" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
         <PackageReference Include="Azure.Identity" Version="1.13.2" />
         <PackageReference Include="Azure.Maps.Search" Version="2.0.0-beta.4" />
+        <PackageReference Include="Azure.Maps.Routing" Version="1.0.0-beta.4" />
         <PackageReference Include="Microsoft.Spatial" Version="8.2.3" />
-        <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
-        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" Version="1.33.0-alpha" />
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.34.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" Version="1.34.0-alpha" />
     </ItemGroup>
 
     <ItemGroup>

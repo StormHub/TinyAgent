@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using TinyAgents.Hosting;
 using TinyAgents.SemanticKernel;
 using TinyAgents.SemanticKernel.Agents;
@@ -35,19 +33,12 @@ try
         var history = new ChatHistory();
         var factory = scope.ServiceProvider.GetRequiredService<SearchAgentFactory>();
 
-        var arguments = new KernelArguments(
-            new AzureOpenAIPromptExecutionSettings
-            {
-                ServiceId = "agents",
-                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
-                Temperature = 0
-            });
-        var agentProxy = await factory.CreateAgent(history, arguments);
+        var agentProxy = await factory.CreateAgent(history);
         history.AddUserMessage(
             $"""
-            Question: 
+            Question:
             What are the charger types of tesla model 3?
-            
+
             Respond in JSON format with the following JSON schema:
             {JsonResponse.JsonSchema()}
             """);

@@ -12,7 +12,7 @@ public sealed class LocationPlugin(MapsSearchClient mapsSearchClient)
 
     [KernelFunction(nameof(GetPosition))]
     [Description("Get GPS latitude and longitude for a given postal address, postcode, suburbs.")]
-    public async Task<GeoPosition?> GetPosition(
+    public async Task<GeographyPoint?> GetPosition(
         [Description("Postal address, postcode, suburbs to search for")]
         string location,
         CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ public sealed class LocationPlugin(MapsSearchClient mapsSearchClient)
             cancellationToken);
 
         return response.Value.Features.Count > 0
-            ? response.Value.Features[0].Geometry.Coordinates
+            ? GeographyPoint.FromGeoPoint(response.Value.Features[0].Geometry)
             : default;
     }
 

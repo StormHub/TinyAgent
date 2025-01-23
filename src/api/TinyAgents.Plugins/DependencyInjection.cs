@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Azure;
 using Azure.Core.Pipeline;
+using Azure.Core.Serialization;
 using Azure.Identity;
 using Azure.Maps.Routing;
 using Azure.Maps.Search;
@@ -66,7 +68,6 @@ public static class DependencyInjection
                     Transport = new HttpClientTransport(httpClient)
                 });
         });
-
         services.AddTransient<LocationPlugin>();
 
         services.AddTransient(provider =>

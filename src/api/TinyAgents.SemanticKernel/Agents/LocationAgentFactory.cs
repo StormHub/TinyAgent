@@ -22,7 +22,7 @@ public sealed class LocationAgentFactory(
     
     private const string Instructions =
         """
-        You are an assistant helping users to find GPS locations from postal address.
+        You are an assistant helping users to find driving routes from a given origin postal address to a destinationf postal address.
         """;
 
     public async Task<AgentProxy> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
@@ -42,6 +42,7 @@ public sealed class LocationAgentFactory(
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
     {
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<LocationPlugin>());
+        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<RoutingPlugin>());
 
         var chatCompletionAgent = new ChatCompletionAgent
         {
@@ -59,6 +60,7 @@ public sealed class LocationAgentFactory(
     {
         var kernel = kernelBuilder.Build();
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<LocationPlugin>());
+        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<RoutingPlugin>());
         
         var provider = kernel.Services.GetRequiredService<OpenAIClientProvider>();
 

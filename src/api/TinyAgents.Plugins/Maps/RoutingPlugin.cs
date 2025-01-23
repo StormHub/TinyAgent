@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using Azure.Core.GeoJson;
 using Azure.Maps.Routing;
 using Azure.Maps.Routing.Models;
 using Microsoft.SemanticKernel;
@@ -9,10 +8,10 @@ namespace TinyAgents.Plugins.Maps;
 public sealed class RoutingPlugin(MapsRoutingClient mapsRoutingClient)
 {
     [KernelFunction(nameof(GetRouteDirection))]
-    [Description("Get GPS route directions for a given GPS origin and GPS destination")]
+    [Description("Get GPS route directions for a given GPS origin and destination")]
     public async Task<IReadOnlyCollection<RouteInstructionGroup>> GetRouteDirection(
-        [Description("The original GPS latitude and longitude to route from")] GeoPosition origin, 
-        [Description("The destination GPS latitude and longitude to route to")] GeoPosition destination,
+        [Description("The origin GPS latitude and longitude to route from")] GeographyPoint origin, 
+        [Description("The destination GPS latitude and longitude to route to")] GeographyPoint destination,
         CancellationToken cancellationToken = default)
     {
         var options = new RouteDirectionOptions
@@ -22,7 +21,9 @@ public sealed class RoutingPlugin(MapsRoutingClient mapsRoutingClient)
             InstructionsType = RouteInstructionsType.Text
         };
         
-        var query = new RouteDirectionQuery([ origin, destination ], options);
+        var query = new RouteDirectionQuery(
+            routePoints: [ origin.AsGeoPosition(), destination.AsGeoPosition() ], 
+            options);
         var response = await mapsRoutingClient.GetDirectionsAsync(query, cancellationToken);
         
         var routes = new List<RouteInstructionGroup>();

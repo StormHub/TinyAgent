@@ -23,9 +23,9 @@
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.1" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
         <PackageReference Include="Azure.Identity" Version="1.13.2" />
-        <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
-        <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.33.0-alpha" />
-        <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.33.0-alpha" />
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.34.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.34.0-alpha" />
+        <PackageReference Include="Microsoft.SemanticKernel.Agents.OpenAI" Version="1.34.0-alpha" />
     </ItemGroup>
 
     <ItemGroup>
