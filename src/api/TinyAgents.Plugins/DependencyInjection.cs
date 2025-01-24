@@ -1,7 +1,5 @@
-using System.Text.Json;
 using Azure;
 using Azure.Core.Pipeline;
-using Azure.Core.Serialization;
 using Azure.Identity;
 using Azure.Maps.Routing;
 using Azure.Maps.Search;
@@ -18,7 +16,7 @@ namespace TinyAgents.Plugins;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddMapPlugin(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddMap(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<MapOptions>()
             .BindConfiguration(nameof(MapOptions))
@@ -102,7 +100,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddSearchPlugin(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddSearch(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<SearchOptions>()
             .BindConfiguration(nameof(SearchOptions))
@@ -113,7 +111,7 @@ public static class DependencyInjection
             services.AddTransient<TraceHttpHandler>();
         }
         
-        var builder = services.AddHttpClient(nameof(BingConnector));
+        var builder = services.AddHttpClient(nameof(BingTextSearch));
         if (environment.IsProduction())
         {
             builder.AddStandardResilienceHandler();
@@ -122,19 +120,23 @@ public static class DependencyInjection
         {
             builder.AddHttpMessageHandler<TraceHttpHandler>();
         }
-        
+
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = factory.CreateClient(nameof(BingConnector));
-
+            var httpClient = factory.CreateClient(nameof(BingTextSearch));
             var searchOptions = provider.GetRequiredService<IOptions<SearchOptions>>().Value;
-            var bingConnector = new BingConnector(
-                apiKey: searchOptions.ApiKey, 
-                httpClient: httpClient, 
-                loggerFactory: provider.GetRequiredService<ILoggerFactory>());
-            return new SearchPlugin(bingConnector, provider.GetRequiredService<ILoggerFactory>());
+            
+            var textSearchOptions = new BingTextSearchOptions
+            {
+                HttpClient = httpClient,
+                LoggerFactory = provider.GetRequiredService<ILoggerFactory>()
+            };
+            
+           return new BingTextSearch(apiKey: searchOptions.ApiKey, textSearchOptions);
         });
+        
+        services.AddTransient<SearchPlugin>();
 
         return services;
     }

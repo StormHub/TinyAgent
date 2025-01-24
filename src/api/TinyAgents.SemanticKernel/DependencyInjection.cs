@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
+using Microsoft.SemanticKernel.Data;
 using TinyAgents.Plugins;
 using TinyAgents.Plugins.Maps;
 using TinyAgents.Plugins.Search;
@@ -20,24 +21,25 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAgents(this IServiceCollection services, IHostEnvironment environment)
     {
-        services.AddMapPlugin(environment);
-        services.AddSearchPlugin(environment);
+        services.AddMap(environment);
+        services.AddSearch(environment);
         
         services.AddTransient<LocationAgentFactory>();
         services.AddTransient<SearchAgentFactory>();
 
-        return services.AddKernelBuilder(environment,
+        return services.AddKernelBuilder(
             (kernelBuilder, provider) =>
             {
                 kernelBuilder.Services.AddSingleton(provider.GetRequiredService<LocationPlugin>());
                 kernelBuilder.Services.AddSingleton(provider.GetRequiredService<SearchPlugin>());
                 kernelBuilder.Services.AddSingleton(provider.GetRequiredService<RoutingPlugin>());
-
-            });
+            },
+            environment);
     }
 
     private static IServiceCollection AddKernelBuilder(this IServiceCollection services,
-        IHostEnvironment environment, Action<IKernelBuilder, IServiceProvider> configureKernelBuilder)
+        Action<IKernelBuilder, IServiceProvider> configureKernelBuilder, 
+        IHostEnvironment environment)
     {
         services.AddOptions<OpenAIOptions>()
             .BindConfiguration(nameof(OpenAIOptions))
