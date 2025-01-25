@@ -21,7 +21,7 @@ public sealed class SearchAgentFactory(
         You are an assistant helping users search the web for the latest information.
         """;
     
-    public async Task<AgentProxy> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
+    public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
     {
         var kernel = kernelBuilder.Build();
         arguments ??= new KernelArguments(
@@ -32,7 +32,7 @@ public sealed class SearchAgentFactory(
                 Temperature = 0
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
-        return new AgentProxy(chatCompletionAgent, history);
+        return new ChatHistoryAgent(chatCompletionAgent, history);
     }
     
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)

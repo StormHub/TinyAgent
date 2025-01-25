@@ -38,13 +38,16 @@ public sealed class SearchPlugin
 
         return await Search(query, searchOptions, cancellationToken);
     }
-    
+
     private async Task<IReadOnlyCollection<TextSearchResult>> Search(
         string query,
         TextSearchOptions searchOptions, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
-        var response = await _bingTextSearch.GetTextSearchResultsAsync(query, searchOptions, cancellationToken);
+        var response = await _bingTextSearch.GetTextSearchResultsAsync(
+            query, 
+            searchOptions,
+            cancellationToken);
         var results = new List<TextSearchResult>();
         await foreach (var result in response.Results.WithCancellation(cancellationToken))
         {
