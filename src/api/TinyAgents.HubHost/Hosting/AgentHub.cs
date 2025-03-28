@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.SemanticKernel;
 using TinyAgents.SemanticKernel.Agents;
+using TinyAgents.SemanticKernel.AzureAI;
 
 namespace TinyAgents.HubHost.Hosting;
 
