@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Serilog.Events;
 using TinyAgents.SemanticKernel;
+using TinyAgents.SemanticKernel.AzureAI;
 using TinyAgents.Shared.Json;
 
 namespace TinyAgents.HubHost.Hosting;
@@ -33,7 +34,7 @@ internal static class HubHostBuilder
                 options.PayloadSerializerOptions.Setup();
             });
         
-        builder.Services.AddAgents(builder.Environment);
+        builder.Services.AddAzureAgents(builder.Environment);
 
         var app = builder.Build();
 

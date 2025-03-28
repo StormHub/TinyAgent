@@ -2,7 +2,7 @@
 
 namespace TinyAgents.SemanticKernel.AzureAI;
 
-public sealed class AzureAIConfiguration
+public sealed class AzureConfiguration
 {
     [Required] 
     public required string Endpoint { get; init; }

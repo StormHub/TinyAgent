@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TinyAgents.Hosting;
-using TinyAgents.SemanticKernel;
 using TinyAgents.SemanticKernel.Agents;
+using TinyAgents.SemanticKernel.AzureAI;
 
 IHost? host = default;
 
@@ -21,7 +21,7 @@ try
         })
         .ConfigureServices((builderContext, services) =>
         {
-            services.AddAgents(builderContext.HostingEnvironment);
+            services.AddAzureAgents(builderContext.HostingEnvironment);
         }).Build();
 
     await host.StartAsync();

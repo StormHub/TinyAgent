@@ -12,14 +12,13 @@ using TinyAgents.Plugins;
 using TinyAgents.Plugins.Maps;
 using TinyAgents.Plugins.Search;
 using TinyAgents.SemanticKernel.Agents;
-using TinyAgents.SemanticKernel.AzureAI;
 using TinyAgents.Shared.Http;
 
-namespace TinyAgents.SemanticKernel;
+namespace TinyAgents.SemanticKernel.AzureAI;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddAgents(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddAzureAgents(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddMap(environment);
         services.AddSearch(environment);
@@ -41,8 +40,8 @@ public static class DependencyInjection
         Action<IKernelBuilder, IServiceProvider> configureKernelBuilder, 
         IHostEnvironment environment)
     {
-        services.AddOptions<AzureAIConfiguration>()
-            .BindConfiguration(nameof(AzureAIConfiguration))
+        services.AddOptions<AzureConfiguration>()
+            .BindConfiguration(nameof(AzureConfiguration))
             .ValidateDataAnnotations();
 
         if (environment.IsDevelopment())
@@ -62,7 +61,7 @@ public static class DependencyInjection
         
         services.AddTransient<AzureOpenAIClient>(provider =>
         {
-            var openAIOptions = provider.GetRequiredService<IOptions<AzureAIConfiguration>>().Value;
+            var openAIOptions = provider.GetRequiredService<IOptions<AzureConfiguration>>().Value;
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(AzureOpenAIClient));
 
@@ -86,7 +85,7 @@ public static class DependencyInjection
         
         services.AddTransient(provider =>
         {
-            var azureAIConfiguration = provider.GetRequiredService<IOptions<AzureAIConfiguration>>().Value;
+            var azureAIConfiguration = provider.GetRequiredService<IOptions<AzureConfiguration>>().Value;
             var azureOpenAIClient = provider.GetRequiredService<AzureOpenAIClient>();
 
             var kernelBuilder = Kernel.CreateBuilder();

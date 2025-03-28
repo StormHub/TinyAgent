@@ -11,10 +11,10 @@ namespace TinyAgents.SemanticKernel.Agents;
 
 public sealed class SearchAgentFactory(
     IKernelBuilder kernelBuilder,
-    IOptions<AzureAIConfiguration> options,
+    IOptions<AzureConfiguration> options,
     ILoggerFactory loggerFactory)
 {
-    private readonly AzureAIConfiguration _azureAIConfiguration = options.Value;
+    private readonly AzureConfiguration _azureConfiguration = options.Value;
 
     private const string Name = "SearchAgent";
     
@@ -29,7 +29,7 @@ public sealed class SearchAgentFactory(
         arguments ??= new KernelArguments(
             new AzureOpenAIPromptExecutionSettings
             {
-                ModelId = _azureAIConfiguration.ModelId,
+                ModelId = _azureConfiguration.ModelId,
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
                 Temperature = 0
             });

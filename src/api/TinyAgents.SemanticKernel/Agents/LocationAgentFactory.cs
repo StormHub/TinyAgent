@@ -10,10 +10,10 @@ namespace TinyAgents.SemanticKernel.Agents;
 
 public sealed class LocationAgentFactory(
     IKernelBuilder kernelBuilder,
-    IOptions<AzureAIConfiguration> options,
+    IOptions<AzureConfiguration> options,
     ILoggerFactory loggerFactory)
 {
-    private readonly AzureAIConfiguration _azureAIConfiguration = options.Value;
+    private readonly AzureConfiguration _azureConfiguration = options.Value;
 
     private const string Name = "LocationAgent";
     
@@ -28,7 +28,7 @@ public sealed class LocationAgentFactory(
         arguments ??= new KernelArguments(
             new PromptExecutionSettings
             {
-                ModelId = _azureAIConfiguration.ModelId,
+                ModelId = _azureConfiguration.ModelId,
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
