@@ -14,16 +14,18 @@ public sealed class LocationAgentFactory(
     IOptions<AzureConfiguration> options,
     ILoggerFactory loggerFactory)
 {
-    private readonly AzureConfiguration _azureConfiguration = options.Value;
-
     private const string Name = "LocationAgent";
-    
+
     private const string Instructions =
         """
         You are an assistant helping users to find driving routes from a given origin postal address to a destinationf postal address.
         """;
 
-    public async Task<ChatHistoryAgent> CreateAgent(KernelArguments? arguments = default, ChatHistoryAgentThread? agentThread = default)
+    private readonly AzureConfiguration _azureConfiguration = options.Value;
+
+    public async Task<ChatHistoryAgent> CreateAgent(
+        KernelArguments? arguments = default,
+        ChatHistoryAgentThread? agentThread = default)
     {
         var kernel = kernelBuilder.Build();
         arguments ??= new KernelArguments(

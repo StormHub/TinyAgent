@@ -26,18 +26,18 @@ public sealed class ChatHistoryAgent
 
     public async IAsyncEnumerable<ChatMessageContent> Invoke(
         string input,
-        KernelArguments? arguments = null, 
+        KernelArguments? arguments = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var message = new ChatMessageContent(AuthorRole.User, input);
-        var options = arguments != null 
-            ? new AgentInvokeOptions { KernelArguments = arguments } 
+        var options = arguments != null
+            ? new AgentInvokeOptions { KernelArguments = arguments }
             : default;
         await foreach (var response in _agent.InvokeAsync(
-                           [ message ], 
-                           _agentThread, 
-                           options, 
-                           cancellationToken: cancellationToken))
+                           [message],
+                           _agentThread,
+                           options,
+                           cancellationToken))
         {
             _logger.LogInformation("{Name} {Content}", _agent.Name, response.Message.Content);
             yield return response.Message;

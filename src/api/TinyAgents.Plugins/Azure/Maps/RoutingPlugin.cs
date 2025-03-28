@@ -10,8 +10,10 @@ public sealed class RoutingPlugin(MapsRoutingClient mapsRoutingClient)
     [KernelFunction(nameof(GetRouteDirection))]
     [Description("Get GPS route directions for a given GPS origin and destination")]
     public async Task<IReadOnlyCollection<RouteInstructionGroup>> GetRouteDirection(
-        [Description("The origin GPS latitude and longitude to route from")] GeographyPoint origin, 
-        [Description("The destination GPS latitude and longitude to route to")] GeographyPoint destination,
+        [Description("The origin GPS latitude and longitude to route from")]
+        GeographyPoint origin,
+        [Description("The destination GPS latitude and longitude to route to")]
+        GeographyPoint destination,
         CancellationToken cancellationToken = default)
     {
         var options = new RouteDirectionOptions
@@ -20,17 +22,14 @@ public sealed class RoutingPlugin(MapsRoutingClient mapsRoutingClient)
             TravelMode = TravelMode.Car,
             InstructionsType = RouteInstructionsType.Text
         };
-        
+
         var query = new RouteDirectionQuery(
-            routePoints: [ origin.AsGeoPosition(), destination.AsGeoPosition() ], 
+            [origin.AsGeoPosition(), destination.AsGeoPosition()],
             options);
         var response = await mapsRoutingClient.GetDirectionsAsync(query, cancellationToken);
-        
+
         var routes = new List<RouteInstructionGroup>();
-        foreach (var routeData in response.Value.Routes)
-        {
-            routes.AddRange(routeData.Guidance.InstructionGroups);
-        }
+        foreach (var routeData in response.Value.Routes) routes.AddRange(routeData.Guidance.InstructionGroups);
 
         return routes;
     }

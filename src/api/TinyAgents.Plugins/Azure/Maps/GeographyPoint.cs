@@ -8,12 +8,17 @@ public sealed class GeographyPoint
 
     public required double Latitude { get; init; }
 
-    public static GeographyPoint FromGeoPoint(GeoPoint Geometry) =>
-        new()
+    public static GeographyPoint FromGeoPoint(GeoPoint Geometry)
+    {
+        return new GeographyPoint
         {
             Longitude = Geometry.Coordinates.Longitude,
             Latitude = Geometry.Coordinates.Latitude
         };
-    
-    public GeoPosition AsGeoPosition() => new(longitude: Longitude, latitude: Latitude);
+    }
+
+    public GeoPosition AsGeoPosition()
+    {
+        return new GeoPosition(Longitude, Latitude);
+    }
 }

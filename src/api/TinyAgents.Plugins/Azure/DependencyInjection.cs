@@ -22,30 +22,19 @@ public static class DependencyInjection
             .BindConfiguration(nameof(MapOptions))
             .ValidateDataAnnotations();
 
-        if (environment.IsDevelopment())
-        {
-            services.AddTransient<TraceHttpHandler>();
-        }
-        
+        if (environment.IsDevelopment()) services.AddTransient<TraceHttpHandler>();
+
         var builder = services.AddHttpClient(nameof(MapsSearchClient));
-        if (environment.IsProduction())
-        {
-            builder.AddStandardResilienceHandler();
-        }
-        if (environment.IsDevelopment())
-        {
-            builder.AddHttpMessageHandler<TraceHttpHandler>();
-        }
+        if (environment.IsProduction()) builder.AddStandardResilienceHandler();
+        if (environment.IsDevelopment()) builder.AddHttpMessageHandler<TraceHttpHandler>();
 
         services.AddTransient(provider =>
         {
             var mapOptions = provider.GetRequiredService<IOptions<MapOptions>>().Value;
             if (string.IsNullOrEmpty(mapOptions.ApiKey)
                 && string.IsNullOrEmpty(mapOptions.ClientId))
-            {
                 throw new InvalidOperationException(
                     $"{nameof(MapsSearchClient)} requires either api key or client id credential.");
-            }
 
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(MapsSearchClient));
@@ -73,11 +62,9 @@ public static class DependencyInjection
             var mapOptions = provider.GetRequiredService<IOptions<MapOptions>>().Value;
             if (string.IsNullOrEmpty(mapOptions.ApiKey)
                 && string.IsNullOrEmpty(mapOptions.ClientId))
-            {
                 throw new InvalidOperationException(
                     $"{nameof(MapsSearchClient)} requires either api key or client id credential.");
-            }
-            
+
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(MapsSearchClient));
             var clientOptions = new MapsRoutingClientOptions
@@ -96,7 +83,7 @@ public static class DependencyInjection
                 clientOptions);
         });
         services.AddTransient<RoutingPlugin>();
-        
+
         return services;
     }
 
@@ -106,36 +93,27 @@ public static class DependencyInjection
             .BindConfiguration(nameof(SearchOptions))
             .ValidateDataAnnotations();
 
-        if (environment.IsDevelopment())
-        {
-            services.AddTransient<TraceHttpHandler>();
-        }
-        
+        if (environment.IsDevelopment()) services.AddTransient<TraceHttpHandler>();
+
         var builder = services.AddHttpClient(nameof(BingTextSearch));
-        if (environment.IsProduction())
-        {
-            builder.AddStandardResilienceHandler();
-        }
-        if (environment.IsDevelopment())
-        {
-            builder.AddHttpMessageHandler<TraceHttpHandler>();
-        }
+        if (environment.IsProduction()) builder.AddStandardResilienceHandler();
+        if (environment.IsDevelopment()) builder.AddHttpMessageHandler<TraceHttpHandler>();
 
         services.AddTransient(provider =>
         {
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(BingTextSearch));
             var searchOptions = provider.GetRequiredService<IOptions<SearchOptions>>().Value;
-            
+
             var textSearchOptions = new BingTextSearchOptions
             {
                 HttpClient = httpClient,
                 LoggerFactory = provider.GetRequiredService<ILoggerFactory>()
             };
-            
-           return new BingTextSearch(apiKey: searchOptions.ApiKey, textSearchOptions);
+
+            return new BingTextSearch(searchOptions.ApiKey, textSearchOptions);
         });
-        
+
         services.AddTransient<SearchPlugin>();
 
         return services;

@@ -14,16 +14,18 @@ public sealed class SearchAgentFactory(
     IOptions<AzureConfiguration> options,
     ILoggerFactory loggerFactory)
 {
-    private readonly AzureConfiguration _azureConfiguration = options.Value;
-
     private const string Name = "SearchAgent";
-    
+
     private const string Instructions =
         """
         You are an assistant helping users search the web for the latest information.
         """;
-    
-    public async Task<ChatHistoryAgent> CreateAgent(KernelArguments? arguments = default, ChatHistoryAgentThread? agentThread = default)
+
+    private readonly AzureConfiguration _azureConfiguration = options.Value;
+
+    public async Task<ChatHistoryAgent> CreateAgent(
+        KernelArguments? arguments = default,
+        ChatHistoryAgentThread? agentThread = default)
     {
         var kernel = kernelBuilder.Build();
         arguments ??= new KernelArguments(
@@ -36,7 +38,7 @@ public sealed class SearchAgentFactory(
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
         return new ChatHistoryAgent(chatCompletionAgent, agentThread, loggerFactory.CreateLogger<ChatHistoryAgent>());
     }
-    
+
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
     {
         kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<SearchPlugin>());

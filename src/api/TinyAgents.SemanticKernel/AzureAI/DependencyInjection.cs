@@ -8,11 +8,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
-using TinyAgents.Plugins;
 using TinyAgents.Plugins.Azure;
 using TinyAgents.Plugins.Azure.Maps;
 using TinyAgents.Plugins.Azure.Search;
-using TinyAgents.SemanticKernel.Agents;
 using TinyAgents.Shared.Http;
 
 namespace TinyAgents.SemanticKernel.AzureAI;
@@ -23,7 +21,7 @@ public static class DependencyInjection
     {
         services.AddMap(environment);
         services.AddSearch(environment);
-        
+
         services.AddTransient<LocationAgentFactory>();
         services.AddTransient<SearchAgentFactory>();
 
@@ -37,29 +35,21 @@ public static class DependencyInjection
             environment);
     }
 
-    private static IServiceCollection AddKernelBuilder(this IServiceCollection services,
-        Action<IKernelBuilder, IServiceProvider> configureKernelBuilder, 
+    private static IServiceCollection AddKernelBuilder(
+        this IServiceCollection services,
+        Action<IKernelBuilder, IServiceProvider> configureKernelBuilder,
         IHostEnvironment environment)
     {
         services.AddOptions<AzureConfiguration>()
             .BindConfiguration(nameof(AzureConfiguration))
             .ValidateDataAnnotations();
 
-        if (environment.IsDevelopment())
-        {
-            services.AddTransient<TraceHttpHandler>();
-        }
-        
+        if (environment.IsDevelopment()) services.AddTransient<TraceHttpHandler>();
+
         var builder = services.AddHttpClient(nameof(AzureOpenAIClient));
-        if (environment.IsProduction())
-        {
-            builder.AddStandardResilienceHandler();
-        }
-        if (environment.IsDevelopment())
-        {
-            builder.AddHttpMessageHandler<TraceHttpHandler>();
-        }
-        
+        if (environment.IsProduction()) builder.AddStandardResilienceHandler();
+        if (environment.IsDevelopment()) builder.AddHttpMessageHandler<TraceHttpHandler>();
+
         services.AddTransient<AzureOpenAIClient>(provider =>
         {
             var openAIOptions = provider.GetRequiredService<IOptions<AzureConfiguration>>().Value;
@@ -80,22 +70,22 @@ public static class DependencyInjection
                     new Uri(openAIOptions.Endpoint),
                     new DefaultAzureCredential(),
                     clientOptions);
-            
+
             return azureOpenAIClient;
         });
-        
+
         services.AddTransient(provider =>
         {
             var azureAIConfiguration = provider.GetRequiredService<IOptions<AzureConfiguration>>().Value;
             var azureOpenAIClient = provider.GetRequiredService<AzureOpenAIClient>();
 
             var kernelBuilder = Kernel.CreateBuilder();
-            
+
             kernelBuilder.AddAzureOpenAIChatCompletion(
-                deploymentName: azureAIConfiguration.DeploymentName,
-                azureOpenAIClient: azureOpenAIClient,
-                serviceId: nameof(azureAIConfiguration).ToLowerInvariant(),
-                modelId: azureAIConfiguration.ModelId);
+                azureAIConfiguration.DeploymentName,
+                azureOpenAIClient,
+                nameof(azureAIConfiguration).ToLowerInvariant(),
+                azureAIConfiguration.ModelId);
 
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));
             configureKernelBuilder(kernelBuilder, provider);
