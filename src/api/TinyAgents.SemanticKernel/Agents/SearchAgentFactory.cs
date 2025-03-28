@@ -1,18 +1,20 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using TinyAgents.Plugins.Search;
+using TinyAgents.SemanticKernel.AzureAI;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
 public sealed class SearchAgentFactory(
     IKernelBuilder kernelBuilder,
-    IOptions<OpenAIOptions> options)
+    IOptions<AzureAIConfiguration> options,
+    ILoggerFactory loggerFactory)
 {
-    private readonly OpenAIOptions _openAIOptions = options.Value;
+    private readonly AzureAIConfiguration _azureAIConfiguration = options.Value;
 
     private const string Name = "SearchAgent";
     
@@ -21,18 +23,18 @@ public sealed class SearchAgentFactory(
         You are an assistant helping users search the web for the latest information.
         """;
     
-    public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
+    public async Task<ChatHistoryAgent> CreateAgent(ChatHistoryAgentThread? agentThread = default, KernelArguments? arguments = default)
     {
         var kernel = kernelBuilder.Build();
         arguments ??= new KernelArguments(
             new AzureOpenAIPromptExecutionSettings
             {
-                ModelId = _openAIOptions.Agents.ModelId,
+                ModelId = _azureAIConfiguration.ModelId,
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
                 Temperature = 0
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
-        return new ChatHistoryAgent(chatCompletionAgent, history);
+        return new ChatHistoryAgent(chatCompletionAgent, agentThread, loggerFactory.CreateLogger<ChatHistoryAgent>());
     }
     
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)

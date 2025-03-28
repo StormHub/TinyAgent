@@ -20,7 +20,7 @@ internal sealed class AgentHub(
             && value is ChatHistoryAgent locationAgent)
         {
             agent = locationAgent;
-            _logger.LogInformation("Connected {ConnectionId} {Assistant}.", Context.ConnectionId, agent.GetType().Name);
+            _logger.LogInformation("Connected {ConnectionId} {Agent}.", Context.ConnectionId, agent.GetType().Name);
         }
 
         if (agent is null)
@@ -47,14 +47,13 @@ internal sealed class AgentHub(
     }
 
     // ReSharper disable once UnusedMember.Global
-    public Task Restart()
+    public async Task Restart()
     {
         if (Context.Items.TryGetValue(AgentKey, out var item)
             && item is ChatHistoryAgent agent)
         {
-            agent.History.Clear();
+            await agent.DeleteThread(Context.ConnectionAborted);
         }
-        return Task.CompletedTask;
     }
 
     // ReSharper disable once UnusedMember.Global
@@ -66,8 +65,7 @@ internal sealed class AgentHub(
             || item is not ChatHistoryAgent agent)
             yield break;
 
-        agent.History.AddUserMessage(input);
-        await foreach (var message in agent.Invoke(cancellationToken: cancellationToken))
+        await foreach (var message in agent.Invoke(input, cancellationToken: cancellationToken))
         {
             yield return message;
         }

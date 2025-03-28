@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
-using Microsoft.SemanticKernel.Data;
 using TinyAgents.Plugins;
 using TinyAgents.Plugins.Maps;
 using TinyAgents.Plugins.Search;
 using TinyAgents.SemanticKernel.Agents;
+using TinyAgents.SemanticKernel.AzureAI;
 using TinyAgents.Shared.Http;
 
 namespace TinyAgents.SemanticKernel;
@@ -41,8 +41,8 @@ public static class DependencyInjection
         Action<IKernelBuilder, IServiceProvider> configureKernelBuilder, 
         IHostEnvironment environment)
     {
-        services.AddOptions<OpenAIOptions>()
-            .BindConfiguration(nameof(OpenAIOptions))
+        services.AddOptions<AzureAIConfiguration>()
+            .BindConfiguration(nameof(AzureAIConfiguration))
             .ValidateDataAnnotations();
 
         if (environment.IsDevelopment())
@@ -62,7 +62,7 @@ public static class DependencyInjection
         
         services.AddTransient<AzureOpenAIClient>(provider =>
         {
-            var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+            var openAIOptions = provider.GetRequiredService<IOptions<AzureAIConfiguration>>().Value;
             var factory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = factory.CreateClient(nameof(AzureOpenAIClient));
 
@@ -86,22 +86,16 @@ public static class DependencyInjection
         
         services.AddTransient(provider =>
         {
-            var openAIOptions = provider.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+            var azureAIConfiguration = provider.GetRequiredService<IOptions<AzureAIConfiguration>>().Value;
             var azureOpenAIClient = provider.GetRequiredService<AzureOpenAIClient>();
 
             var kernelBuilder = Kernel.CreateBuilder();
             
             kernelBuilder.AddAzureOpenAIChatCompletion(
-                deploymentName: openAIOptions.Agents.DeploymentName,
+                deploymentName: azureAIConfiguration.DeploymentName,
                 azureOpenAIClient: azureOpenAIClient,
-                serviceId: nameof(openAIOptions.Agents).ToLowerInvariant(),
-                modelId: openAIOptions.Agents.ModelId);
-            
-            kernelBuilder.AddAzureOpenAIChatCompletion(
-                deploymentName: openAIOptions.Assistants.DeploymentName,
-                azureOpenAIClient: azureOpenAIClient,
-                serviceId: nameof(openAIOptions.Assistants).ToLowerInvariant(),
-                modelId: openAIOptions.Assistants.ModelId);
+                serviceId: nameof(azureAIConfiguration).ToLowerInvariant(),
+                modelId: azureAIConfiguration.ModelId);
 
             kernelBuilder.Services.AddSingleton(OpenAIClientProvider.FromClient(azureOpenAIClient));
             configureKernelBuilder(kernelBuilder, provider);

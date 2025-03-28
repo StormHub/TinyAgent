@@ -3,20 +3,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.Agents.OpenAI;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using TinyAgents.Plugins.Maps;
+using TinyAgents.SemanticKernel.AzureAI;
 
 namespace TinyAgents.SemanticKernel.Agents;
 
 public sealed class LocationAgentFactory(
     IKernelBuilder kernelBuilder,
-    IOptions<OpenAIOptions> options,
-    ILogger<LocationAgentFactory> logger)
+    IOptions<AzureAIConfiguration> options,
+    ILoggerFactory loggerFactory)
 {
-    private readonly OpenAIOptions _openAIOptions = options.Value;
-    private readonly ILogger _logger = logger;
+    private readonly AzureAIConfiguration _azureAIConfiguration = options.Value;
 
     private const string Name = "LocationAgent";
     
@@ -25,18 +22,17 @@ public sealed class LocationAgentFactory(
         You are an assistant helping users to find driving routes from a given origin postal address to a destinationf postal address.
         """;
 
-    public async Task<ChatHistoryAgent> CreateAgent(ChatHistory? history = default, KernelArguments? arguments = default)
+    public async Task<ChatHistoryAgent> CreateAgent(ChatHistoryAgentThread? agentThread = default, KernelArguments? arguments = default)
     {
         var kernel = kernelBuilder.Build();
         arguments ??= new KernelArguments(
-            new AzureOpenAIPromptExecutionSettings
+            new PromptExecutionSettings
             {
-                ModelId = _openAIOptions.Agents.ModelId,
+                ModelId = _azureAIConfiguration.ModelId,
                 FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
-                Temperature = 0
             });
         var chatCompletionAgent = await CreateChatCompletionAgent(kernel, arguments);
-        return new ChatHistoryAgent(chatCompletionAgent, history);
+        return new ChatHistoryAgent(chatCompletionAgent, agentThread, loggerFactory.CreateLogger<ChatHistoryAgent>());
     }
 
     internal static Task<ChatCompletionAgent> CreateChatCompletionAgent(Kernel kernel, KernelArguments arguments)
@@ -54,50 +50,5 @@ public sealed class LocationAgentFactory(
         };
 
         return Task.FromResult(chatCompletionAgent);
-    }
-
-    public async Task<AssistantAgent> CreateAssistant(CancellationToken cancellationToken = default)
-    {
-        var kernel = kernelBuilder.Build();
-        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<LocationPlugin>());
-        kernel.Plugins.AddFromObject(kernel.Services.GetRequiredService<RoutingPlugin>());
-        
-        var provider = kernel.Services.GetRequiredService<OpenAIClientProvider>();
-
-        await foreach (var definition in OpenAIAssistantAgent.ListDefinitionsAsync(provider, cancellationToken))
-        {
-            if (string.Equals(definition.Name, Name, StringComparison.OrdinalIgnoreCase)
-                && string.Equals(definition.ModelId, _openAIOptions.Agents.ModelId))
-            {
-                _logger.LogInformation("OpenAIAssistantAgent {Name} {Id} exists", definition.Name, definition.Id);
-                var openAIAssistantAgent = await OpenAIAssistantAgent.RetrieveAsync(
-                    provider,
-                    definition.Id,
-                    kernel,
-                    default,
-                    default,
-                    cancellationToken);
-                return new AssistantAgent(openAIAssistantAgent);
-            }
-        }
-
-        var assistantDefinition = new OpenAIAssistantDefinition(_openAIOptions.Agents.ModelId)
-        {
-            Name = Name,
-            Instructions = Instructions,
-            Temperature = 0,
-            TopP = 0,
-        };
-
-        var agent = await OpenAIAssistantAgent.CreateAsync(
-            provider,
-            assistantDefinition,
-            kernel,
-            default,
-            cancellationToken);
-        
-        _logger.LogInformation("OpenAIAssistantAgent {Name} {Id} created", agent.Name, agent.Id);
-
-        return new AssistantAgent(agent);
     }
 }

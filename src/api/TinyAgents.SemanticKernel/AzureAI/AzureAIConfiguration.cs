@@ -1,21 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TinyAgents.SemanticKernel;
+namespace TinyAgents.SemanticKernel.AzureAI;
 
-public sealed class OpenAIOptions
+public sealed class AzureAIConfiguration
 {
     [Required] 
     public required string Endpoint { get; init; }
 
     public string? ApiKey { get; init; }
     
-    public required OpenAIDeployment Agents { get; init; }
-    
-    public required OpenAIDeployment Assistants { get; init; }
-}
-
-public sealed class OpenAIDeployment
-{
     [Required(AllowEmptyStrings = false)] 
     public required string DeploymentName { get; init; }
 

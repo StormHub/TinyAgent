@@ -9,26 +9,38 @@ namespace TinyAgents.SemanticKernel.Agents;
 public sealed class ChatHistoryAgent
 {
     private readonly ChatCompletionAgent _agent;
+    private readonly ChatHistoryAgentThread _agentThread;
     private readonly ILogger _logger;
 
-    internal ChatHistoryAgent(ChatCompletionAgent agent, ChatHistory? history = default)
+    internal ChatHistoryAgent(ChatCompletionAgent agent, ChatHistoryAgentThread? agentThread, ILogger logger)
     {
         _agent = agent;
-        History = history ?? [];
-        _logger = agent.LoggerFactory.CreateLogger<ChatHistoryAgent>();
+        _agentThread = agentThread ?? new();
+        _logger = logger;
     }
 
-    public ChatHistory History { get; }
+    public async Task DeleteThread(CancellationToken cancellationToken = default)
+    {
+        await _agentThread.DeleteAsync(cancellationToken);
+    }
 
     public async IAsyncEnumerable<ChatMessageContent> Invoke(
+        string input,
         KernelArguments? arguments = null, 
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var content in _agent.InvokeAsync(History, arguments, cancellationToken: cancellationToken))
+        var message = new ChatMessageContent(AuthorRole.User, input);
+        var options = arguments != null 
+            ? new AgentInvokeOptions { KernelArguments = arguments } 
+            : default;
+        await foreach (var response in _agent.InvokeAsync(
+                           [ message ], 
+                           _agentThread, 
+                           options, 
+                           cancellationToken: cancellationToken))
         {
-            History.Add(content);
-            _logger.LogInformation("{Name} {Content}", _agent.Name, content.Content);
-            yield return content;
+            _logger.LogInformation("{Name} {Content}", _agent.Name, response.Message.Content);
+            yield return response.Message;
         }
     }
 }

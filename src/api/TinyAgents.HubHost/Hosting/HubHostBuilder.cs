@@ -43,7 +43,6 @@ internal static class HubHostBuilder
         }
         
         app.MapHub<AgentHub>("/agent");
-        app.MapHub<AssistantHub>("/assistant");
 
         return app;
     }
