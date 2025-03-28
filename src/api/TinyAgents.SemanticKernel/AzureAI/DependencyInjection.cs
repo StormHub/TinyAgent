@@ -9,8 +9,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents.OpenAI;
 using TinyAgents.Plugins;
-using TinyAgents.Plugins.Maps;
-using TinyAgents.Plugins.Search;
+using TinyAgents.Plugins.Azure;
+using TinyAgents.Plugins.Azure.Maps;
+using TinyAgents.Plugins.Azure.Search;
 using TinyAgents.SemanticKernel.Agents;
 using TinyAgents.Shared.Http;
 

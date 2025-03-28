@@ -4,7 +4,7 @@ using Azure.Maps.Search;
 using Azure.Maps.Search.Models;
 using Microsoft.SemanticKernel;
 
-namespace TinyAgents.Plugins.Maps;
+namespace TinyAgents.Plugins.Azure.Maps;
 
 public sealed class LocationPlugin(MapsSearchClient mapsSearchClient)
 {

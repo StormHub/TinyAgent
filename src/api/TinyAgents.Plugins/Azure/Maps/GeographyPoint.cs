@@ -1,6 +1,6 @@
 using Azure.Core.GeoJson;
 
-namespace TinyAgents.Plugins.Maps;
+namespace TinyAgents.Plugins.Azure.Maps;
 
 public sealed class GeographyPoint
 {

@@ -3,7 +3,7 @@ using Azure.Maps.Routing;
 using Azure.Maps.Routing.Models;
 using Microsoft.SemanticKernel;
 
-namespace TinyAgents.Plugins.Maps;
+namespace TinyAgents.Plugins.Azure.Maps;
 
 public sealed class RoutingPlugin(MapsRoutingClient mapsRoutingClient)
 {

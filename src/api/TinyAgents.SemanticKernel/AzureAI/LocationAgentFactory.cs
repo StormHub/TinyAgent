@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
-using TinyAgents.Plugins.Maps;
+using TinyAgents.Plugins.Azure.Maps;
 using TinyAgents.SemanticKernel.Agents;
 
 namespace TinyAgents.SemanticKernel.AzureAI;

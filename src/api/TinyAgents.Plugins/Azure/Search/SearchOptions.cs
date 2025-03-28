@@ -1,4 +1,4 @@
-namespace TinyAgents.Plugins.Search;
+namespace TinyAgents.Plugins.Azure.Search;
 
 public sealed class SearchOptions
 {

@@ -8,11 +8,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
-using TinyAgents.Plugins.Maps;
-using TinyAgents.Plugins.Search;
+using TinyAgents.Plugins.Azure.Maps;
+using TinyAgents.Plugins.Azure.Search;
 using TinyAgents.Shared.Http;
 
-namespace TinyAgents.Plugins;
+namespace TinyAgents.Plugins.Azure;
 
 public static class DependencyInjection
 {

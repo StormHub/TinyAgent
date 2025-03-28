@@ -4,7 +4,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Data;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
 
-namespace TinyAgents.Plugins.Search;
+namespace TinyAgents.Plugins.Azure.Search;
 
 public sealed class SearchPlugin
 {
