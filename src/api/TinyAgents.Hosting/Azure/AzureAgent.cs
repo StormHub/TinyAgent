@@ -1,8 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TinyAgents.SemanticKernel.AzureAI;
+using TinyAgents.SemanticKernel.Json;
 
 namespace TinyAgents.Hosting.Azure;
+
+public record Charger(string Type, string Description);
 
 internal static class AzureAgent
 {
@@ -25,7 +28,7 @@ internal static class AzureAgent
                  What are the charger types of tesla model 3?
 
                  Respond in JSON format with the following JSON schema:
-                 {JsonResponse.JsonSchema()}
+                 {ResponseFormat.JsonSchema<Charger[]>().GetRawText()}
                  """;
 
             var response = agentProxy.Invoke(input, cancellationToken: lifetime.ApplicationStopping);
