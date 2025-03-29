@@ -16,7 +16,7 @@ namespace TinyAgents.Plugins.Azure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddMap(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddAzureMap(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<MapOptions>()
             .BindConfiguration(nameof(MapOptions))
@@ -87,7 +87,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddSearch(this IServiceCollection services, IHostEnvironment environment)
+    public static IServiceCollection AddAzureBingSearch(this IServiceCollection services, IHostEnvironment environment)
     {
         services.AddOptions<SearchOptions>()
             .BindConfiguration(nameof(SearchOptions))

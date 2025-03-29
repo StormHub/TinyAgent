@@ -19,8 +19,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAzureAgents(this IServiceCollection services, IHostEnvironment environment)
     {
-        services.AddMap(environment);
-        services.AddSearch(environment);
+        services.AddAzureMap(environment);
+        services.AddAzureBingSearch(environment);
 
         services.AddTransient<LocationAgentFactory>();
         services.AddTransient<SearchAgentFactory>();
