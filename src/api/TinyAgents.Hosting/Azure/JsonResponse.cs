@@ -1,6 +1,6 @@
 using TinyAgents.SemanticKernel.Json;
 
-namespace TinyAgents.Hosting;
+namespace TinyAgents.Hosting.Azure;
 
 public record Charger(string Type, string Description);
 
